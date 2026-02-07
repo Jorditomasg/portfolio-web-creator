@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -11,6 +12,7 @@ import { ExperienceModule } from './experience/experience.module';
 import { HeroModule } from './hero/hero.module';
 import { SettingsModule } from './settings/settings.module';
 import { SpecialtiesModule } from './specialties/specialties.module';
+import { ContactModule } from './contact/contact.module';
 import * as entities from './entities';
 
 @Module({
@@ -20,6 +22,12 @@ import * as entities from './entities';
       isGlobal: true,
       envFilePath: '.env',
     }),
+
+    // Rate limiting
+    ThrottlerModule.forRoot([{
+      ttl: 60000,
+      limit: 10,
+    }]),
 
     // TypeORM database connection
     TypeOrmModule.forRootAsync({
@@ -47,6 +55,7 @@ import * as entities from './entities';
     HeroModule,
     SettingsModule,
     SpecialtiesModule,
+    ContactModule,
   ],
   controllers: [AppController],
   providers: [AppService],

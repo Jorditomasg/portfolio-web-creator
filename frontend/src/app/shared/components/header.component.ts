@@ -19,101 +19,7 @@ const FAVICON_ICONS: Record<string, string> = {
   selector: 'app-header',
   standalone: true,
   imports: [RouterLink, RouterLinkActive],
-  template: `
-    <header class="fixed top-0 left-0 right-0 z-50 bg-dark-bg/95 backdrop-blur-md border-b border-dark-border">
-      <nav class="container mx-auto px-6 py-4">
-        <div class="flex items-center justify-between">
-          <!-- Logo with dynamic icon -->
-          <a routerLink="/" class="flex items-center gap-3 text-xl font-bold text-white hover:text-primary transition-colors group">
-            <span class="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center group-hover:bg-primary/30 transition-colors text-primary"
-                  [innerHTML]="getLogoIcon()">
-            </span>
-            <span class="font-mono">{{ contentService.siteTitle() }}</span>
-          </a>
-
-          <!-- Navigation + Language Switch -->
-          <div class="hidden md:flex items-center gap-8">
-            <ul class="flex items-center gap-8">
-              <li>
-                <a routerLink="/" routerLinkActive="text-primary" [routerLinkActiveOptions]="{exact: true}"
-                   class="text-gray-400 hover:text-white transition-colors font-medium">
-                  {{ i18n.t('nav.home') }}
-                </a>
-              </li>
-              <li>
-                <a routerLink="/about" routerLinkActive="text-primary"
-                   class="text-gray-400 hover:text-white transition-colors font-medium">
-                  {{ i18n.t('nav.about') }}
-                </a>
-              </li>
-              <li>
-                <a routerLink="/projects" routerLinkActive="text-primary"
-                   class="text-gray-400 hover:text-white transition-colors font-medium">
-                  {{ i18n.t('nav.projects') }}
-                </a>
-              </li>
-              <li>
-                <a routerLink="/contact" routerLinkActive="text-primary"
-                   class="text-gray-400 hover:text-white transition-colors font-medium">
-                  {{ i18n.t('nav.contact') }}
-                </a>
-              </li>
-              @if (contentService.settings()?.show_admin_link) {
-                <li>
-                  <a routerLink="/admin/login" 
-                     class="flex items-center gap-2 px-3 py-1.5 bg-dark-surface border border-dark-border rounded-lg text-gray-400 hover:text-white hover:border-primary/50 transition-all">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                    </svg>
-                    <span class="text-sm font-medium">Admin</span>
-                  </a>
-                </li>
-              }
-            </ul>
-
-            <!-- Language Switch -->
-            <button (click)="i18n.toggleLanguage()" 
-                    class="flex items-center gap-2 px-3 py-1.5 bg-dark-surface border border-dark-border rounded-lg hover:border-primary/50 transition-colors text-sm">
-              <span class="text-gray-400">{{ i18n.currentLang() === 'es' ? '🇪🇸' : '🇬🇧' }}</span>
-              <span class="text-white font-medium uppercase">{{ i18n.currentLang() }}</span>
-            </button>
-          </div>
-
-          <!-- Mobile menu button -->
-          <button class="md:hidden text-white" (click)="toggleMobileMenu()">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-            </svg>
-          </button>
-        </div>
-
-        <!-- Mobile menu -->
-        @if (mobileMenuOpen()) {
-          <div class="md:hidden mt-4 py-4 border-t border-dark-border">
-            <ul class="flex flex-col gap-4">
-              <li><a routerLink="/" (click)="closeMobileMenu()" class="text-gray-300 hover:text-white">{{ i18n.t('nav.home') }}</a></li>
-              <li><a routerLink="/about" (click)="closeMobileMenu()" class="text-gray-300 hover:text-white">{{ i18n.t('nav.about') }}</a></li>
-              <li><a routerLink="/projects" (click)="closeMobileMenu()" class="text-gray-300 hover:text-white">{{ i18n.t('nav.projects') }}</a></li>
-              <li><a routerLink="/contact" (click)="closeMobileMenu()" class="text-gray-300 hover:text-white">{{ i18n.t('nav.contact') }}</a></li>
-              @if (contentService.settings()?.show_admin_link) {
-                <li>
-                  <a routerLink="/admin/login" (click)="closeMobileMenu()" class="flex items-center gap-2 text-gray-300 hover:text-white">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                    </svg>
-                    Admin
-                  </a>
-                </li>
-              }
-            </ul>
-            <button (click)="i18n.toggleLanguage()" class="mt-4 px-4 py-2 bg-dark-surface border border-dark-border rounded-lg text-white">
-              {{ i18n.currentLang() === 'es' ? '🇪🇸 Español' : '🇬🇧 English' }}
-            </button>
-          </div>
-        }
-      </nav>
-    </header>
-  `,
+  templateUrl: './header.component.html',
 })
 export class HeaderComponent {
   contentService = inject(ContentService);
@@ -130,8 +36,15 @@ export class HeaderComponent {
       this.titleService.setTitle(title);
       
       const settings = this.contentService.settings();
-      if (settings?.favicon_type) {
-        this.updateFavicon(settings.favicon_type, settings.accent_color || '#F5A623');
+      if (settings) {
+        // Update favicon
+        if (settings.favicon_type) {
+          this.updateFavicon(settings.favicon_type, settings.accent_color || '#F5A623');
+        }
+        // Update CSS variables for accent color
+        if (settings.accent_color) {
+          this.updateAccentColor(settings.accent_color);
+        }
       }
     });
   }
@@ -139,12 +52,12 @@ export class HeaderComponent {
   getLogoIcon(): SafeHtml {
     const faviconType = this.contentService.settings()?.favicon_type || 'terminal';
     const svg = FAVICON_ICONS[faviconType] || FAVICON_ICONS['terminal'];
+    // We shouldn't need to replace currentColor here because we use text-primary class in HTML
     return this.sanitizer.bypassSecurityTrustHtml(svg);
   }
 
   updateFavicon(type: string, color: string) {
     const baseSvg = FAVICON_ICONS[type] || FAVICON_ICONS['terminal'];
-    // Remove class for favicon, replace currentColor with actual color
     const svg = baseSvg.replace('class="w-6 h-6" ', '').replace(/currentColor/g, color);
     const encoded = encodeURIComponent(svg);
     const dataUrl = `data:image/svg+xml,${encoded}`;
@@ -157,6 +70,24 @@ export class HeaderComponent {
     }
     link.type = 'image/svg+xml';
     link.href = dataUrl;
+  }
+
+  updateAccentColor(color: string) {
+    const root = this.document.documentElement;
+    root.style.setProperty('--color-primary', color);
+    
+    // Convert hex to RGB for opacity utilities
+    const r = parseInt(color.substr(1, 2), 16);
+    const g = parseInt(color.substr(3, 2), 16);
+    const b = parseInt(color.substr(5, 2), 16);
+    root.style.setProperty('--color-primary-rgb', `${r}, ${g}, ${b}`);
+    
+    // Calculate a darker shade
+    // Simple darkening logic (reduce RGB by 20%)
+    const darkR = Math.max(0, Math.floor(r * 0.8));
+    const darkG = Math.max(0, Math.floor(g * 0.8));
+    const darkB = Math.max(0, Math.floor(b * 0.8));
+    root.style.setProperty('--color-primary-dark', `rgb(${darkR}, ${darkG}, ${darkB})`);
   }
 
   toggleMobileMenu() {

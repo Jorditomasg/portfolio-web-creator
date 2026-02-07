@@ -9,183 +9,7 @@ import { ToastService } from '../../core/services/toast.service';
   selector: 'app-admin-settings',
   standalone: true,
   imports: [FormsModule],
-  template: `
-    <div>
-      <h1 class="text-2xl font-bold text-white mb-8">Configuración General</h1>
-
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <!-- General Settings -->
-        <div class="bg-dark-surface rounded-xl border border-dark-border p-6">
-          <h2 class="text-lg font-semibold text-white mb-4">Sitio Web</h2>
-          <form (ngSubmit)="save()" class="space-y-5">
-            <div>
-              <label class="block text-sm text-gray-400 mb-2">Título del Sitio <span class="text-red-500">*</span></label>
-              <input [(ngModel)]="form.site_title" name="site_title" required
-                     class="w-full px-4 py-3 bg-dark-bg border border-dark-border rounded-lg focus:border-primary outline-none text-white"
-                     placeholder="Portfolio Creator">
-              <p class="mt-1 text-xs text-gray-500">Aparece en la pestaña del navegador y footer</p>
-            </div>
-
-            <div>
-              <label class="block text-sm text-gray-400 mb-2">URL Foto Principal</label>
-              <input [(ngModel)]="form.main_photo_url" name="main_photo_url"
-                     class="w-full px-4 py-3 bg-dark-bg border border-dark-border rounded-lg focus:border-primary outline-none text-white"
-                     placeholder="https://example.com/photo.jpg">
-              @if (form.main_photo_url) {
-                <img [src]="form.main_photo_url" alt="Preview" class="mt-3 w-24 h-24 object-cover rounded-lg border border-dark-border">
-              }
-            </div>
-
-            <div>
-              <label class="block text-sm text-gray-400 mb-2">Meta Descripción (SEO)</label>
-              <textarea [(ngModel)]="form.meta_description" name="meta_description" rows="3"
-                        class="w-full px-4 py-3 bg-dark-bg border border-dark-border rounded-lg focus:border-primary outline-none text-white resize-none"
-                        placeholder="Descripción para motores de búsqueda..."></textarea>
-              <p class="mt-1 text-xs text-gray-500">{{ (form.meta_description || '').length }}/160 caracteres recomendados</p>
-            </div>
-
-            <button type="submit" [disabled]="isSaving()" 
-                    class="w-full py-3 bg-primary hover:bg-primary-dark disabled:opacity-50 text-dark-bg font-semibold rounded-lg transition-colors">
-              {{ isSaving() ? 'Guardando...' : 'Guardar' }}
-            </button>
-          </form>
-        </div>
-
-        <!-- Social Links -->
-        <div class="bg-dark-surface rounded-xl border border-dark-border p-6">
-          <h2 class="text-lg font-semibold text-white mb-4">Redes Sociales & Contacto</h2>
-          <p class="text-gray-400 text-sm mb-6">Deja en blanco los campos que no quieras mostrar</p>
-          
-          <form (ngSubmit)="save()" class="space-y-5">
-            <div>
-              <label class="block text-sm text-gray-400 mb-2">
-                <span class="flex items-center gap-2">
-                  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linkedin/linkedin-original.svg" class="w-4 h-4">
-                  LinkedIn URL
-                </span>
-              </label>
-              <input [(ngModel)]="form.linkedin_url" name="linkedin_url"
-                     class="w-full px-4 py-3 bg-dark-bg border border-dark-border rounded-lg focus:border-primary outline-none text-white"
-                     placeholder="https://linkedin.com/in/tu-perfil">
-            </div>
-
-            <div>
-              <label class="block text-sm text-gray-400 mb-2">
-                <span class="flex items-center gap-2">
-                  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" class="w-4 h-4 invert">
-                  GitHub URL
-                </span>
-              </label>
-              <input [(ngModel)]="form.github_url" name="github_url"
-                     class="w-full px-4 py-3 bg-dark-bg border border-dark-border rounded-lg focus:border-primary outline-none text-white"
-                     placeholder="https://github.com/tu-usuario">
-            </div>
-
-            <div>
-              <label class="block text-sm text-gray-400 mb-2">
-                <span class="flex items-center gap-2">
-                  <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                  </svg>
-                  Email de Contacto
-                </span>
-              </label>
-              <input [(ngModel)]="form.email" name="email" type="email"
-                     class="w-full px-4 py-3 bg-dark-bg border border-dark-border rounded-lg focus:border-primary outline-none text-white"
-                     placeholder="tu@email.com">
-            </div>
-
-            <button type="submit" [disabled]="isSaving()" 
-                    class="w-full py-3 bg-primary hover:bg-primary-dark disabled:opacity-50 text-dark-bg font-semibold rounded-lg transition-colors">
-              {{ isSaving() ? 'Guardando...' : 'Guardar' }}
-            </button>
-          </form>
-        </div>
-
-        <!-- Appearance Settings -->
-        <div class="bg-dark-surface rounded-xl border border-dark-border p-6">
-          <h2 class="text-lg font-semibold text-white mb-4">Apariencia</h2>
-          <p class="text-gray-400 text-sm mb-6">Personaliza el aspecto visual del portfolio</p>
-          
-          <form (ngSubmit)="save()" class="space-y-5">
-            <div>
-              <label class="block text-sm text-gray-400 mb-2">Icono del Sitio (Favicon)</label>
-              <div class="grid grid-cols-3 gap-3">
-                @for (icon of faviconOptions; track icon.value) {
-                  <button type="button" (click)="form.favicon_type = icon.value"
-                          [class]="'p-4 rounded-xl border-2 flex flex-col items-center gap-2 transition-all ' + 
-                                   (form.favicon_type === icon.value ? 'border-primary bg-primary/10' : 'border-dark-border hover:border-gray-600')">
-                    <span class="text-2xl">{{ icon.emoji }}</span>
-                    <span class="text-xs text-gray-400">{{ icon.label }}</span>
-                  </button>
-                }
-              </div>
-            </div>
-
-            <div>
-              <label class="block text-sm text-gray-400 mb-2">Color de Énfasis</label>
-              <div class="flex gap-3">
-                @for (color of accentColors; track color.value) {
-                  <button type="button" (click)="form.accent_color = color.value"
-                          [style.background-color]="color.value"
-                          [class]="'w-12 h-12 rounded-xl border-2 transition-all ' + 
-                                   (form.accent_color === color.value ? 'border-white scale-110' : 'border-transparent hover:scale-105')">
-                  </button>
-                }
-                <div class="flex items-center gap-2">
-                  <input type="color" [(ngModel)]="form.accent_color" name="accent_color" 
-                         class="w-12 h-12 rounded-lg cursor-pointer border-0 bg-transparent">
-                  <span class="text-xs text-gray-500">Custom</span>
-                </div>
-              </div>
-              <p class="mt-2 text-xs text-gray-500">Color actual: <code class="text-primary">{{ form.accent_color }}</code></p>
-            </div>
-
-            <button type="submit" [disabled]="isSaving()" 
-                    class="w-full py-3 bg-primary hover:bg-primary-dark disabled:opacity-50 text-dark-bg font-semibold rounded-lg transition-colors">
-              {{ isSaving() ? 'Guardando...' : 'Guardar' }}
-            </button>
-          </form>
-        </div>
-
-        <!-- Navigation Settings -->
-        <div class="bg-dark-surface rounded-xl border border-dark-border p-6">
-          <h2 class="text-lg font-semibold text-white mb-4">Navegación</h2>
-          <p class="text-gray-400 text-sm mb-6">Configura los enlaces de navegación</p>
-          
-          <form (ngSubmit)="save()" class="space-y-5">
-            <div class="flex items-center justify-between p-4 bg-dark-bg rounded-lg border border-dark-border">
-              <div>
-                <h3 class="text-white font-medium">Mostrar enlace Admin</h3>
-                <p class="text-xs text-gray-500 mt-1">Añade "Admin" al menú de navegación</p>
-              </div>
-              <label class="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" [(ngModel)]="form.show_admin_link" name="show_admin_link" class="sr-only peer">
-                <div class="w-11 h-6 bg-dark-border peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-              </label>
-            </div>
-
-            <div class="p-4 bg-dark-bg/50 rounded-lg border border-dark-border/50">
-              <p class="text-sm text-gray-400">
-                <span class="text-yellow-500">💡</span> Puedes siempre acceder al admin desde <code class="text-primary">/admin/login</code>
-              </p>
-            </div>
-
-            <button type="submit" [disabled]="isSaving()" 
-                    class="w-full py-3 bg-primary hover:bg-primary-dark disabled:opacity-50 text-dark-bg font-semibold rounded-lg transition-colors">
-              {{ isSaving() ? 'Guardando...' : 'Guardar' }}
-            </button>
-          </form>
-        </div>
-      </div>
-
-      @if (saved()) {
-        <div class="mt-6 p-4 bg-green-500/20 text-green-400 rounded-lg text-center border border-green-500/30">
-          ✓ ¡Configuración guardada correctamente!
-        </div>
-      }
-    </div>
-  `,
+  templateUrl: './settings.component.html',
 })
 export class AdminSettingsComponent {
   private http = inject(HttpClient);
@@ -193,7 +17,9 @@ export class AdminSettingsComponent {
   private toast = inject(ToastService);
 
   isSaving = signal(false);
-  saved = signal(false);
+  isSendingTest = signal(false);
+  isDirty = signal(false);
+  initialForm: any = {};
 
   faviconOptions = [
     { value: 'terminal', label: 'Terminal', emoji: '💻' },
@@ -216,7 +42,9 @@ export class AdminSettingsComponent {
   form: any = { 
     site_title: '', main_photo_url: '', meta_description: '', 
     linkedin_url: '', github_url: '', email: '',
-    favicon_type: 'terminal', accent_color: '#F5A623', show_admin_link: false
+    favicon_type: 'terminal', accent_color: '#F5A623', show_admin_link: false,
+    enable_contact_form: true, enable_email_sending: false, enable_database_storage: true,
+    smtp_host: '', smtp_port: 587, smtp_user: '', smtp_pass: '', smtp_secure: false, smtp_require_tls: true, smtp_from: ''
   };
 
   constructor() {
@@ -232,6 +60,21 @@ export class AdminSettingsComponent {
         this.form.favicon_type = settings.favicon_type || 'terminal';
         this.form.accent_color = settings.accent_color || '#F5A623';
         this.form.show_admin_link = settings.show_admin_link || false;
+        
+        // Contact & SMTP
+        this.form.enable_contact_form = settings.enable_contact_form ?? true;
+        this.form.enable_email_sending = settings.enable_email_sending ?? false;
+        this.form.enable_database_storage = settings.enable_database_storage ?? true;
+        this.form.smtp_host = settings.smtp_host || '';
+        this.form.smtp_port = settings.smtp_port || 587;
+        this.form.smtp_user = settings.smtp_user || '';
+        this.form.smtp_pass = settings.smtp_pass || '';
+        this.form.smtp_secure = settings.smtp_secure ?? false;
+        this.form.smtp_require_tls = settings.smtp_require_tls ?? true;
+        this.form.smtp_from = settings.smtp_from || '';
+
+        this.initialForm = JSON.parse(JSON.stringify(this.form));
+        this.checkDirty();
       }
     }, { allowSignalWrites: true });
   }
@@ -249,9 +92,24 @@ export class AdminSettingsComponent {
         favicon_type: this.form.favicon_type,
         accent_color: this.form.accent_color,
         show_admin_link: this.form.show_admin_link,
+        
+        enable_contact_form: this.form.enable_contact_form,
+        enable_email_sending: this.form.enable_email_sending,
+        enable_database_storage: this.form.enable_database_storage,
+        smtp_host: this.form.smtp_host || null,
+        smtp_port: this.form.smtp_port || 587,
+        smtp_user: this.form.smtp_user || null,
+        smtp_pass: this.form.smtp_pass || null,
+        smtp_secure: this.form.smtp_secure,
+        smtp_require_tls: this.form.smtp_require_tls,
+        smtp_from: this.form.smtp_from || null,
       };
       await firstValueFrom(this.http.put('/api/settings', data));
       await this.content.loadAllContent();
+      
+      this.initialForm = JSON.parse(JSON.stringify(this.form));
+      this.checkDirty();
+      
       this.toast.success('Configuración guardada correctamente');
     } catch (err) { 
       console.error('Error saving settings', err);
@@ -259,5 +117,50 @@ export class AdminSettingsComponent {
     }
     finally { this.isSaving.set(false); }
   }
-}
+  
+  checkDirty() {
+    this.isDirty.set(JSON.stringify(this.form) !== JSON.stringify(this.initialForm));
+  }
+  
+  onContactFormToggle() {
+    if (!this.form.enable_contact_form) {
+      this.form.enable_email_sending = false;
+      this.form.enable_database_storage = false;
+    }
+  }
 
+  async sendTestEmail() {
+    this.isSendingTest.set(true);
+    try {
+      // First save settings to ensure backend has latest config to test with
+      // Or we could pass current form data to test endpoint. 
+      // Let's passed form data since we might want to test without saving yet?
+      // Actually usually user saves first. Let's send current form data to the test endpoint.
+      const data = {
+        host: this.form.smtp_host,
+        port: this.form.smtp_port,
+        user: this.form.smtp_user,
+        pass: this.form.smtp_pass,
+        secure: this.form.smtp_secure,
+        require_tls: this.form.smtp_require_tls,
+        from: this.form.smtp_from,
+        to: this.form.email // Send to the configured contact email or logged in user? 
+                            // Using contact email if available, otherwise maybe alert user.
+      };
+      
+      if (!data.to) {
+        this.toast.error('Configura un "Email de Contacto" para recibir la prueba');
+        return;
+      }
+
+      await firstValueFrom(this.http.post('/api/admin/contact/test-email', data));
+      this.toast.success(`Correo de prueba enviado a ${data.to}`);
+    } catch (err: any) {
+      console.error('Error sending test email', err);
+      const errorMsg = err.error?.message || 'Error al enviar correo de prueba';
+      this.toast.error(errorMsg);
+    } finally {
+      this.isSendingTest.set(false);
+    }
+  }
+}

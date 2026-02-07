@@ -7,3 +7,4 @@ export { Experience } from './experience.entity';
 export { HeroContent } from './hero-content.entity';
 export { PortfolioSettings } from './portfolio-settings.entity';
 export { Specialty } from './specialty.entity';
+export { Contact } from './contact.entity';

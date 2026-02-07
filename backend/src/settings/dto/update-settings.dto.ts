@@ -44,4 +44,45 @@ export class UpdateSettingsDto {
   @IsBoolean()
   @IsOptional()
   show_admin_link?: boolean;
+
+  // Contact System Configuration
+  @IsBoolean()
+  @IsOptional()
+  enable_contact_form?: boolean;
+
+  @IsBoolean()
+  @IsOptional()
+  enable_email_sending?: boolean;
+
+  @IsBoolean()
+  @IsOptional()
+  enable_database_storage?: boolean;
+
+  // SMTP Settings
+  @IsString()
+  @IsOptional()
+  smtp_host?: string;
+
+  @IsOptional() // TypeORM might return string or number
+  smtp_port?: number;
+
+  @IsString()
+  @IsOptional()
+  smtp_user?: string;
+
+  @IsString()
+  @IsOptional()
+  smtp_pass?: string;
+
+  @IsBoolean()
+  @IsOptional()
+  smtp_secure?: boolean;
+
+  @IsBoolean()
+  @IsOptional()
+  smtp_require_tls?: boolean;
+
+  @IsString()
+  @IsOptional()
+  smtp_from?: string;
 }

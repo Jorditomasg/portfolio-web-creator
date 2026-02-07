@@ -76,6 +76,16 @@ export interface PortfolioSettings {
   favicon_type: string;
   accent_color: string;
   show_admin_link: boolean;
+  enable_contact_form: boolean;
+  enable_email_sending: boolean;
+  enable_database_storage: boolean;
+  smtp_host: string | null;
+  smtp_port: number | null;
+  smtp_user: string | null;
+  smtp_pass: string | null;
+  smtp_secure: boolean;
+  smtp_require_tls: boolean;
+  smtp_from: string | null;
   created_at: string;
   updated_at: string;
 }

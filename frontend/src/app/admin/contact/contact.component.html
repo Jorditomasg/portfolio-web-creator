@@ -1,0 +1,93 @@
+<div>
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="text-2xl font-bold text-white">Mensajes de Contacto</h1>
+    <div class="px-4 py-2 bg-dark-surface border border-dark-border rounded-lg text-sm text-gray-400">
+      Total: <span class="text-white font-bold ml-1">{{ messages().length }}</span>
+    </div>
+  </div>
+
+  <div class="space-y-4">
+    @for (msg of messages(); track msg.id) {
+      <div class="bg-dark-surface rounded-xl border transition-all duration-300 overflow-hidden"
+           [class.border-l-4]="!msg.read"
+           [class.border-l-primary]="!msg.read"
+           [class.border-dark-border]="msg.read"
+           [class.bg-dark-surface/50]="msg.read">
+        
+        <!-- Header / Summary -->
+        <div class="p-4 flex items-center justify-between cursor-pointer hover:bg-dark-bg/50 transition-colors"
+             (click)="toggleExpand(msg.id)">
+          <div class="flex items-center gap-4 flex-1 min-w-0">
+            <div class="w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold shrink-0"
+                 [class.bg-primary/20]="!msg.read"
+                 [class.text-primary]="!msg.read"
+                 [class.bg-gray-700/50]="msg.read"
+                 [class.text-gray-400]="msg.read">
+              {{ msg.name.charAt(0).toUpperCase() }}
+            </div>
+            <div class="min-w-0">
+              <h3 class="font-semibold truncate" [class.text-white]="!msg.read" [class.text-gray-400]="msg.read">
+                {{ msg.subject || 'Sin asunto' }}
+              </h3>
+              <p class="text-sm text-gray-500 truncate">
+                {{ msg.name }} &lt;{{ msg.email }}&gt;
+              </p>
+            </div>
+          </div>
+          
+          <div class="flex items-center gap-4 shrink-0 ml-4">
+            <span class="text-xs text-gray-500">{{ formatDate(msg.created_at) }}</span>
+            <div class="flex gap-2">
+              <button (click)="deleteMessage(msg.id, $event)" 
+                      class="p-2 hover:bg-red-500/10 text-gray-400 hover:text-red-500 rounded-lg transition-colors"
+                      title="Eliminar">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
+              <div class="w-6 h-6 flex items-center justify-center">
+                <svg class="w-4 h-4 text-gray-400 transition-transform" 
+                     [class.rotate-180]="expandedId() === msg.id"
+                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Expanded Content -->
+        @if (expandedId() === msg.id) {
+          <div class="px-4 pb-4 pt-0 animate-fadeIn">
+            <div class="p-4 bg-dark-bg/50 rounded-lg border border-dark-border mt-2">
+              <div class="flex justify-between items-start mb-4 pb-4 border-b border-dark-border">
+                <div>
+                  <p class="text-sm text-gray-400">De:</p>
+                  <p class="text-white">{{ msg.name }} <span class="text-gray-500">&lt;{{ msg.email }}&gt;</span></p>
+                </div>
+                <a [href]="'mailto:' + msg.email" 
+                   class="px-3 py-1.5 bg-primary/10 hover:bg-primary/20 text-primary text-sm rounded-lg transition-colors flex items-center gap-2">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                  </svg>
+                  Responder
+                </a>
+              </div>
+              <div class="prose prose-invert max-w-none">
+                <p class="whitespace-pre-wrap text-gray-300">{{ msg.message }}</p>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    } @empty {
+      <div class="text-center py-12 bg-dark-surface rounded-xl border border-dark-border">
+        <svg class="w-16 h-16 text-gray-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+        </svg>
+        <p class="text-gray-400 text-lg">No hay mensajes de contacto</p>
+        <p class="text-gray-600 text-sm mt-2">Los mensajes enviados desde el formulario aparecerán aquí</p>
+      </div>
+    }
+  </div>
+</div>

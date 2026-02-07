@@ -63,6 +63,10 @@ export const routes: Routes = [
         path: 'settings',
         loadComponent: () => import('./admin/settings/settings.component').then(m => m.AdminSettingsComponent),
       },
+      {
+        path: 'contact',
+        loadComponent: () => import('./admin/contact/contact.component').then(m => m.AdminContactComponent),
+      },
     ],
   },
 

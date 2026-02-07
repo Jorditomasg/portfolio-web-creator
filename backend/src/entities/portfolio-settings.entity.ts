@@ -35,6 +35,38 @@ export class PortfolioSettings {
   @Column({ default: false })
   show_admin_link: boolean;
 
+  // Contact System Configuration
+  @Column({ default: true })
+  enable_contact_form: boolean;
+
+  @Column({ default: false })
+  enable_email_sending: boolean;
+
+  @Column({ default: true })
+  enable_database_storage: boolean;
+
+  // SMTP Settings (Optional, for email sending)
+  @Column({ nullable: true })
+  smtp_host: string;
+
+  @Column({ nullable: true })
+  smtp_port: number;
+
+  @Column({ nullable: true })
+  smtp_user: string;
+
+  @Column({ nullable: true })
+  smtp_pass: string;
+
+  @Column({ default: false })
+  smtp_secure: boolean;
+
+  @Column({ default: true })
+  smtp_require_tls: boolean;
+
+  @Column({ nullable: true })
+  smtp_from: string;
+
   @CreateDateColumn()
   created_at: Date;
 

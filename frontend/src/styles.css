@@ -2,4 +2,83 @@
 @tailwind components;
 @tailwind utilities;
 
-/* You can add global styles to this file, and also import other style files */
+:root {
+  /* Default accent color (Yellow) */
+  --color-primary: #F5A623;
+  --color-primary-rgb: 245, 166, 35;
+  --color-primary-dark: #D48806;
+}
+
+@layer base {
+  body {
+    @apply text-white bg-dark-bg;
+  }
+}
+
+/* Custom utility class for text-primary using CSS variable */
+.text-primary {
+  color: var(--color-primary) !important;
+}
+
+.bg-primary {
+  background-color: var(--color-primary) !important;
+}
+
+.bg-primary\/10 {
+  background-color: rgba(var(--color-primary-rgb), 0.1) !important;
+}
+
+.bg-primary\/20 {
+  background-color: rgba(var(--color-primary-rgb), 0.2) !important;
+}
+
+.bg-primary\/30 {
+  background-color: rgba(var(--color-primary-rgb), 0.3) !important;
+}
+
+.bg-primary-dark {
+  background-color: var(--color-primary-dark) !important;
+}
+
+.border-primary {
+  border-color: var(--color-primary) !important;
+}
+
+.border-primary\/50 {
+  border-color: rgba(var(--color-primary-rgb), 0.5) !important;
+}
+
+.accent-primary {
+  accent-color: var(--color-primary) !important;
+}
+
+.hover\:text-primary:hover {
+  color: var(--color-primary) !important;
+}
+
+.hover\:bg-primary:hover {
+  background-color: var(--color-primary) !important;
+}
+
+.hover\:bg-primary-dark:hover {
+  background-color: var(--color-primary-dark) !important;
+}
+
+.hover\:border-primary:hover {
+  border-color: var(--color-primary) !important;
+}
+
+.hover\:border-primary\/50:hover {
+  border-color: rgba(var(--color-primary-rgb), 0.5) !important;
+}
+
+/* Focus rings */
+.focus\:border-primary:focus {
+  border-color: var(--color-primary) !important;
+}
+
+/* Selection */
+::selection {
+  background-color: rgba(var(--color-primary-rgb), 0.3);
+  color: white;
+}
