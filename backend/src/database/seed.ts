@@ -1,5 +1,6 @@
 import { DataSource } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import * as allEntities from '../entities'; // Import all for datasource config
 import { User } from '../entities/user.entity';
 import { Project } from '../entities/project.entity';
 import { AboutContent } from '../entities/about-content.entity';
@@ -11,7 +12,6 @@ import { Category } from '../entities/category.entity';
 import { Technology } from '../entities/technology.entity';
 import { Contact } from '../entities/contact.entity';
 
-// ... (previous imports)
 
 export async function seedDatabase(dataSource: DataSource): Promise<void> {
 
@@ -435,4 +435,30 @@ export async function seedDatabase(dataSource: DataSource): Promise<void> {
   }
 
   console.log('🎉 Database seeding completed!');
+}
+
+// Auto-run if executed directly
+if (require.main === module) {
+  const dataSource = new DataSource({
+    type: 'postgres',
+    host: process.env.DATABASE_HOST || 'localhost',
+    port: parseInt(process.env.DATABASE_PORT || '5432', 10),
+    username: process.env.DATABASE_USER || 'portfolio_user',
+    password: process.env.DATABASE_PASSWORD || 'portfolio_pass',
+    database: process.env.DATABASE_NAME || 'portfolio_db',
+    entities: Object.values(allEntities),
+    synchronize: true, // Auto-create schema if missing
+  });
+
+  dataSource.initialize()
+    .then(async () => {
+      console.log('🌱 Starting seed...');
+      await seedDatabase(dataSource);
+      console.log('✅ Seed completed');
+      process.exit(0);
+    })
+    .catch((error) => {
+      console.error('❌ Seed failed:', error);
+      process.exit(1);
+    });
 }

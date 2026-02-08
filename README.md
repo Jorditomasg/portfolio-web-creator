@@ -109,8 +109,7 @@ services:
       - ./backend:/app/backend
       - ./frontend:/app/frontend
     depends_on:
-      db:
-        condition: service_healthy
+      - db
     ports:
       - "3000:3000"
       - "4200:4200"

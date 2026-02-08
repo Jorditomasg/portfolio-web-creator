@@ -21,5 +21,13 @@ EOF
 
 echo "✅ Environment configured"
 
+# Run database seed
+if [ -f "/app/backend/dist/database/seed.js" ]; then
+    echo "🌱 Running database seed..."
+    (cd /app/backend && node dist/database/seed.js) || echo "⚠️ Seed failed but continuing..."
+else
+    echo "⚠️ Seed script not found at /app/backend/dist/database/seed.js"
+fi
+
 # Execute the main command
 exec "$@"
