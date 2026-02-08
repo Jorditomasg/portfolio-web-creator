@@ -9,7 +9,7 @@
         <h1 class="text-5xl md:text-7xl font-bold mb-6 leading-tight">
           <span class="text-white">{{ i18n.isSpanish() ? hero.title : (hero.title_en || hero.title) }}</span>
           @if (i18n.isSpanish() ? hero.title_highlight : (hero.title_highlight_en || hero.title_highlight); as highlight) {
-            <span class="text-primary">, {{ highlight }}</span>
+            <span class="text-primary"> {{ highlight }}</span>
           }
         </h1>
         <p class="text-xl text-gray-400 mb-12 max-w-2xl leading-relaxed">
@@ -58,7 +58,8 @@
             <p class="text-gray-400 mb-6">
               {{ i18n.isSpanish() ? specialty.description : (specialty.description_en || specialty.description) }}
             </p>
-            @if (specialty.technologies?.length) {
+
+            @if (specialty.technologies.length) {
               <div class="flex flex-wrap gap-2">
                 @for (tech of specialty.technologies; track tech) {
                   <span class="flex items-center gap-1.5 px-3 py-1 text-xs font-mono rounded-full"

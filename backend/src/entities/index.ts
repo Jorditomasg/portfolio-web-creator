@@ -1,10 +1,13 @@
-export { User } from './user.entity';
-export { Project } from './project.entity';
-export { Skill } from './skill.entity';
-export { AboutContent } from './about-content.entity';
-export { WorkPhilosophy } from './work-philosophy.entity';
-export { Experience } from './experience.entity';
-export { HeroContent } from './hero-content.entity';
-export { PortfolioSettings } from './portfolio-settings.entity';
-export { Specialty } from './specialty.entity';
-export { Contact } from './contact.entity';
+export * from './user.entity';
+export * from './project.entity';
+export * from './skill.entity';
+export * from './about-content.entity';
+export * from './experience.entity';
+export * from './hero-content.entity';
+export * from './portfolio-settings.entity';
+export * from './specialty.entity';
+export * from './technology.entity';
+export * from './contact.entity';
+export * from './work-philosophy.entity';
+export * from './category.entity';
+

@@ -30,12 +30,14 @@
               {{ i18n.t('nav.projects') }}
             </a>
           </li>
-          <li>
-            <a routerLink="/contact" routerLinkActive="text-primary"
-               class="text-gray-400 hover:text-white transition-colors font-medium">
-              {{ i18n.t('nav.contact') }}
-            </a>
-          </li>
+          @if (contentService.settings()?.enable_contact_form) {
+            <li>
+              <a routerLink="/contact" routerLinkActive="text-primary"
+                 class="text-gray-400 hover:text-white transition-colors font-medium">
+                {{ i18n.t('nav.contact') }}
+              </a>
+            </li>
+          }
         </ul>
 
         <div class="flex items-center gap-4">
@@ -74,7 +76,9 @@
           <li><a routerLink="/" (click)="closeMobileMenu()" class="text-gray-300 hover:text-white">{{ i18n.t('nav.home') }}</a></li>
           <li><a routerLink="/about" (click)="closeMobileMenu()" class="text-gray-300 hover:text-white">{{ i18n.t('nav.about') }}</a></li>
           <li><a routerLink="/projects" (click)="closeMobileMenu()" class="text-gray-300 hover:text-white">{{ i18n.t('nav.projects') }}</a></li>
-          <li><a routerLink="/contact" (click)="closeMobileMenu()" class="text-gray-300 hover:text-white">{{ i18n.t('nav.contact') }}</a></li>
+          @if (contentService.settings()?.enable_contact_form) {
+            <li><a routerLink="/contact" (click)="closeMobileMenu()" class="text-gray-300 hover:text-white">{{ i18n.t('nav.contact') }}</a></li>
+          }
           @if (contentService.settings()?.show_admin_link) {
             <li>
               <a routerLink="/admin/login" (click)="closeMobileMenu()" class="flex items-center gap-2 text-gray-300 hover:text-white">

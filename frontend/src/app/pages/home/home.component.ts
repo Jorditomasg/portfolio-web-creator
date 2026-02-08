@@ -54,30 +54,14 @@ export class HomeComponent {
   }
 
   getTechIcon(tech: string): string {
-    const normalize = (t: string) => {
-      const lower = t.toLowerCase();
-      const map: Record<string, string> = {
-        'c#': 'csharp',
-        'c++': 'cplusplus',
-        'node.js': 'nodejs',
-        'vue': 'vuejs',
-        'angular': 'angularjs', // Devicon uses angularjs folder but angular-original.svg exists? detailed check needed. generic fallback:
-        // Actually devicon has 'angular' now? No, it's usually under 'angularjs' folder but 'angular-original.svg'? 
-        // Let's stick to simple logic: try name-original.svg
-      };
-      // Common replacements
-      return map[lower] || lower.replace(/[ .]/g, '');
-    };
+    // 1. Check if we have a defined technology with icon
+    const knownTech = this.content.technologies().find(t => t.name.toLowerCase() === tech.toLowerCase());
+    if (knownTech && knownTech.icon) {
+      return knownTech.icon;
+    }
 
-    const name = normalize(tech);
-    // Angular special case in devicon: folder 'angularjs', file 'angularjs-original.svg' (for old) or 'angular-original.svg' (new)?
-    // Inspecting devicon: icons/angularjs/angularjs-original.svg. icons/angular/angular-original.svg also exists in newer versions.
-    // Let's try to map common ones to ensure they work.
-    
-    // Better strategy: Use the specific map provided by user demand but dynamic fallback
-    // The user said: "que pongas el ícono que pongas busque y coja el icono desde https://cdn.jsdelivr.net y no estár hardcodeado como está ahora"
-    // So mostly dynamic.
-    
-    return `https://cdn.jsdelivr.net/gh/devicons/devicon/icons/${name}/${name}-original.svg`;
+    // 2. Return empty string if not found (or a generic default if desired)
+    // User requested to remove hardcoded mapping/guessing.
+    return ''; 
   }
 }

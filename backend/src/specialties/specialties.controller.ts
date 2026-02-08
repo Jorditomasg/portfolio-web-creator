@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Patch, Delete, Body, Param, UseGuards } from '@nestjs/common';
 import { SpecialtiesService } from './specialties.service';
 import { CreateSpecialtyDto } from './dto/create-specialty.dto';
 import { UpdateSpecialtyDto } from './dto/update-specialty.dto';
@@ -28,6 +28,12 @@ export class SpecialtiesController {
   @UseGuards(JwtAuthGuard)
   update(@Param('id') id: string, @Body() updateDto: UpdateSpecialtyDto) {
     return this.specialtiesService.update(+id, updateDto);
+  }
+
+  @Patch(':id')
+  @UseGuards(JwtAuthGuard)
+  partialUpdate(@Param('id') id: string, @Body() updateDto: Partial<UpdateSpecialtyDto>) {
+    return this.specialtiesService.update(+id, updateDto as UpdateSpecialtyDto);
   }
 
   @Delete(':id')

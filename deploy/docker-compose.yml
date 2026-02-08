@@ -1,0 +1,57 @@
+# Portfolio Web Creator - Quick Deploy
+# Just configure .env and run: docker-compose up -d
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:16-alpine
+    container_name: portfolio-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-portfolio_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-portfolio_db}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-portfolio_user}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - portfolio
+
+  # All-in-one App (Frontend + Backend + Nginx)
+  app:
+    image: ${DOCKER_IMAGE:-jorditomasg/portfolio-app:latest}
+    container_name: portfolio-app
+    restart: unless-stopped
+    ports:
+      - "${PORT:-80}:80"
+    environment:
+      # Database
+      DATABASE_HOST: db
+      DATABASE_PORT: 5432
+      DATABASE_USER: ${POSTGRES_USER:-portfolio_user}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      DATABASE_NAME: ${POSTGRES_DB:-portfolio_db}
+      # Security
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
+      # Admin (for initial setup)
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@example.com}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin123}
+      # App
+      NODE_ENV: production
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - portfolio
+
+volumes:
+  postgres_data:
+
+networks:
+  portfolio:
+    driver: bridge

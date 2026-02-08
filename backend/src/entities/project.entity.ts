@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToMany, JoinTable } from 'typeorm';
+import { Technology } from './technology.entity';
 
 @Entity('projects')
 export class Project {
@@ -33,10 +34,23 @@ export class Project {
   github_url: string;
 
   @Column({ type: 'text', array: true, default: [] })
-  technologies: string[];
+  technologies: string[]; // Keep for legacy/simple display, but usage should migrate to relation
+
+  @ManyToMany(() => Technology)
+  @JoinTable()
+  technology_entities: Technology[];
 
   @Column({ default: false })
   featured: boolean;
+
+  @Column({ type: 'date', nullable: true })
+  start_date: Date;
+
+  @Column({ type: 'date', nullable: true })
+  end_date: Date;
+
+  @Column({ default: false })
+  is_in_progress: boolean;
 
   @Column({ default: 0 })
   display_order: number;

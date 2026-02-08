@@ -20,7 +20,7 @@ export class AdminAboutComponent {
   isDirtyAbout = signal(false);
   isDirtyHero = signal(false);
 
-  aboutForm = { bio: '', highlightsText: '' };
+  aboutForm = { bio: '', bio_en: '', highlightsText: '', highlightsText_en: '' };
   initialAboutForm: any = {};
 
   heroForm: any = { title: '', title_highlight: '', title_en: '', title_highlight_en: '', subtitle: '', subtitle_en: '', description: '', description_en: '' };
@@ -33,7 +33,9 @@ export class AdminAboutComponent {
       const about = this.content.about();
       if (about) { 
         this.aboutForm.bio = about.bio || '';
+        this.aboutForm.bio_en = about.bio_en || '';
         this.aboutForm.highlightsText = about.highlights?.join('\n') || '';
+        this.aboutForm.highlightsText_en = about.highlights_en?.join('\n') || '';
         this.initialAboutForm = JSON.parse(JSON.stringify(this.aboutForm));
         this.checkDirtyAbout();
       }
@@ -72,9 +74,14 @@ export class AdminAboutComponent {
       const promises = [];
       
       if (this.isDirtyAbout()) {
-        const aboutData = { bio: this.aboutForm.bio, highlights: this.aboutForm.highlightsText.split('\n').map(h => h.trim()).filter(h => h) };
+        const aboutPayload = {
+        bio: this.aboutForm.bio,
+        bio_en: this.aboutForm.bio_en,
+        highlights: this.aboutForm.highlightsText.split('\n').map(h => h.trim()).filter(h => h),
+        highlights_en: this.aboutForm.highlightsText_en.split('\n').map(h => h.trim()).filter(h => h)
+      };
         promises.push(
-          firstValueFrom(this.http.put('/api/about', aboutData))
+          firstValueFrom(this.http.put('/api/about', aboutPayload))
             .then(() => {
               this.initialAboutForm = JSON.parse(JSON.stringify(this.aboutForm));
               this.checkDirtyAbout();

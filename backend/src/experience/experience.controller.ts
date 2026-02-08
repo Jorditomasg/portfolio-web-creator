@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, ParseIntPipe, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Patch, Delete, Body, Param, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { ExperienceService } from './experience.service';
 import { CreateExperienceDto } from './dto/create-experience.dto';
 import { UpdateExperienceDto } from './dto/update-experience.dto';
@@ -21,6 +21,12 @@ export class ExperienceController {
   @Put(':id')
   @UseGuards(JwtAuthGuard)
   update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateExperienceDto) {
+    return this.experienceService.update(id, dto);
+  }
+
+  @Patch(':id')
+  @UseGuards(JwtAuthGuard)
+  partialUpdate(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateExperienceDto) {
     return this.experienceService.update(id, dto);
   }
 

@@ -18,9 +18,28 @@ import { TranslationService } from '../../core/services/translation.service';
     <section class="py-24">
       <div class="container mx-auto px-6">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          @for (project of content.projects(); track project.id) {
-            <article class="group bg-dark-surface rounded-2xl border border-dark-border overflow-hidden hover:border-primary/50 transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+          @for (project of getSortedProjects(); track project.id) {
+            <article class="group rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1 cursor-pointer relative"
+                     [class]="project.featured 
+                       ? 'bg-gradient-to-br from-primary/20 via-dark-surface to-dark-surface border-2 border-primary/50 shadow-lg shadow-primary/10' 
+                       : 'bg-dark-surface border border-dark-border hover:border-primary/50'"
                      (click)="openProject(project)">
+              
+              <!-- Featured Badge -->
+              @if (project.featured) {
+                <div class="absolute top-3 right-3 z-10 px-2 py-1 bg-dark-surface/90 border border-primary/50 text-primary text-xs font-bold rounded-full flex items-center gap-1">
+                  <span class="text-current">⭐</span> Destacado
+                </div>
+              }
+              
+              <!-- In Progress Badge -->
+              @if (project.is_in_progress) {
+                <div class="absolute top-3 z-10 px-2 py-1 bg-blue-500 text-white text-xs font-bold rounded-full flex items-center gap-1"
+                     [class]="project.featured ? 'left-3' : 'right-3'">
+                  🔨 En desarrollo
+                </div>
+              }
+
               @if (project.image_url) {
                 <div class="aspect-video bg-dark-bg overflow-hidden">
                   <img [src]="project.image_url" [alt]="project.title" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
@@ -40,7 +59,7 @@ import { TranslationService } from '../../core/services/translation.service';
                 
                 <!-- Technologies -->
                 <div class="flex flex-wrap gap-2 mb-6">
-                  @for (tech of project.technologies?.slice(0, 5); track tech) {
+                  @for (tech of project.technologies.slice(0, 5); track tech) {
                     <span class="flex items-center gap-1 px-2 py-1 bg-dark-bg text-xs text-gray-300 rounded-lg border border-dark-border">
                       <img [src]="getTechIcon(tech)" [alt]="tech" class="w-3.5 h-3.5">
                       {{ tech }}
@@ -85,6 +104,12 @@ export class ProjectsComponent {
     if (url) {
       window.open(url, '_blank', 'noopener');
     }
+  }
+
+  getSortedProjects() {
+    const projects = [...this.content.projects()];
+    // Sort by display_order only (set via admin drag-and-drop)
+    return projects.sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
   }
 
   getTechIcon(tech: string): string {

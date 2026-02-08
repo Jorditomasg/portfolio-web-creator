@@ -1,14 +1,16 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { ContentService } from '../../core/services/content.service';
 import { ToastService } from '../../core/services/toast.service';
 import { firstValueFrom } from 'rxjs';
+import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-admin-projects',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, RouterLink, DragDropModule],
   templateUrl: './projects.component.html',
 })
 export class AdminProjectsComponent {
@@ -23,7 +25,8 @@ export class AdminProjectsComponent {
     description: '', description_en: '',
     long_description: '', long_description_en: '',
     image_url: '', demo_url: '', github_url: '', 
-    technologies: '', featured: false 
+    technologies: '', featured: false, is_in_progress: false,
+    start_date: '', end_date: ''
   };
 
   openModal() { 
@@ -32,7 +35,8 @@ export class AdminProjectsComponent {
       description: '', description_en: '',
       long_description: '', long_description_en: '',
       image_url: '', demo_url: '', github_url: '', 
-      technologies: '', featured: false 
+      technologies: '', featured: false, is_in_progress: false,
+      start_date: '', end_date: ''
     }; 
     this.editing.set(null); 
     this.showModal.set(true); 
@@ -54,13 +58,21 @@ export class AdminProjectsComponent {
       github_url: project.github_url || '',
       technologies: project.technologies?.join(', ') || '',
       featured: project.featured || false,
-      display_order: project.display_order || 0
+      is_in_progress: project.is_in_progress || false,
+      display_order: project.display_order || 0,
+      start_date: project.start_date ? project.start_date.split('T')[0] : '',
+      end_date: project.end_date ? project.end_date.split('T')[0] : ''
     };
     this.editing.set(project.id);
     this.showModal.set(true);
   }
 
   async save() {
+    if (!this.form.title) {
+      this.toast.error('Por favor completa el campo obligatorio (Título)');
+      return;
+    }
+
     const data = { 
       ...this.form, 
       technologies: this.form.technologies ? this.form.technologies.split(',').map((t: string) => t.trim()).filter((t: string) => t) : []
@@ -81,15 +93,88 @@ export class AdminProjectsComponent {
     }
   }
 
-  async deleteProject(id: number) {
+  // Tag Management
+  newTechInput = signal('');
+  
+  // Filtered technologies for autocomplete
+  filteredTechnologies = signal<any[]>([]);
+
+  updateFilteredTechs() {
+    const input = this.newTechInput().toLowerCase();
+    if (!input) {
+      this.filteredTechnologies.set([]);
+      return;
+    }
+    
+    const all = this.content.technologies();
+    const current = this.form.technologies ? this.form.technologies.split(',').map((t: string) => t.trim().toLowerCase()) : [];
+    
+    this.filteredTechnologies.set(
+      all.filter(t => t.name.toLowerCase().includes(input) && !current.includes(t.name.toLowerCase()))
+    );
+  }
+
+  addTech(techName: string) {
+    const current = this.form.technologies ? this.form.technologies.split(',').map((t: string) => t.trim()).filter((t: string) => t) : [];
+    if (!current.includes(techName)) {
+      current.push(techName);
+      this.form.technologies = current.join(', ');
+    }
+    this.newTechInput.set('');
+    this.filteredTechnologies.set([]);
+  }
+
+  removeTech(techName: string) {
+    const current = this.form.technologies ? this.form.technologies.split(',').map((t: string) => t.trim()).filter((t: string) => t) : [];
+    this.form.technologies = current.filter((t: string) => t !== techName).join(', ');
+  }
+
+  onTechEnter(event: Event) {
+    event.preventDefault();
+    const val = this.newTechInput().trim();
+    if (val) {
+      this.addTech(val);
+    }
+  }
+
+  deleteProject(id: number) {
     if (confirm('¿Eliminar este proyecto?')) {
-      try {
-        await firstValueFrom(this.http.delete(`/api/projects/${id}`));
-        await this.content.loadAllContent();
-        this.toast.success('Proyecto eliminado');
-      } catch (e) {
-        this.toast.error('Error al eliminar el proyecto');
-      }
+      // ... existing delete logic ...
+      this.http.delete(`/api/projects/${id}`).subscribe({
+        next: () => {
+             this.content.loadAllContent();
+             this.toast.success('Proyecto eliminado');
+        },
+        error: () => this.toast.error('Error al eliminar el proyecto')
+      });
+    }
+  }
+
+  // Sorting helpers
+  getSortedProjects() {
+    const projects = [...this.content.projects()];
+    return projects.sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
+  }
+
+  formatDate(dateStr: string): string {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' });
+  }
+
+  async drop(event: CdkDragDrop<any[]>) {
+    const projects = [...this.getSortedProjects()];
+    moveItemInArray(projects, event.previousIndex, event.currentIndex);
+    
+    try {
+      await Promise.all(projects.map((project, index) => 
+        firstValueFrom(this.http.put(`/api/projects/${project.id}`, { display_order: index }))
+      ));
+      await this.content.loadAllContent();
+      this.toast.success('Orden actualizado');
+    } catch (e) {
+      console.error(e);
+      this.toast.error('Error al actualizar orden');
     }
   }
 }

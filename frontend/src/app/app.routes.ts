@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
+import { contactGuard } from './core/guards/contact.guard';
 
 export const routes: Routes = [
   // Public routes
@@ -17,6 +18,7 @@ export const routes: Routes = [
   },
   {
     path: 'contact',
+    canActivate: [contactGuard],
     loadComponent: () => import('./pages/contact/contact.component').then(m => m.ContactComponent),
   },
 
@@ -43,14 +45,8 @@ export const routes: Routes = [
         path: 'projects',
         loadComponent: () => import('./admin/projects/projects.component').then(m => m.AdminProjectsComponent),
       },
-      {
-        path: 'skills',
-        loadComponent: () => import('./admin/skills/skills.component').then(m => m.AdminSkillsComponent),
-      },
-      {
-        path: 'specialties',
-        loadComponent: () => import('./admin/specialties/specialties.component').then(m => m.AdminSpecialtiesComponent),
-      },
+
+
       {
         path: 'about',
         loadComponent: () => import('./admin/about/about.component').then(m => m.AdminAboutComponent),
@@ -62,6 +58,10 @@ export const routes: Routes = [
       {
         path: 'settings',
         loadComponent: () => import('./admin/settings/settings.component').then(m => m.AdminSettingsComponent),
+      },
+      {
+        path: 'technologies',
+        loadComponent: () => import('./admin/technologies/technologies.component').then(m => m.AdminTechnologiesComponent),
       },
       {
         path: 'contact',

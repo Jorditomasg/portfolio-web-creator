@@ -1,4 +1,4 @@
-# Portfolio Creator
+# Portfolio Web Creator
 
 A modern, customizable portfolio website builder with **Angular** (frontend) and **NestJS** (backend). Features a complete admin panel, internationalization, and dynamic theming.
 
@@ -27,7 +27,8 @@ A modern, customizable portfolio website builder with **Angular** (frontend) and
 - **Dashboard** with content overview
 - **Projects Management**: Full CRUD with multilingual support
 - **Skills Management**: Categorized by Frontend/Backend/Tools (1-5 level slider)
-- **Specialties Management**: Customizable specialty cards
+- **Technologies Management**: Centralized management of technology icons (auto-fetched from DevIcon or custom URL)
+- **Specialties Management**: Customizable specialty cards with SVG icons
 - **About & Hero Editor**: Edit bio, highlights, and hero section
 - **Settings**: 
   - Site title and meta description
@@ -36,84 +37,101 @@ A modern, customizable portfolio website builder with **Angular** (frontend) and
   - Accent color customization
   - Toggle admin link in navigation
 
-## 🚀 Quick Start
+## 🚀 Installation
 
-### Prerequisites
-- Docker and Docker Compose
-- Node.js 18+ (for local development)
+### Method 1: Clone Repository (Recommended for Development)
 
-### Installation
-
-1. **Clone the repository**
+1. **Clone and navigate**
 ```bash
-git clone https://github.com/your-username/portfolio-creator.git
-cd portfolio-creator
+git clone https://github.com/Jorditomasg/portfolio-web-creator.git
+cd portfolio-web-creator
 ```
 
-2. **Configure environment variables**
+2. **Configure environment** (optional, has defaults)
 ```bash
 cp .env.example .env
+# Edit .env if you want custom credentials
 ```
 
-Edit `.env` with secure values:
-```env
-POSTGRES_PASSWORD=your_secure_password
-JWT_SECRET=your_jwt_secret_key_here
-ADMIN_PASSWORD=your_admin_password
-ADMIN_EMAIL=admin@example.com
-ADMIN_PASSWORD=admin123
-```
-
-> ⚠️ **Security**: Generate a secure JWT secret with `openssl rand -hex 32`
-
-3. **Start the application**
+3. **Start with Docker Compose**
 ```bash
-docker-compose up --build
+docker compose up -d
 ```
 
 4. **Access the application**
 - Frontend: http://localhost:4200
-- API: http://localhost:3000
 - Admin Panel: http://localhost:4200/admin/login
+- Default login: `admin` / `admin123`
 
-### Default Admin Credentials
-- Username: `admin` (or `ADMIN_USERNAME` from .env)
-- Password: `admin123` (or `ADMIN_PASSWORD` from .env)
+---
 
-## 📁 Project Structure
+### Method 2: Docker Hub (No Git Clone Required)
 
+Perfect for quick deployment without cloning the repository.
+
+1. **Create a directory**
+```bash
+mkdir portfolio && cd portfolio
 ```
-portfolio-creator/
-├── backend/                    # NestJS API
-│   ├── src/
-│   │   ├── auth/              # JWT authentication
-│   │   ├── database/          # Database connection & seeding
-│   │   ├── entities/          # TypeORM entities
-│   │   ├── projects/          # Projects CRUD
-│   │   ├── skills/            # Skills CRUD
-│   │   ├── specialties/       # Specialties CRUD
-│   │   ├── settings/          # Site settings
-│   │   ├── hero/              # Hero section
-│   │   └── about/             # About section
-│   └── Dockerfile
-├── frontend/                   # Angular Application
-│   ├── src/
-│   │   ├── app/
-│   │   │   ├── core/          # Services, guards, models
-│   │   │   ├── pages/         # Public pages
-│   │   │   ├── admin/         # Admin panel components
-│   │   │   └── shared/        # Shared components
-│   │   └── styles.css         # Global styles
-│   └── Dockerfile
-├── nginx/                      # Reverse proxy config
-├── docker-compose.yml          # Container orchestration
-├── .env.example               # Environment template
-└── .gitignore                 # Git ignore rules
+
+2. **Create `docker-compose.yml`**
+
+Copy and paste this content into a new `docker-compose.yml` file:
+
+```yaml
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: portfolio-db
+    environment:
+      POSTGRES_USER: portfolio_user
+      POSTGRES_PASSWORD: portfolio_pass
+      POSTGRES_DB: portfolio_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U portfolio_user -d portfolio_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    image: jorditomasg/portfolio:latest
+    container_name: portfolio-app
+    environment:
+      - DATABASE_URL=postgresql://portfolio_user:portfolio_pass@db:5432/portfolio_db
+      - JWT_SECRET=demo_jwt_secret_change_in_production
+      - NODE_ENV=production
+      - ADMIN_USERNAME=admin
+      - ADMIN_EMAIL=admin@demo.com
+      - ADMIN_PASSWORD=demo123
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+      - "4200:4200"
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
 ```
+
+3. **Start the application**
+```bash
+docker compose up -d
+```
+
+4. **Access your portfolio**
+- Frontend: http://localhost:4200
+- Admin Panel: http://localhost:4200/admin/login
+- Login: `admin` / `admin123`
+
+> ⚠️ **Security**: Change `JWT_SECRET` and `ADMIN_PASSWORD` for production!
+
+---
 
 ## 🔧 Configuration
-
-### Environment Variables
 
 | Variable | Description | Default |
 |----------|-------------|---------|
@@ -137,6 +155,8 @@ portfolio-creator/
 | **Favicon Type** | terminal, code, rocket, star, briefcase, user |
 | **Accent Color** | Primary color for buttons and highlights |
 | **Show Admin Link** | Toggle "Admin" in navigation menu |
+| **Contact System** | Toggle Form, Email sending, Database storage |
+| **SMTP Config** | Host, Port, User, Pass for email notifications |
 
 ### Translation System
 
@@ -163,46 +183,7 @@ Before deploying to production:
 4. **Use HTTPS** in production
 5. **Disable admin link** in settings unless needed
 
-## 🛠️ Development
 
-### Running Locally (without Docker)
-
-**Backend:**
-```bash
-cd backend
-npm install
-npm run start:dev
-```
-
-**Frontend:**
-```bash
-cd frontend
-npm install
-npm start
-```
-
-### Rebuilding After Changes
-
-When changing backend DTOs or entities:
-```bash
-docker-compose down
-docker-compose build --no-cache backend
-docker-compose up
-```
-
-### API Endpoints
-
-| Method | Endpoint | Description | Auth |
-|--------|----------|-------------|------|
-| GET | `/api/projects` | List all projects | No |
-| POST | `/api/projects` | Create project | Yes |
-| PUT | `/api/projects/:id` | Update project | Yes |
-| DELETE | `/api/projects/:id` | Delete project | Yes |
-| GET | `/api/skills` | List all skills | No |
-| GET | `/api/specialties` | List specialties | No |
-| GET | `/api/settings` | Get site settings | No |
-| PUT | `/api/settings` | Update settings | Yes |
-| POST | `/api/auth/login` | Authenticate | No |
 
 ## 🎨 Customization
 
@@ -224,8 +205,11 @@ Default palette: Yellow (#F5A623), Green, Blue, Purple, Pink, Red
 Or use the custom color picker in Settings.
 
 ### Technology Icons
-
-Icons are automatically loaded from [DevIcon](https://devicon.dev/). The system matches technology names to icons.
+ 
+Icons are managed centrally via the **Technologies** page in the Admin Panel. 
+- **Auto-detection**: When adding a technology, the system attempts to auto-fetch the icon from [DevIcon](https://devicon.dev/).
+- **Smart Tags**: In the Projects editor, typing a technology name (e.g., "Angular") will auto-suggest existing technologies and display their correctly associated icons.
+- **Custom Icons**: You can manually provide any image URL for a technology if the auto-detection fails.
 
 ### Specialty Icons
 
@@ -242,13 +226,6 @@ Icons are automatically loaded from [DevIcon](https://devicon.dev/). The system 
 
 MIT License - see [LICENSE](LICENSE) for details.
 
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/amazing-feature`
-3. Commit your changes: `git commit -m 'Add amazing feature'`
-4. Push to the branch: `git push origin feature/amazing-feature`
-5. Open a Pull Request
 
 ---
 

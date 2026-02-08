@@ -11,6 +11,9 @@ export interface Project {
   github_url: string | null;
   technologies: string[];
   featured: boolean;
+  start_date: string | null;
+  end_date: string | null;
+  is_in_progress: boolean;
   display_order: number;
   created_at: string;
   updated_at: string;
@@ -30,10 +33,17 @@ export interface Skill {
 export interface Experience {
   id: number;
   title: string;
+  title_en: string | null;
   company: string | null;
+  company_logo: string | null;
   period: string | null;
   description: string | null;
+  description_en: string | null;
   achievements: string[];
+  achievements_en: string[];
+  start_date: string | null;
+  end_date: string | null;
+  is_current: boolean;
   display_order: number;
   created_at: string;
   updated_at: string;
@@ -112,3 +122,21 @@ export interface LoginResponse {
     email: string;
   };
 }
+
+export interface Category {
+  id: number;
+  name: string;
+  color: string;
+  long_title?: string;
+  short_title?: string;
+  description?: string;
+  long_title_en?: string;
+  short_title_en?: string;
+  description_en?: string;
+  icon?: string;
+  display_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+

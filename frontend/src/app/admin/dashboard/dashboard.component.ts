@@ -23,7 +23,7 @@ export class DashboardComponent implements OnInit {
 
   async fetchMessages() {
     try {
-      const messages = await firstValueFrom(this.http.get<any[]>('/api/contact'));
+      const messages = await firstValueFrom(this.http.get<any[]>('/api/admin/contacts'));
       this.totalMessages.set(messages.length);
       this.unreadMessages.set(messages.filter(m => !m.read_status).length);
     } catch (e) {

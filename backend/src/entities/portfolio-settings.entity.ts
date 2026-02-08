@@ -32,7 +32,7 @@ export class PortfolioSettings {
   accent_color: string; // hex color
 
   // Navigation settings
-  @Column({ default: false })
+  @Column({ default: true })
   show_admin_link: boolean;
 
   // Contact System Configuration

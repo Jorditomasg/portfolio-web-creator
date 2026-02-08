@@ -73,7 +73,7 @@ const SPECIALTY_ICONS: Record<string, string> = {
               </div>
 
               <!-- Highlights -->
-              @if ((i18n.isSpanish() ? about.highlights : (about.highlights_en && about.highlights_en.length ? about.highlights_en : about.highlights))?.length) {
+              @if ((i18n.isSpanish() ? about.highlights : (about.highlights_en && about.highlights_en.length ? about.highlights_en : about.highlights)).length) {
                 <div class="mb-12">
                   <h3 class="text-xl font-semibold text-white mb-6">{{ i18n.t('about.highlights') }}</h3>
                   <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -221,7 +221,7 @@ const SPECIALTY_ICONS: Record<string, string> = {
                 </div>
                 <p class="text-gray-400 mb-4">{{ exp.company }}</p>
                 <p class="text-gray-300 mb-4">{{ exp.description }}</p>
-                @if (exp.achievements?.length) {
+                @if (exp.achievements.length) {
                   <ul class="space-y-2">
                     @for (achievement of exp.achievements; track $index) {
                       <li class="flex items-start gap-2 text-sm text-gray-400">
