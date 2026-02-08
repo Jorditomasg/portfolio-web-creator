@@ -98,9 +98,8 @@ services:
       - POSTGRES_USER=portfolio_user
       - POSTGRES_PASSWORD=portfolio_pass
       - POSTGRES_DB=portfolio_db
-      
-      # App Configuration (No .env file needed for testing)
       - DATABASE_URL=postgresql://portfolio_user:portfolio_pass@db:5432/portfolio_db
+      # App Configuration (Generate secret with: openssl rand -base64 32)
       - JWT_SECRET=change_this_secret_in_production
       - NODE_ENV=production
       - ADMIN_USERNAME=admin
