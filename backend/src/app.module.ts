@@ -35,31 +35,17 @@ import * as entities from './entities';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => {
-        const url = configService.get<string>('DATABASE_URL');
-        const baseConfig = {
-          type: 'postgres' as const,
-          entities: Object.values(entities),
-          synchronize: true,
-          logging: configService.get('NODE_ENV') === 'development',
-        };
-
-        if (url) {
-          return {
-            ...baseConfig,
-            url,
-          };
-        }
-
-        return {
-          ...baseConfig,
-          host: configService.get<string>('DATABASE_HOST', 'postgres'),
-          port: configService.get<number>('DATABASE_PORT', 5432),
-          username: configService.get<string>('DATABASE_USER', 'portfolio_user'),
-          password: configService.get<string>('DATABASE_PASSWORD', 'portfolio_pass'),
-          database: configService.get<string>('DATABASE_NAME', 'portfolio_db'),
-        };
-      },
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres',
+        host: configService.get<string>('DATABASE_HOST', 'postgres'),
+        port: configService.get<number>('DATABASE_PORT', 5432),
+        username: configService.get<string>('DATABASE_USER', 'portfolio_user'),
+        password: configService.get<string>('DATABASE_PASSWORD', 'portfolio_pass'),
+        database: configService.get<string>('DATABASE_NAME', 'portfolio_db'),
+        entities: Object.values(entities),
+        synchronize: true,
+        logging: configService.get('NODE_ENV') === 'development',
+      }),
     }),
 
     // Feature modules

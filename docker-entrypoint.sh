@@ -9,9 +9,20 @@ rsync -a --info=progress2 --exclude='.env' /app/backup/backend/ /app/backend/
 echo "🔄 Syncing frontend source code from image..."
 rsync -a --info=progress2 /app/backup/frontend/ /app/frontend/
 
-# Generate .env file from environment variables for backend
+# Map POSTGRES_ vars to DATABASE_ vars (so user only needs one set in docker-compose)
+export DATABASE_HOST=${DATABASE_HOST:-db}
+export DATABASE_PORT=${DATABASE_PORT:-5432}
+export DATABASE_USER=${DATABASE_USER:-${POSTGRES_USER:-portfolio_user}}
+export DATABASE_PASSWORD=${DATABASE_PASSWORD:-${POSTGRES_PASSWORD:-admin123}}
+export DATABASE_NAME=${DATABASE_NAME:-${POSTGRES_DB:-portfolio_db}}
+
+# Generate .env file from environment variables for backend (and Seed)
 cat > /app/backend/.env << EOF
-DATABASE_URL=${DATABASE_URL:-postgresql://portfolio_user:portfolio_pass@db:5432/portfolio_db}
+DATABASE_HOST=${DATABASE_HOST}
+DATABASE_PORT=${DATABASE_PORT}
+DATABASE_USER=${DATABASE_USER}
+DATABASE_PASSWORD=${DATABASE_PASSWORD}
+DATABASE_NAME=${DATABASE_NAME}
 JWT_SECRET=${JWT_SECRET:-demo_jwt_secret_change_in_production}
 NODE_ENV=${NODE_ENV:-production}
 ADMIN_USERNAME=${ADMIN_USERNAME:-admin}
