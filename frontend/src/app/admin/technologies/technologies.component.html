@@ -248,123 +248,124 @@
 <!-- Category Modal -->
 @if (showCategoryModal()) {
   <div class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4" (click)="closeCategoryModal()">
-    <div class="bg-dark-surface border border-dark-border rounded-xl shadow-2xl w-full max-w-md" (click)="$event.stopPropagation()">
+    <div class="bg-dark-surface border border-dark-border rounded-xl shadow-2xl w-full max-w-2xl" (click)="$event.stopPropagation()">
       <div class="p-6 border-b border-dark-border">
         <h2 class="text-xl font-bold text-white">{{ isEditingCategory() ? 'Editar Categoría' : 'Nueva Categoría' }}</h2>
-        <p class="text-gray-400 text-sm mt-1">{{ isEditingCategory() ? 'Modificar nombre y color de la categoría' : 'Crear una nueva categoría para tecnologías' }}</p>
+        <p class="text-gray-400 text-sm mt-1">{{ isEditingCategory() ? 'Modificar configuración de la categoría' : 'Crear nueva agrupación para tecnologías' }}</p>
       </div>
       
-      <form (ngSubmit)="saveCategory()" class="p-6 space-y-4 max-h-[80vh] overflow-y-auto custom-scrollbar">
+      <form (ngSubmit)="saveCategory()" class="p-6 space-y-6 max-h-[85vh] overflow-y-auto custom-scrollbar">
         
         <!-- Internal Name & Color -->
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="block text-sm font-medium mb-1 text-gray-300">Identificador interno *</label>
-            <input type="text" [(ngModel)]="categoryForm.name" name="categoryName" required
-                   class="w-full p-2 bg-dark-bg border border-dark-border rounded-lg focus:border-primary focus:outline-none text-white font-mono text-sm"
-                   placeholder="frontend">
-            <p class="text-xs text-gray-500 mt-1">Usado en código (sin espacios, minúsculas)</p>
-          </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Removed Internal ID input as requested, it's auto-generated from short_title -->
           
           <div>
-            <label class="block text-sm font-medium mb-1 text-gray-300">Color</label>
-            <div class="flex items-center gap-2">
-              <input type="color" [(ngModel)]="categoryForm.color" name="categoryColor"
-                     class="w-10 h-10 rounded cursor-pointer border-0 bg-transparent p-0">
+            <label class="block text-sm font-medium mb-1 text-gray-300">Color distintivo</label>
+            <div class="flex items-center gap-3">
+              <div class="relative w-10 h-10 rounded-lg overflow-hidden border border-dark-border shadow-sm flex-shrink-0">
+                <input type="color" [(ngModel)]="categoryForm.color" name="categoryColor"
+                       class="absolute inset-0 w-[150%] h-[150%] -top-1/4 -left-1/4 cursor-pointer p-0 border-0">
+              </div>
               <input type="text" [(ngModel)]="categoryForm.color" name="categoryColorText"
-                     class="flex-1 p-2 bg-dark-bg border border-dark-border rounded-lg focus:border-primary focus:outline-none text-white font-mono text-sm"
+                     class="flex-1 p-2 bg-dark-bg border border-dark-border rounded-lg focus:border-primary focus:outline-none text-white font-mono text-sm uppercase"
                      placeholder="#F5A623">
             </div>
           </div>
         </div>
 
-        <!-- Spanish Content -->
-        <div class="border-t border-dark-border pt-4 mt-2">
-          <h3 class="text-primary font-medium mb-3 flex items-center gap-2">
-            <span class="text-lg">🇪🇸</span> Contenido Español
-          </h3>
-          
-          <div class="grid grid-cols-2 gap-4 mb-3">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <!-- Spanish Content -->
+          <div class="space-y-4">
+            <h3 class="text-primary font-medium flex items-center gap-2 border-b border-dark-border pb-2">
+              <span class="text-xl">🇪🇸</span> Contenido Español
+            </h3>
+            
             <div>
-              <label class="block text-sm font-medium mb-1 text-gray-300">Título Corto (Sobre mí)</label>
-              <input type="text" [(ngModel)]="categoryForm.short_title" (ngModelChange)="onCategoryTitleChange($event)" name="short_title"
+              <label class="block text-sm font-medium mb-1 text-gray-300">Título Corto (Sobre mí) *</label>
+              <input type="text" [(ngModel)]="categoryForm.short_title" (ngModelChange)="onCategoryTitleChange($event)" name="short_title" required
                      class="w-full p-2 bg-dark-bg border border-dark-border rounded-lg focus:border-primary focus:outline-none text-white"
                      placeholder="Frontend">
             </div>
+            
             <div>
               <label class="block text-sm font-medium mb-1 text-gray-300">Título Largo (Inicio)</label>
               <input type="text" [(ngModel)]="categoryForm.long_title" name="long_title"
                      class="w-full p-2 bg-dark-bg border border-dark-border rounded-lg focus:border-primary focus:outline-none text-white"
                      placeholder="Desarrollo Frontend">
             </div>
+            
+            <div>
+              <label class="block text-sm font-medium mb-1 text-gray-300">Descripción</label>
+              <textarea [(ngModel)]="categoryForm.description" name="description" rows="3"
+                        class="w-full p-2 bg-dark-bg border border-dark-border rounded-lg focus:border-primary focus:outline-none text-white resize-none"
+                        placeholder="Descripción..."></textarea>
+            </div>
           </div>
-          
-          <div>
-            <label class="block text-sm font-medium mb-1 text-gray-300">Descripción</label>
-            <textarea [(ngModel)]="categoryForm.description" name="description" rows="2"
-                      class="w-full p-2 bg-dark-bg border border-dark-border rounded-lg focus:border-primary focus:outline-none text-white resize-none"
-                      placeholder="Descripción de la categoría..."></textarea>
-          </div>
-        </div>
 
-        <!-- English Content -->
-        <div class="border-t border-dark-border pt-4 mt-2">
-          <h3 class="text-primary font-medium mb-3 flex items-center gap-2">
-            <span class="text-lg">🇺🇸</span> English Content
-          </h3>
-          
-          <div class="grid grid-cols-2 gap-4 mb-3">
+          <!-- English Content -->
+          <div class="space-y-4">
+            <h3 class="text-primary font-medium flex items-center gap-2 border-b border-dark-border pb-2">
+              <span class="text-xl">🇺🇸</span> English Content
+            </h3>
+            
             <div>
               <label class="block text-sm font-medium mb-1 text-gray-300">Short Title (About)</label>
               <input type="text" [(ngModel)]="categoryForm.short_title_en" name="short_title_en"
                      class="w-full p-2 bg-dark-bg border border-dark-border rounded-lg focus:border-primary focus:outline-none text-white"
                      placeholder="Frontend">
             </div>
+            
             <div>
               <label class="block text-sm font-medium mb-1 text-gray-300">Long Title (Home)</label>
               <input type="text" [(ngModel)]="categoryForm.long_title_en" name="long_title_en"
                      class="w-full p-2 bg-dark-bg border border-dark-border rounded-lg focus:border-primary focus:outline-none text-white"
                      placeholder="Frontend Development">
             </div>
-          </div>
-          
-          <div>
-            <label class="block text-sm font-medium mb-1 text-gray-300">Description</label>
-            <textarea [(ngModel)]="categoryForm.description_en" name="description_en" rows="2"
-                      class="w-full p-2 bg-dark-bg border border-dark-border rounded-lg focus:border-primary focus:outline-none text-white resize-none"
-                      placeholder="Category description..."></textarea>
+            
+            <div>
+              <label class="block text-sm font-medium mb-1 text-gray-300">Description</label>
+              <textarea [(ngModel)]="categoryForm.description_en" name="description_en" rows="3"
+                        class="w-full p-2 bg-dark-bg border border-dark-border rounded-lg focus:border-primary focus:outline-none text-white resize-none"
+                        placeholder="Description..."></textarea>
+            </div>
           </div>
         </div>
 
-        <!-- Icon -->
-        <div class="border-t border-dark-border pt-4 mt-2">
-           <label class="block text-sm font-medium mb-1 text-gray-300">Icono (Identificador)</label>
-           <div class="grid grid-cols-4 gap-2 mb-2">
+        <!-- Icon Selection -->
+        <div class="pt-4 border-t border-dark-border">
+           <label class="block text-sm font-medium mb-3 text-gray-300">Icono Representativo</label>
+           <div class="grid grid-cols-4 sm:grid-cols-6 gap-3 mb-4">
              @for (icon of availableIcons; track icon) {
                <button type="button" (click)="categoryForm.icon = icon"
                        [class.ring-2]="categoryForm.icon === icon"
                        [class.ring-primary]="categoryForm.icon === icon"
-                       class="flex flex-col items-center justify-center p-2 bg-dark-bg border border-dark-border rounded-lg hover:bg-dark-border/50 transition-all">
-                 <!-- Simple placeholder or mapping if real icons aren't available -->
-                 <div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary text-xs font-bold uppercase mb-1">
-                   {{ icon.substring(0,2) }}
+                       [class.bg-primary-10]="categoryForm.icon === icon"
+                       class="flex flex-col items-center justify-center p-3 bg-dark-bg border border-dark-border rounded-lg hover:bg-dark-border/50 transition-all group">
+                 
+                 <div class="w-10 h-10 rounded-lg flex items-center justify-center mb-2 transition-colors"
+                      [class.text-primary]="categoryForm.icon === icon"
+                      [class.text-gray-400]="categoryForm.icon !== icon"
+                      [innerHTML]="getIconForCategory(icon)">
                  </div>
-                 <span class="text-xs text-gray-400">{{ icon }}</span>
+                 
+                 <span class="text-[10px] uppercase font-bold tracking-wider"
+                       [class.text-white]="categoryForm.icon === icon"
+                       [class.text-gray-500]="categoryForm.icon !== icon">
+                   {{ icon }}
+                 </span>
                </button>
              }
            </div>
-           <input type="text" [(ngModel)]="categoryForm.icon" name="icon"
-                  class="w-full p-2 bg-dark-bg border border-dark-border rounded-lg focus:border-primary focus:outline-none text-white font-mono text-sm"
-                  placeholder="custom-icon">
         </div>
         
-        <div class="flex justify-end gap-3 pt-4 border-t border-dark-border mt-2">
+        <div class="flex justify-end gap-3 pt-4 border-t border-dark-border">
           <button type="button" (click)="closeCategoryModal()"
-                  class="px-4 py-2 bg-dark-bg border border-dark-border hover:bg-dark-border/50 text-gray-300 rounded-lg transition-colors">
+                  class="px-5 py-2.5 bg-dark-bg border border-dark-border hover:bg-dark-border/50 text-gray-300 rounded-lg transition-colors font-medium">
             Cancelar
           </button>
-          <button type="submit" [disabled]="!categoryForm.name"
-                  class="px-4 py-2 bg-primary hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed text-dark-bg font-medium rounded-lg transition-colors">
+          <button type="submit" [disabled]="!categoryForm.short_title"
+                  class="px-5 py-2.5 bg-primary hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed text-dark-bg font-bold rounded-lg transition-colors shadow-lg shadow-primary/20">
             {{ isEditingCategory() ? 'Guardar Cambios' : 'Crear Categoría' }}
           </button>
         </div>

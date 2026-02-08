@@ -2,12 +2,15 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Category } from '../entities/category.entity';
+import { Technology } from '../entities/technology.entity';
 
 @Injectable()
 export class CategoriesService {
   constructor(
     @InjectRepository(Category)
     private categoriesRepository: Repository<Category>,
+    @InjectRepository(Technology)
+    private technologiesRepository: Repository<Technology>,
   ) {}
 
   async findAll(): Promise<Category[]> {
@@ -28,7 +31,17 @@ export class CategoriesService {
   }
 
   async update(id: number, updateCategoryDto: Partial<Category>): Promise<Category> {
+    const category = await this.findOne(id);
+    const oldName = category.name;
+
     await this.categoriesRepository.update(id, updateCategoryDto);
+    
+    // Check if name changed and propagate to technologies
+    if (updateCategoryDto.name && updateCategoryDto.name !== oldName) {
+      // Update associated technologies using the legacy string column
+      await this.technologiesRepository.update({ category: oldName }, { category: updateCategoryDto.name });
+    }
+
     return this.findOne(id);
   }
 

@@ -110,6 +110,16 @@ export class ContentService {
     return result;
   });
 
+  readonly specialtyCategories = computed(() => {
+    // Filter categories that have enough info to be shown as a "Specialty Card" (Hero/About)
+    // User requirement: Must have long_title and description.
+    return this.skillsByCategory().filter(group => 
+      group.category && 
+      group.category.long_title && 
+      group.category.description
+    );
+  });
+
   readonly siteTitle = computed(() => 
     this._settings()?.site_title || 'Portfolio'
   );
@@ -169,5 +179,10 @@ export class ContentService {
   async refreshTechnologies(): Promise<void> {
     const technologies = await firstValueFrom(this.http.get<Technology[]>(`${this.apiUrl}/technologies`));
     this._technologies.set(technologies || []);
+  }
+
+  async refreshCategories(): Promise<void> {
+    const categories = await firstValueFrom(this.http.get<Category[]>(`${this.apiUrl}/categories`));
+    this._categories.set(categories || []);
   }
 }

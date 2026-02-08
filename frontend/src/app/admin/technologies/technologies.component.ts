@@ -1,13 +1,90 @@
 import { Component, inject, signal, effect, computed, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { TechnologiesService } from '../../core/services/technologies.service';
 import { CategoriesService } from '../../core/services/categories.service';
+import { ContentService } from '../../core/services/content.service';
 import { ToastService } from '../../core/services/toast.service';
 import { Technology } from '../../core/models/technology.model';
 import { Category } from '../../core/models/api.models';
 import { firstValueFrom } from 'rxjs';
 import { DragDropModule, CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { DOCUMENT } from '@angular/common'; // Import DOCUMENT
+
+// SVG icons for specialty types (matching AboutComponent)
+const SPECIALTY_ICONS: Record<string, string> = {
+  'frontend': `<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+    <rect x="2" y="3" width="20" height="14" rx="2" />
+    <path d="M8 21h8M12 17v4" />
+    <path d="M7 8l3 3-3 3M13 14h4" stroke-linecap="round" stroke-linejoin="round" />
+  </svg>`,
+  'tools': `<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+  </svg>`,
+  'backend': `<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+    <rect x="2" y="2" width="20" height="8" rx="2" />
+    <rect x="2" y="14" width="20" height="8" rx="2" />
+    <circle cx="6" cy="6" r="1" fill="currentColor" />
+    <circle cx="6" cy="18" r="1" fill="currentColor" />
+    <path d="M10 6h8M10 18h8" stroke-linecap="round" />
+  </svg>`,
+  'devops': `<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" />
+    <path d="M2 12h20" />
+    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+  </svg>`,
+  'database': `<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+    <ellipse cx="12" cy="5" rx="9" ry="3" />
+    <path d="M21 12c0 1.66-4.03 3-9 3s-9-1.34-9-3" />
+    <path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5" />
+  </svg>`,
+  'mobile': `<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+    <rect x="5" y="2" width="14" height="20" rx="2" />
+    <path d="M12 18h.01" stroke-linecap="round" />
+  </svg>`,
+  'cloud': `<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+    <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" />
+  </svg>`,
+  'design': `<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+    <path d="M12 19l7-7 3 3-7 7-3-3z"/>
+    <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/>
+    <path d="M2 2l7.586 7.586"/>
+    <circle cx="11" cy="11" r="2"/>
+  </svg>`,
+  'security': `<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+    <path d="M12 1l10 5v6c0 5.55-3.84 10.74-9 12-5.16-1.26-9-6.45-9-12V6l9-5z"/>
+  </svg>`,
+  'testing': `<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+    <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+  </svg>`,
+  'ai': `<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+    <path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V11a2 2 0 1 1-2 0V5.73C10.4 5.39 10 4.74 10 4a2 2 0 0 1 2-2z"/>
+    <path d="M12 13v8"/>
+    <path d="M12 18l-5-3"/>
+    <path d="M12 18l5-3"/>
+  </svg>`,
+  'blockchain': `<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+    <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+    <line x1="12" y1="22.08" x2="12" y2="12"/>
+  </svg>`,
+  'game': `<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+    <rect x="2" y="6" width="20" height="12" rx="2" />
+    <path d="M6 12h4m-2-2v4" />
+    <circle cx="15" cy="11" r="1" />
+    <circle cx="17" cy="13" r="1" />
+  </svg>`,
+  'desktop': `<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+    <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+    <line x1="8" y1="21" x2="16" y2="21" />
+    <line x1="12" y1="17" x2="12" y2="21" />
+  </svg>`,
+  'other': `<svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+    <circle cx="12" cy="12" r="10"/>
+    <path d="M12 16v-4"/>
+    <path d="M12 8h.01"/>
+  </svg>`,
+};
 
 @Component({
   selector: 'app-admin-technologies',
@@ -18,7 +95,14 @@ import { DOCUMENT } from '@angular/common'; // Import DOCUMENT
 export class AdminTechnologiesComponent implements OnInit {
   private techService = inject(TechnologiesService);
   private catService = inject(CategoriesService);
+  private contentService = inject(ContentService);
   private toast = inject(ToastService);
+  private sanitizer = inject(DomSanitizer);
+
+  getIconForCategory(type: string): SafeHtml {
+    const svg = SPECIALTY_ICONS[type] || SPECIALTY_ICONS['other'];
+    return this.sanitizer.bypassSecurityTrustHtml(svg);
+  }
 
   technologies = signal<Technology[]>([]);
   categories = signal<Category[]>([]);
@@ -176,9 +260,9 @@ export class AdminTechnologiesComponent implements OnInit {
     this.form = { 
       name: '', 
       icon: '',
-      show_in_about: false,
+      show_in_about: true,
       category: this.activeTab() || 'other',
-      level: 1
+      level: 4
     };
     this.searchResults.set([]);
     this.showModal.set(true);
@@ -189,9 +273,9 @@ export class AdminTechnologiesComponent implements OnInit {
     this.form = { 
       name: '', 
       icon: '',
-      show_in_about: false,
+      show_in_about: true,
       category: category || 'other',
-      level: 1
+      level: 4
     };
     this.searchResults.set([]);
     this.showModal.set(true);
@@ -236,7 +320,14 @@ export class AdminTechnologiesComponent implements OnInit {
   }
 
   async saveCategory() {
-    if (!this.categoryForm.name) return;
+    // If short_title is missing, we can't properly generate the slug or show it
+    if (!this.categoryForm.short_title) {
+      this.toast.error('El título corto es requerido');
+      return;
+    }
+
+    // Always regenerate name from short_title to ensure consistency
+    this.categoryForm.name = this.slugify(this.categoryForm.short_title);
     
     try {
       if (this.isEditingCategory() && this.editingCategoryId()) {
@@ -250,15 +341,17 @@ export class AdminTechnologiesComponent implements OnInit {
         this.toast.success('Categoría creada');
       }
       await this.loadCategories(); // Reload to get updates/new IDs
+      
+      // Refresh global content
+      this.contentService.refreshCategories();
+      this.contentService.refreshTechnologies();
+
       // If we renamed the category, we might need to update activeTab if it was the edited one
       // But for now let's keep it simple. User can click tab again.
       if (this.isEditingCategory() && this.categoryForm.name === this.activeTab()) {
          // keep active
-      } else if (this.isEditingCategory()) {
-         // if renamed, switch to new name
-         this.activeTab.set(this.categoryForm.name!);
       } else {
-         // if new, switch to it
+         // switch to new/renamed category
          this.activeTab.set(this.categoryForm.name!);
       }
 
@@ -289,6 +382,10 @@ export class AdminTechnologiesComponent implements OnInit {
       
       // Update grouped technologies locally (remove them)
       this.technologies.update(techs => techs.filter(t => t.category !== category.name));
+      
+      // Refresh global content as well
+      this.contentService.refreshCategories();
+      this.contentService.refreshTechnologies();
 
       // Switch tab
       if (this.categoryKeys().length > 0) {
@@ -337,6 +434,7 @@ export class AdminTechnologiesComponent implements OnInit {
         firstValueFrom(this.catService.update(cat.id, { display_order: index }))
       ));
       await this.loadCategories();
+      this.contentService.refreshCategories(); // Sync global
       this.toast.success('Orden de categorías actualizado');
       this.closeCategoryOrderModal();
     } catch (e) {
@@ -400,6 +498,8 @@ export class AdminTechnologiesComponent implements OnInit {
         this.technologies.update(techs => [...techs, created]);
         this.toast.success('Tecnología creada');
       }
+      
+      this.contentService.refreshTechnologies(); // Sync global
       this.closeModal();
     } catch (err) {
       console.error('Error saving technology', err);
@@ -415,6 +515,7 @@ export class AdminTechnologiesComponent implements OnInit {
     try {
       await firstValueFrom(this.techService.deleteTechnology(tech.id!));
       this.technologies.update(techs => techs.filter(t => t.id !== tech.id));
+      this.contentService.refreshTechnologies(); // Sync global
       this.toast.success('Tecnología eliminada');
     } catch (err) {
       console.error('Error deleting technology', err);
@@ -448,6 +549,7 @@ export class AdminTechnologiesComponent implements OnInit {
         );
 
         await this.updateOrder(event.container.data);
+        this.contentService.refreshTechnologies(); // Sync global
       } catch (err) {
         this.toast.error('Error al mover la tecnología');
       }
@@ -475,6 +577,7 @@ export class AdminTechnologiesComponent implements OnInit {
            return t;
         });
       });
+      // this.contentService.refreshTechnologies(); // Maybe overkill to sync order detail instantly, but helpful
 
     } catch (err) {
       console.error('Error updating order', err);
@@ -494,6 +597,7 @@ export class AdminTechnologiesComponent implements OnInit {
         
         // Refresh global categories
         await this.loadCategories();
+        this.contentService.refreshCategories(); // Sync global
         this.toast.success('Orden de categorías actualizado');
       } catch (e) {
         console.error(e);
@@ -515,6 +619,7 @@ export class AdminTechnologiesComponent implements OnInit {
 
     try {
       await firstValueFrom(this.techService.updateTechnology(tech.id!, { show_in_about: newValue, level: newLevel }));
+      this.contentService.refreshTechnologies(); // Sync global
     } catch(err) {
       this.toast.error('Error al actualizar');
       // Revert on error
@@ -538,6 +643,7 @@ export class AdminTechnologiesComponent implements OnInit {
 
     try {
        await firstValueFrom(this.techService.updateTechnology(tech.id!, { level: newLevel, show_in_about: newShowInAbout }));
+       this.contentService.refreshTechnologies(); // Sync global
     } catch (err) {
        this.toast.error('Error al actualizar nivel');
        // Revert

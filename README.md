@@ -89,22 +89,23 @@ services:
       POSTGRES_DB: portfolio_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U portfolio_user -d portfolio_db"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
 
   app:
     image: jorditomasg/portfolio-web-creator:latest
     container_name: portfolio-app
     environment:
-      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
-      - JWT_SECRET=${JWT_SECRET}
-      - NODE_ENV=${NODE_ENV}
-      - ADMIN_USERNAME=${ADMIN_USERNAME}
-      - ADMIN_EMAIL=${ADMIN_EMAIL}
-      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      # Database Configuration
+      - POSTGRES_USER=portfolio_user
+      - POSTGRES_PASSWORD=portfolio_pass
+      - POSTGRES_DB=portfolio_db
+      
+      # App Configuration (No .env file needed for testing)
+      - DATABASE_URL=postgresql://portfolio_user:portfolio_pass@db:5432/portfolio_db
+      - JWT_SECRET=change_this_secret_in_production
+      - NODE_ENV=production
+      - ADMIN_USERNAME=admin
+      - ADMIN_EMAIL=admin@example.com
+      - ADMIN_PASSWORD=admin123
     volumes:
       - ./backend:/app/backend
       - ./frontend:/app/frontend
