@@ -25,7 +25,7 @@ export class DashboardComponent implements OnInit {
     try {
       const messages = await firstValueFrom(this.http.get<any[]>('/api/admin/contacts'));
       this.totalMessages.set(messages.length);
-      this.unreadMessages.set(messages.filter(m => !m.read_status).length);
+      this.unreadMessages.set(messages.filter(m => !m.read).length);
     } catch (e) {
       console.error('Error loading messages stats', e);
     }

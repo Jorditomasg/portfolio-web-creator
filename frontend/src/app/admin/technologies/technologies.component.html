@@ -385,26 +385,39 @@
           </svg>
         </button>
       </div>
-      <div class="p-4 space-y-2 max-h-96 overflow-y-auto">
-        @for (cat of categoriesForOrdering(); track cat.id; let i = $index) {
-          <div class="flex items-center gap-3 bg-dark-bg rounded-lg p-3 border border-dark-border">
+      <div cdkDropList 
+           [cdkDropListData]="categoriesForOrdering()"
+           (cdkDropListDropped)="dropCategory($event)"
+           class="p-4 space-y-2 max-h-96 overflow-y-auto custom-scrollbar">
+        @for (cat of categoriesForOrdering(); track cat; let i = $index) {
+          <div cdkDrag 
+               class="flex items-center gap-3 bg-dark-bg rounded-lg p-3 border border-dark-border cursor-move hover:border-primary/50 group transition-colors">
+            
+            <!-- Custom Drag Preview -->
+            <div *cdkDragPreview class="bg-dark-bg/95 backdrop-blur rounded-lg border-2 border-primary shadow-2xl p-3 flex items-center gap-3 w-64">
+              <span class="w-4 h-4 rounded-full flex-shrink-0" [style.backgroundColor]="cat.color"></span>
+              <span class="text-white font-medium">{{ cat.short_title || cat.name }}</span>
+            </div>
+
+            <!-- Placeholder -->
+            <div *cdkDragPlaceholder class="bg-dark-border/30 border-2 border-dashed border-primary/50 rounded-lg h-12"></div>
+
+            <!-- Handle -->
+            <div cdkDragHandle class="text-gray-500 group-hover:text-white transition-colors">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"/>
+              </svg>
+            </div>
+
             <span class="w-4 h-4 rounded-full flex-shrink-0" [style.backgroundColor]="cat.color"></span>
-            <span class="flex-1 text-white font-medium">{{ cat.short_title || cat.name }}</span>
-            <div class="flex gap-1">
-              <button (click)="moveCategoryUp(i)" 
-                      [disabled]="i === 0"
-                      class="p-1.5 rounded hover:bg-dark-border disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
-                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
-                </svg>
-              </button>
-              <button (click)="moveCategoryDown(i)"
-                      [disabled]="i === categoriesForOrdering().length - 1"
-                      class="p-1.5 rounded hover:bg-dark-border disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
-                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                </svg>
-              </button>
+            
+            <span class="flex-1 text-white font-medium select-none">
+              {{ cat.long_title || cat.name }} 
+              <span class="text-xs text-gray-500 ml-2 font-mono">({{ cat.short_title || cat.name }})</span>
+            </span>
+
+            <div class="text-xs text-gray-500 font-mono">
+              #{{ i + 1 }}
             </div>
           </div>
         }

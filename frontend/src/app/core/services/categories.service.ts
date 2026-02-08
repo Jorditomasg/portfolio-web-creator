@@ -21,7 +21,7 @@ export class CategoriesService {
   }
 
   update(id: number, data: Partial<Category>): Observable<Category> {
-    return this.http.put<Category>(`${this.api}/${id}`, data);
+    return this.http.patch<Category>(`${this.api}/${id}`, data);
   }
 
   delete(id: number): Observable<void> {

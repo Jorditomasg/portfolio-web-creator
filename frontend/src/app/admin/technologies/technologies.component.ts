@@ -149,7 +149,7 @@ export class AdminTechnologiesComponent implements OnInit {
   async loadCategories() {
     try {
       const cats = await firstValueFrom(this.catService.getCategories());
-      this.categories.set(cats);
+      this.categories.set(cats.sort((a, b) => (a.display_order || 0) - (b.display_order || 0)));
     } catch (err) {
       console.error('Error loading categories', err);
       this.toast.error('Error al cargar categorías');
@@ -479,6 +479,26 @@ export class AdminTechnologiesComponent implements OnInit {
     } catch (err) {
       console.error('Error updating order', err);
       this.toast.error('Error al guardar el orden');
+    }
+  }
+
+  async dropCategory(event: CdkDragDrop<Category[]>) {
+    if (event.previousContainer === event.container) {
+      moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+      
+      const cats = event.container.data;
+      try {
+        await Promise.all(cats.map((cat, index) => 
+          firstValueFrom(this.catService.update(cat.id, { display_order: index }))
+        ));
+        
+        // Refresh global categories
+        await this.loadCategories();
+        this.toast.success('Orden de categorías actualizado');
+      } catch (e) {
+        console.error(e);
+        this.toast.error('Error al actualizar orden de categorías');
+      }
     }
   }
 

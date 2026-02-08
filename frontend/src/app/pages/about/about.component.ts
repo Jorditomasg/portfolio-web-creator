@@ -136,68 +136,30 @@ const SPECIALTY_ICONS: Record<string, string> = {
               </h2>
 
               <div class="space-y-6">
-                <!-- Frontend -->
-                <div class="bg-dark-surface p-6 rounded-xl border border-dark-border">
-                  <h3 class="text-lg font-semibold text-primary mb-4">{{ i18n.t('about.frontend') }}</h3>
-                  <div class="space-y-3">
-                    @for (skill of content.skillsByCategory().frontend; track skill.id) {
-                      <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                          <img [src]="getTechIcon(skill.name)" [alt]="skill.name" class="w-5 h-5">
-                          <span class="text-gray-300">{{ skill.name }}</span>
+                @for (group of content.skillsByCategory(); track group.category.id) {
+                  <div class="bg-dark-surface p-6 rounded-xl border border-dark-border">
+                    <h3 class="text-lg font-semibold mb-4" [style.color]="group.category.color">
+                      {{ i18n.isSpanish() ? (group.category.short_title || group.category.name) : (group.category.short_title_en || group.category.name) }}
+                    </h3>
+                    <div class="space-y-3">
+                      @for (skill of group.skills; track skill.id) {
+                        <div class="flex items-center justify-between">
+                          <div class="flex items-center gap-2">
+                            <img [src]="getTechIcon(skill.name)" [alt]="skill.name" class="w-5 h-5">
+                            <span class="text-gray-300">{{ skill.name }}</span>
+                          </div>
+                          <div class="flex gap-1">
+                            @for (_ of [1,2,3,4,5]; track $index; let i = $index) {
+                              <span class="w-2 h-2 rounded-full transition-colors" 
+                                    [class]="i < skill.level ? '' : 'bg-dark-border'"
+                                    [style.backgroundColor]="i < skill.level ? group.category.color : ''"></span>
+                            }
+                          </div>
                         </div>
-                        <div class="flex gap-1">
-                          @for (_ of [1,2,3,4,5]; track $index; let i = $index) {
-                            <span class="w-2 h-2 rounded-full transition-colors" 
-                                  [class]="i < skill.level ? 'bg-primary' : 'bg-dark-border'"></span>
-                          }
-                        </div>
-                      </div>
-                    }
+                      }
+                    </div>
                   </div>
-                </div>
-
-                <!-- Backend -->
-                <div class="bg-dark-surface p-6 rounded-xl border border-dark-border">
-                  <h3 class="text-lg font-semibold text-accent-green mb-4">{{ i18n.t('about.backend') }}</h3>
-                  <div class="space-y-3">
-                    @for (skill of content.skillsByCategory().backend; track skill.id) {
-                      <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                          <img [src]="getTechIcon(skill.name)" [alt]="skill.name" class="w-5 h-5">
-                          <span class="text-gray-300">{{ skill.name }}</span>
-                        </div>
-                        <div class="flex gap-1">
-                          @for (_ of [1,2,3,4,5]; track $index; let i = $index) {
-                            <span class="w-2 h-2 rounded-full transition-colors" 
-                                  [class]="i < skill.level ? 'bg-accent-green' : 'bg-dark-border'"></span>
-                          }
-                        </div>
-                      </div>
-                    }
-                  </div>
-                </div>
-
-                <!-- Tools -->
-                <div class="bg-dark-surface p-6 rounded-xl border border-dark-border">
-                  <h3 class="text-lg font-semibold text-accent-blue mb-4">{{ i18n.t('about.tools') }}</h3>
-                  <div class="space-y-3">
-                    @for (skill of content.skillsByCategory().tools; track skill.id) {
-                      <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                          <img [src]="getTechIcon(skill.name)" [alt]="skill.name" class="w-5 h-5">
-                          <span class="text-gray-300">{{ skill.name }}</span>
-                        </div>
-                        <div class="flex gap-1">
-                          @for (_ of [1,2,3,4,5]; track $index; let i = $index) {
-                            <span class="w-2 h-2 rounded-full transition-colors" 
-                                  [class]="i < skill.level ? 'bg-accent-blue' : 'bg-dark-border'"></span>
-                          }
-                        </div>
-                      </div>
-                    }
-                  </div>
-                </div>
+                }
               </div>
             </div>
           </div>
@@ -250,32 +212,13 @@ export class AboutComponent {
   }
 
   getTechIcon(tech: string): string {
-    const iconMap: Record<string, string> = {
-      'Angular': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/angularjs/angularjs-original.svg',
-      'TypeScript': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg',
-      'JavaScript': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg',
-      'React': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg',
-      'Vue': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vuejs/vuejs-original.svg',
-      'Node.js': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg',
-      'NestJS': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nestjs/nestjs-original.svg',
-      'Python': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg',
-      'PostgreSQL': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg',
-      'MySQL': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg',
-      'MongoDB': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg',
-      'Docker': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg',
-      'Git': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg',
-      'Tailwind': 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/tailwindcss/tailwindcss-original.svg',
-      'Bootstrap': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/bootstrap/bootstrap-original.svg',
-      'Material': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/materialui/materialui-original.svg',
-      'Java': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg',
-      'Spring Boot': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/spring/spring-original.svg',
-      'Laravel': 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/laravel/laravel-original.svg',
-      'AWS': 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/amazonwebservices/amazonwebservices-original-wordmark.svg',
-      'Jenkins': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/jenkins/jenkins-original.svg',
-      'English': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/devicon/devicon-original.svg',
-      'DevExtreme': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/devicon/devicon-original.svg',
-      'CodeIgniter': 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/codeigniter/codeigniter-plain.svg',
-    };
-    return iconMap[tech] || 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/devicon/devicon-original.svg';
+    // 1. Check if we have a defined technology with icon
+    const knownTech = this.content.technologies().find(t => t.name.toLowerCase() === tech.toLowerCase());
+    if (knownTech && knownTech.icon) {
+      return knownTech.icon;
+    }
+
+    // 2. Return empty string if not found (matching Home component strictness)
+    return '';
   }
 }

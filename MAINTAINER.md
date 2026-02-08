@@ -10,14 +10,14 @@
 
 ```bash
 # Build the unified image (backend + frontend in one)
-docker build -t jorditomasg/portfolio:latest -f Dockerfile .
+docker build -t jorditomasg/portfolio-web-creator:latest -f Dockerfile .
 
 # Optional: Tag with version
-docker tag jorditomasg/portfolio:latest jorditomasg/portfolio:v1.0.0
+docker tag jorditomasg/portfolio-web-creator:latest jorditomasg/portfolio-web-creator:v1.0.0
 
 # Push to Docker Hub
-docker push jorditomasg/portfolio:latest
-docker push jorditomasg/portfolio:v1.0.0  # If versioned
+docker push jorditomasg/portfolio-web-creator:latest
+docker push jorditomasg/portfolio-web-creator:v1.0.0  # If versioned
 ```
 
 ### Multi-Architecture Build (Optional)
@@ -30,7 +30,7 @@ docker buildx create --name multiarch --use
 
 # Build and push for multiple architectures
 docker buildx build --platform linux/amd64,linux/arm64 \
-  -t jorditomasg/portfolio:latest \
+  -t jorditomasg/portfolio-web-creator:latest \
   -f Dockerfile \
   --push .
 ```
@@ -63,9 +63,9 @@ Environment variables are converted to `.env` file automatically via `docker-ent
 ## Updating the Image
 
 1. Make changes to backend or frontend
-2. Rebuild the unified image: `docker build -t jorditomasg/portfolio:latest -f Dockerfile .`
+2. Rebuild the unified image: `docker build -t jorditomasg/portfolio-web-creator:latest -f Dockerfile .`
 3. Test locally
-4. Push to Docker Hub: `docker push jorditomasg/portfolio:latest`
+4. Push to Docker Hub: `docker push jorditomasg/portfolio-web-creator:latest`
 5. Users pull the new image with `docker compose pull && docker compose up -d`
 
 ## File Structure

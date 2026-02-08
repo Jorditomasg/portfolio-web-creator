@@ -9,6 +9,7 @@ import {
   HeroContent,
   PortfolioSettings,
   Specialty,
+  Category,
 } from '../models/api.models';
 import { Technology } from '../models/technology.model';
 
@@ -26,6 +27,7 @@ export class ContentService {
   private _settings = signal<PortfolioSettings | null>(null);
   private _specialties = signal<Specialty[]>([]);
   private _technologies = signal<Technology[]>([]);
+  private _categories = signal<Category[]>([]);
   private _isLoading = signal(false);
   private _error = signal<string | null>(null);
 
@@ -38,6 +40,7 @@ export class ContentService {
   readonly settings = this._settings.asReadonly();
   readonly specialties = this._specialties.asReadonly();
   readonly technologies = this._technologies.asReadonly();
+  readonly categories = this._categories.asReadonly();
   readonly isLoading = this._isLoading.asReadonly();
   readonly error = this._error.asReadonly();
 
@@ -55,32 +58,53 @@ export class ContentService {
   readonly skillsByCategory = computed(() => {
     // Filter technologies that should be shown in about
     const skills = this._technologies().filter(t => t.show_in_about);
-    
-    // Create result object with fixed category properties for backward compatibility
-    const result: Record<string, Technology[]> & {
-      frontend: Technology[];
-      backend: Technology[];
-      tools: Technology[];
-      other: Technology[];
-    } = {
-      frontend: [],
-      backend: [],
-      tools: [],
-      other: []
-    };
-    
+    const categories = this._categories();
+
     // Group by category
+    const grouped: Record<string, Technology[]> = {};
     skills.forEach(skill => {
       const cat = skill.category || 'other';
-      if (!result[cat]) {
-        result[cat] = [];
-      }
-      result[cat].push(skill);
+      if (!grouped[cat]) grouped[cat] = [];
+      grouped[cat].push(skill);
     });
 
-    // Sort within categories by display_order
-    Object.keys(result).forEach(cat => {
-      result[cat].sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
+    // Create result structure: Array of { category: Category | string, skills: Technology[] }
+    // Sort categories by display_order
+    const sortedCategories = [...categories].sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
+    
+    const result: { category: Category, skills: Technology[] }[] = [];
+
+    // Add defined categories if they have skills
+    sortedCategories.forEach(cat => {
+      if (grouped[cat.name] && grouped[cat.name].length > 0) {
+        // Sort skills within category
+        const catSkills = grouped[cat.name].sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
+        result.push({ category: cat, skills: catSkills });
+        delete grouped[cat.name];
+      }
+    });
+
+    // Handle 'other' or undefined categories if any remain and have skills
+    // We can attach them to a dummy Category object or handle them separately.
+    // Assuming 'other' is mapped to a fallback or just pushed at the end.
+    Object.keys(grouped).forEach(key => {
+      if (grouped[key].length > 0) {
+        // Create a mock category for unknown ones
+        const mockCat: Category = {
+          id: -1,
+          name: key,
+          long_title: key.charAt(0).toUpperCase() + key.slice(1),
+          short_title: key.charAt(0).toUpperCase() + key.slice(1),
+          // ... defaults
+          display_order: 999,
+          color: '#6B7280',
+          created_at: new Date(),
+          updated_at: new Date(),
+          technologies: []
+        } as any; 
+        
+        result.push({ category: mockCat, skills: grouped[key] });
+      }
     });
 
     return result;
@@ -99,7 +123,7 @@ export class ContentService {
     this._error.set(null);
 
     try {
-      const [projects, experiences, about, hero, settings, specialties, technologies] = await Promise.all([
+      const [projects, experiences, about, hero, settings, specialties, technologies, categories] = await Promise.all([
         firstValueFrom(this.http.get<Project[]>(`${this.apiUrl}/projects`)),
         firstValueFrom(this.http.get<Experience[]>(`${this.apiUrl}/experiences`)),
         firstValueFrom(this.http.get<AboutContent>(`${this.apiUrl}/about`)),
@@ -107,6 +131,7 @@ export class ContentService {
         firstValueFrom(this.http.get<PortfolioSettings>(`${this.apiUrl}/settings`)),
         firstValueFrom(this.http.get<Specialty[]>(`${this.apiUrl}/specialties`)),
         firstValueFrom(this.http.get<Technology[]>(`${this.apiUrl}/technologies`)),
+        firstValueFrom(this.http.get<Category[]>(`${this.apiUrl}/categories`)),
       ]);
 
       this._projects.set(projects || []);
@@ -117,6 +142,7 @@ export class ContentService {
       this._settings.set(settings);
       this._specialties.set(specialties || []);
       this._technologies.set(technologies || []);
+      this._categories.set(categories || []);
     } catch (err) {
       console.error('Failed to load content', err);
       this._error.set('Error al cargar el contenido');

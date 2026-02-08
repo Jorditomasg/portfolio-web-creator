@@ -65,9 +65,9 @@ docker compose up -d
 
 ---
 
-### Method 2: Docker Hub (No Git Clone Required)
+### Method 2: Docker Hub (Automated Deployment)
 
-Perfect for quick deployment without cloning the repository.
+Perfect for quick deployment. The container will **automatically download and update** the source code into your local folders using the latest image.
 
 1. **Create a directory**
 ```bash
@@ -96,15 +96,18 @@ services:
       retries: 5
 
   app:
-    image: jorditomasg/portfolio:latest
+    image: jorditomasg/portfolio-web-creator:latest
     container_name: portfolio-app
     environment:
-      - DATABASE_URL=postgresql://portfolio_user:portfolio_pass@db:5432/portfolio_db
-      - JWT_SECRET=demo_jwt_secret_change_in_production
-      - NODE_ENV=production
-      - ADMIN_USERNAME=admin
-      - ADMIN_EMAIL=admin@demo.com
-      - ADMIN_PASSWORD=demo123
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      - JWT_SECRET=${JWT_SECRET}
+      - NODE_ENV=${NODE_ENV}
+      - ADMIN_USERNAME=${ADMIN_USERNAME}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+    volumes:
+      - ./backend:/app/backend
+      - ./frontend:/app/frontend
     depends_on:
       db:
         condition: service_healthy
@@ -121,6 +124,7 @@ volumes:
 ```bash
 docker compose up -d
 ```
+*The `backend` and `frontend` folders will be automatically created and populated with the latest code from the image.*
 
 4. **Access your portfolio**
 - Frontend: http://localhost:4200

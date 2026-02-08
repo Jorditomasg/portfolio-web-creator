@@ -25,10 +25,17 @@ COPY --from=backend-builder /app/backend/package*.json ./backend/
 # Copy frontend build
 COPY --from=frontend-builder /app/frontend/dist/frontend/browser ./frontend/dist
 
-# Install serve for frontend
-RUN npm install -g serve
+# Install serve for frontend and rsync for volume syncing
+RUN npm install -g serve && apk add --no-cache rsync
 
-# Entrypoint script to generate .env
+# Create backup of FULL populated app (source + node_modules + dist) for volume syncing
+# We copy the ALREADY POPULATED /app/backend and /app/frontend to /app/backup
+# This ensures that when we sync to volume, we provide a fully working environment
+RUN mkdir -p /app/backup && \
+    cp -r /app/backend /app/backup/backend && \
+    cp -r /app/frontend /app/backup/frontend
+
+# Entrypoint script to generate .env and populate volumes
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
 

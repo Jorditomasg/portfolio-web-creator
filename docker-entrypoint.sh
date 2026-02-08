@@ -1,7 +1,15 @@
 #!/bin/sh
 set -e
 
-# Generate .env file from environment variables
+# Sync backend volume (updates code from image to volume)
+echo "🔄 Syncing backend source code from image..."
+rsync -a --info=progress2 --exclude='.env' /app/backup/backend/ /app/backend/
+
+# Sync frontend volume
+echo "🔄 Syncing frontend source code from image..."
+rsync -a --info=progress2 /app/backup/frontend/ /app/frontend/
+
+# Generate .env file from environment variables for backend
 cat > /app/backend/.env << EOF
 DATABASE_URL=${DATABASE_URL:-postgresql://portfolio_user:portfolio_pass@db:5432/portfolio_db}
 JWT_SECRET=${JWT_SECRET:-demo_jwt_secret_change_in_production}
@@ -11,7 +19,7 @@ ADMIN_EMAIL=${ADMIN_EMAIL:-admin@demo.com}
 ADMIN_PASSWORD=${ADMIN_PASSWORD:-demo123}
 EOF
 
-echo "✅ Generated .env file with environment variables"
+echo "✅ Environment configured"
 
 # Execute the main command
 exec "$@"
