@@ -6,11 +6,12 @@ import { ContentService } from '../../core/services/content.service';
 import { ToastService } from '../../core/services/toast.service';
 import { firstValueFrom } from 'rxjs';
 import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { FileUploadComponent } from '../../shared/components/file-upload/file-upload.component';
 
 @Component({
   selector: 'app-admin-projects',
   standalone: true,
-  imports: [FormsModule, RouterLink, DragDropModule],
+  imports: [FormsModule, RouterLink, DragDropModule, FileUploadComponent],
   templateUrl: './projects.component.html',
 })
 export class AdminProjectsComponent {

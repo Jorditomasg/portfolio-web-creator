@@ -15,6 +15,9 @@ import { SpecialtiesModule } from './specialties/specialties.module';
 import { ContactModule } from './contact/contact.module';
 import { TechnologiesModule } from './technologies/technologies.module';
 import { CategoriesModule } from './categories/categories.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
+import { UploadModule } from './upload/upload.module';
 import * as entities from './entities';
 
 @Module({
@@ -60,6 +63,11 @@ import * as entities from './entities';
     ContactModule,
     TechnologiesModule,
     CategoriesModule,
+    UploadModule,
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
+      serveRoot: '/uploads',
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],

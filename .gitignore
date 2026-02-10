@@ -65,6 +65,7 @@ Thumbs.db
 # ===========================================
 # Docker volumes and local data
 postgres_data/
+uploads/
 
 # ===========================================
 # MISC

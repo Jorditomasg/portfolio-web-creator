@@ -12,7 +12,7 @@ export class CreateExperienceDto {
   @IsString()
   company: string;
 
-  @IsUrl()
+  @IsString()
   @IsOptional()
   @Transform(({ value }) => value === '' ? null : value)
   company_logo?: string;

@@ -32,8 +32,6 @@ export class HeroContent {
   @Column({ type: 'text', nullable: true })
   description_en: string;
 
-  @Column({ length: 500, nullable: true })
-  background_image_url: string;
 
   @CreateDateColumn()
   created_at: Date;

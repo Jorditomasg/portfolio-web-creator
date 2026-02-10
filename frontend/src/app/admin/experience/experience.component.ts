@@ -6,11 +6,12 @@ import { ToastService } from '../../core/services/toast.service';
 import { firstValueFrom } from 'rxjs';
 import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Experience } from '../../core/models/api.models';
+import { FileUploadComponent } from '../../shared/components/file-upload/file-upload.component';
 
 @Component({
   selector: 'app-admin-experience',
   standalone: true,
-  imports: [FormsModule, DragDropModule],
+  imports: [FormsModule, DragDropModule, FileUploadComponent],
   templateUrl: './experience.component.html',
 })
 export class AdminExperienceComponent {
@@ -100,7 +101,7 @@ export class AdminExperienceComponent {
       period = period.charAt(0).toUpperCase() + period.slice(1);
     }
 
-    const data = { 
+    const data: any = { 
       ...this.form, 
       period,
       start_date: this.form.start_date ? this.form.start_date + '-01' : null,
@@ -108,8 +109,13 @@ export class AdminExperienceComponent {
       achievements: this.form.achievementsText.split('\n').map((a: string) => a.trim()).filter((a: string) => a),
       achievements_en: this.form.achievementsTextEn?.split('\n').map((a: string) => a.trim()).filter((a: string) => a) || []
     };
+    
+    // Remove temporary and read-only fields
     delete data.achievementsText;
     delete data.achievementsTextEn;
+    delete data.id;
+    delete data.created_at;
+    delete data.updated_at;
     
     try {
       if (this.editing()) { 

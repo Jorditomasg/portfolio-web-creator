@@ -4,11 +4,12 @@ import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { ContentService } from '../../core/services/content.service';
 import { ToastService } from '../../core/services/toast.service';
+import { FileUploadComponent } from '../../shared/components/file-upload/file-upload.component';
 
 @Component({
   selector: 'app-admin-settings',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, FileUploadComponent],
   templateUrl: './settings.component.html',
 })
 export class AdminSettingsComponent {
@@ -40,7 +41,7 @@ export class AdminSettingsComponent {
   ];
 
   form: any = { 
-    site_title: '', main_photo_url: '', meta_description: '', 
+    site_title: '', main_photo_url: '', meta_description: '', seo_image_url: '', hero_background_url: '',
     linkedin_url: '', github_url: '', email: '',
     favicon_type: 'terminal', accent_color: '#F5A623', show_admin_link: false,
     enable_contact_form: true, enable_email_sending: false, enable_database_storage: true,
@@ -53,7 +54,9 @@ export class AdminSettingsComponent {
       if (settings) {
         this.form.site_title = settings.site_title || '';
         this.form.main_photo_url = settings.main_photo_url || '';
+        this.form.hero_background_url = settings.hero_background_url || '';
         this.form.meta_description = settings.meta_description || '';
+        this.form.seo_image_url = settings.seo_image_url || '';
         this.form.linkedin_url = settings.linkedin_url || '';
         this.form.github_url = settings.github_url || '';
         this.form.email = settings.email || '';
@@ -85,6 +88,8 @@ export class AdminSettingsComponent {
       const data = {
         site_title: this.form.site_title,
         main_photo_url: this.form.main_photo_url || null,
+        hero_background_url: this.form.hero_background_url || null,
+        seo_image_url: this.form.seo_image_url || null,
         meta_description: this.form.meta_description,
         linkedin_url: this.form.linkedin_url || null,
         github_url: this.form.github_url || null,

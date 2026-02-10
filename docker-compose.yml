@@ -43,6 +43,8 @@ services:
         condition: service_healthy
     ports:
       - "3000:3000"
+    volumes:
+      - ./uploads:/app/uploads
     command: /bin/sh -c "npm run seed:prod && npm run start:prod"
 
   # Angular Frontend (Served by internal Nginx)

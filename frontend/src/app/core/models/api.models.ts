@@ -53,7 +53,6 @@ export interface AboutContent {
   id: number;
   bio: string | null;
   bio_en: string | null;
-  image_url: string | null;
   highlights: string[];
   highlights_en: string[];
   created_at: string;
@@ -70,7 +69,6 @@ export interface HeroContent {
   subtitle_en: string | null;
   description: string | null;
   description_en: string | null;
-  background_image_url: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -79,6 +77,8 @@ export interface PortfolioSettings {
   id: number;
   site_title: string;
   main_photo_url: string | null;
+  hero_background_url: string | null;
+  seo_image_url: string | null;
   meta_description: string | null;
   linkedin_url: string | null;
   github_url: string | null;

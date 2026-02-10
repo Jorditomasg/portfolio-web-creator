@@ -4,11 +4,13 @@ import { HttpClient } from '@angular/common/http';
 import { ContentService } from '../../core/services/content.service';
 import { ToastService } from '../../core/services/toast.service';
 import { firstValueFrom } from 'rxjs';
+import { FileUploadComponent } from '../../shared/components/file-upload/file-upload.component';
 
 @Component({
   selector: 'app-admin-about',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, FileUploadComponent],
+
   templateUrl: './about.component.html',
 })
 export class AdminAboutComponent {
@@ -20,10 +22,17 @@ export class AdminAboutComponent {
   isDirtyAbout = signal(false);
   isDirtyHero = signal(false);
 
-  aboutForm = { bio: '', bio_en: '', highlightsText: '', highlightsText_en: '' };
+  aboutForm: { bio: string; bio_en: string; highlightsText: string; highlightsText_en: string } = { 
+    bio: '', bio_en: '', highlightsText: '', highlightsText_en: '' 
+  };
+
   initialAboutForm: any = {};
 
-  heroForm: any = { title: '', title_highlight: '', title_en: '', title_highlight_en: '', subtitle: '', subtitle_en: '', description: '', description_en: '' };
+  heroForm: any = { 
+    title: '', title_highlight: '', title_en: '', title_highlight_en: '', 
+    subtitle: '', subtitle_en: '', description: '', description_en: '' 
+  };
+
   initialHeroForm: any = {};
 
   isDirty = computed(() => this.isDirtyAbout() || this.isDirtyHero());
@@ -90,8 +99,10 @@ export class AdminAboutComponent {
       }
 
       if (this.isDirtyHero()) {
+        const payload = { ...this.heroForm };
+        
         promises.push(
-          firstValueFrom(this.http.put('/api/hero', this.heroForm))
+          firstValueFrom(this.http.put('/api/hero', payload))
             .then(() => {
               this.initialHeroForm = JSON.parse(JSON.stringify(this.heroForm));
               this.checkDirtyHero();

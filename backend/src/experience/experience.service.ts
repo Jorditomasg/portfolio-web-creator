@@ -13,7 +13,7 @@ export class ExperienceService {
   ) {}
 
   async findAll(): Promise<Experience[]> {
-    return this.experienceRepository.find({ order: { start_date: 'DESC', display_order: 'ASC' } });
+    return this.experienceRepository.find({ order: { display_order: 'ASC', start_date: 'DESC' } });
   }
 
   async findOne(id: number): Promise<Experience> {

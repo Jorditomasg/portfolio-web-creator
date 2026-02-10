@@ -14,6 +14,12 @@ export class PortfolioSettings {
   @Column({ type: 'text', nullable: true })
   meta_description: string;
 
+  @Column({ length: 500, nullable: true })
+  seo_image_url: string;
+
+  @Column({ length: 500, nullable: true })
+  hero_background_url: string;
+
   // Social links (optional)
   @Column({ length: 255, nullable: true })
   linkedin_url: string;

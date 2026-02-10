@@ -11,8 +11,6 @@ export class AboutContent {
   @Column({ type: 'text', nullable: true })
   bio_en: string;
 
-  @Column({ length: 500, nullable: true })
-  image_url: string;
 
   @Column({ type: 'text', array: true, default: [] })
   highlights: string[];

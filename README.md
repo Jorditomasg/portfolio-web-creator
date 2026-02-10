@@ -89,6 +89,8 @@ services:
       POSTGRES_DB: portfolio_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./uploads:/app/uploads
+    restart: unless-stopped
 
   app:
     image: jorditomasg/portfolio-web-creator:latest
@@ -111,6 +113,8 @@ services:
       - "3000:3000"
       - "4200:4200"
     restart: unless-stopped
+    volumes:
+      - ./uploads:/app/uploads
 
 volumes:
   postgres_data:

@@ -5,10 +5,17 @@ export class UpdateSettingsDto {
   @IsOptional()
   site_title?: string;
 
-  @ValidateIf(o => o.main_photo_url !== '' && o.main_photo_url != null)
-  @IsUrl()
+  @IsString()
   @IsOptional()
   main_photo_url?: string;
+
+  @IsString()
+  @IsOptional()
+  hero_background_url?: string;
+
+  @IsString()
+  @IsOptional()
+  seo_image_url?: string;
 
   @IsString()
   @IsOptional()

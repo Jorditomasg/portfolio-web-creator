@@ -25,7 +25,7 @@ export class CreateProjectDto {
   @IsOptional()
   long_description_en?: string;
 
-  @IsUrl()
+  @IsString()
   @IsOptional()
   @Transform(({ value }) => value === '' ? null : value)
   image_url?: string;
@@ -55,12 +55,22 @@ export class CreateProjectDto {
 
   @IsString()
   @IsOptional()
-  @Transform(({ value }) => value === '' ? null : value)
+  @Transform(({ value }) => {
+    if (!value) return null;
+    if (value === '') return null;
+    if (/^\d{4}-\d{2}$/.test(value)) return `${value}-01`;
+    return value;
+  })
   start_date?: string;
 
   @IsString()
   @IsOptional()
-  @Transform(({ value }) => value === '' ? null : value)
+  @Transform(({ value }) => {
+    if (!value) return null;
+    if (value === '') return null;
+    if (/^\d{4}-\d{2}$/.test(value)) return `${value}-01`;
+    return value;
+  })
   end_date?: string;
 
   @IsInt()

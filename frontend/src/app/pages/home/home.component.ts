@@ -81,9 +81,8 @@ const SPECIALTY_ICONS: Record<string, string> = {
 
 @Component({
   selector: 'app-home',
-  standalone: true,
-  imports: [RouterLink],
   templateUrl: './home.component.html',
+  imports: [RouterLink],
 })
 export class HomeComponent {
   content = inject(ContentService);

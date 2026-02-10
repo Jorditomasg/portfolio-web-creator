@@ -29,9 +29,7 @@
           <div class="flex-1 min-w-0">
             <h3 class="text-white font-medium truncate">{{ project.title }}</h3>
             <div class="flex items-center gap-3 text-sm text-gray-400 mt-1">
-              @if (project.start_date) {
-                <span>{{ formatDate(project.start_date) }}@if (project.end_date) { - {{ formatDate(project.end_date) }}}</span>
-              }
+              <!-- Date removed -->
               <div class="flex gap-1">
                 @for (tech of project.technologies?.slice(0, 3) || []; track tech) {
                   <span class="px-1.5 py-0.5 bg-dark-bg text-xs rounded">{{ tech }}</span>
@@ -113,21 +111,27 @@
           </div>
 
           <!-- URLs -->
-          <div class="grid grid-cols-3 gap-4">
+          <div class="space-y-4">
+             <!-- Full width image upload -->
             <div>
-              <label class="block text-sm text-gray-400 mb-1">URL Imagen</label>
-              <input [(ngModel)]="form.image_url" name="image_url"
-                     class="w-full px-4 py-2 bg-dark-bg border border-dark-border rounded-lg focus:border-primary outline-none text-white">
+              <app-file-upload 
+                label="Imagen de Portada" 
+                [currentPath]="form.image_url" 
+                (pathChange)="form.image_url = $event">
+              </app-file-upload>
             </div>
-            <div>
-              <label class="block text-sm text-gray-400 mb-1">URL Demo</label>
-              <input [(ngModel)]="form.demo_url" name="demo_url"
-                     class="w-full px-4 py-2 bg-dark-bg border border-dark-border rounded-lg focus:border-primary outline-none text-white">
-            </div>
-            <div>
-              <label class="block text-sm text-gray-400 mb-1">URL GitHub</label>
-              <input [(ngModel)]="form.github_url" name="github_url"
-                     class="w-full px-4 py-2 bg-dark-bg border border-dark-border rounded-lg focus:border-primary outline-none text-white">
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm text-gray-400 mb-1">URL Demo</label>
+                <input [(ngModel)]="form.demo_url" name="demo_url"
+                       class="w-full px-4 py-2 bg-dark-bg border border-dark-border rounded-lg focus:border-primary outline-none text-white">
+              </div>
+              <div>
+                <label class="block text-sm text-gray-400 mb-1">URL GitHub</label>
+                <input [(ngModel)]="form.github_url" name="github_url"
+                       class="w-full px-4 py-2 bg-dark-bg border border-dark-border rounded-lg focus:border-primary outline-none text-white">
+              </div>
             </div>
           </div>
           
@@ -192,13 +196,13 @@
           <div class="space-y-3">
             <div class="flex items-center gap-4">
               <div class="flex-1">
-                <label class="block text-sm text-gray-400 mb-1">Fecha Inicio (o solo año)</label>
-                <input type="date" [(ngModel)]="form.start_date" name="start_date"
+                <label class="block text-sm text-gray-400 mb-1">Fecha Inicio</label>
+                <input type="month" [(ngModel)]="form.start_date" name="start_date"
                        class="w-full px-4 py-2 bg-dark-bg border border-dark-border rounded-lg focus:border-primary outline-none text-white">
               </div>
               <div class="flex-1">
                 <label class="block text-sm text-gray-400 mb-1">Fecha Fin</label>
-                <input type="date" [(ngModel)]="form.end_date" name="end_date"
+                <input type="month" [(ngModel)]="form.end_date" name="end_date"
                        [disabled]="form.is_in_progress"
                        [class.opacity-50]="form.is_in_progress"
                        class="w-full px-4 py-2 bg-dark-bg border border-dark-border rounded-lg focus:border-primary outline-none text-white">
