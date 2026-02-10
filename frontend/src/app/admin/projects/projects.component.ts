@@ -46,6 +46,8 @@ export class AdminProjectsComponent {
   closeModal() { this.showModal.set(false); }
 
   edit(project: any) {
+    const fmtDate = (d: any) => d ? new Date(d).toISOString().substring(0, 7) : '';
+
     // Only keep editable fields, not id, created_at, updated_at
     this.form = { 
       title: project.title || '',
@@ -61,8 +63,8 @@ export class AdminProjectsComponent {
       featured: project.featured || false,
       is_in_progress: project.is_in_progress || false,
       display_order: project.display_order || 0,
-      start_date: project.start_date ? project.start_date.split('T')[0] : '',
-      end_date: project.end_date ? project.end_date.split('T')[0] : ''
+      start_date: fmtDate(project.start_date),
+      end_date: fmtDate(project.end_date)
     };
     this.editing.set(project.id);
     this.showModal.set(true);

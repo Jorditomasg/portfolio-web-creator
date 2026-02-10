@@ -20,7 +20,7 @@ export class ContentService {
 
   // Reactive state with signals
   private _projects = signal<Project[]>([]);
-  private _skills = signal<Skill[]>([]);
+  private _skills = signal<Skill[]>([]); // Keep if needed for backward compat, though depleted
   private _experiences = signal<Experience[]>([]);
   private _about = signal<AboutContent | null>(null);
   private _hero = signal<HeroContent | null>(null);
@@ -28,6 +28,7 @@ export class ContentService {
   private _specialties = signal<Specialty[]>([]);
   private _technologies = signal<Technology[]>([]);
   private _categories = signal<Category[]>([]);
+  
   private _isLoading = signal(false);
   private _error = signal<string | null>(null);
 
@@ -85,8 +86,6 @@ export class ContentService {
     });
 
     // Handle 'other' or undefined categories if any remain and have skills
-    // We can attach them to a dummy Category object or handle them separately.
-    // Assuming 'other' is mapped to a fallback or just pushed at the end.
     Object.keys(grouped).forEach(key => {
       if (grouped[key].length > 0) {
         // Create a mock category for unknown ones
@@ -111,8 +110,6 @@ export class ContentService {
   });
 
   readonly specialtyCategories = computed(() => {
-    // Filter categories that have enough info to be shown as a "Specialty Card" (Hero/About)
-    // User requirement: Must have long_title and description.
     return this.skillsByCategory().filter(group => 
       group.category && 
       group.category.long_title && 
@@ -125,64 +122,101 @@ export class ContentService {
   );
 
   constructor() {
-    this.loadAllContent();
+    // No explicit loadAllContent() here anymore
   }
 
-  async loadAllContent(): Promise<void> {
+  // --- Granular Fetch Methods ---
+
+  async loadProjects(force: boolean = false): Promise<void> {
+    if (!force && this._projects().length > 0) return;
+    await this.fetchData(this._projects, `${this.apiUrl}/projects`);
+  }
+
+  async loadExperiences(force: boolean = false): Promise<void> {
+    if (!force && this._experiences().length > 0) return;
+    await this.fetchData(this._experiences, `${this.apiUrl}/experiences`);
+  }
+
+  async loadAbout(force: boolean = false): Promise<void> {
+    if (!force && this._about()) return;
+    await this.fetchData(this._about, `${this.apiUrl}/about`);
+  }
+
+  async loadHero(force: boolean = false): Promise<void> {
+    if (!force && this._hero()) return;
+    await this.fetchData(this._hero, `${this.apiUrl}/hero`);
+  }
+
+  async loadSettings(force: boolean = false): Promise<void> {
+    if (!force && this._settings()) return;
+    await this.fetchData(this._settings, `${this.apiUrl}/settings`);
+  }
+
+  async loadSpecialties(force: boolean = false): Promise<void> {
+    if (!force && this._specialties().length > 0) return;
+    await this.fetchData(this._specialties, `${this.apiUrl}/specialties`);
+  }
+
+  async loadTechnologies(force: boolean = false): Promise<void> {
+    if (!force && this._technologies().length > 0) return;
+    await this.fetchData(this._technologies, `${this.apiUrl}/technologies`);
+  }
+
+  async loadCategories(force: boolean = false): Promise<void> {
+    if (!force && this._categories().length > 0) return;
+    await this.fetchData(this._categories, `${this.apiUrl}/categories`);
+  }
+
+  async loadSkills(force: boolean = false): Promise<void> {
+    if (!force && this._skills().length > 0) return;
+    await this.fetchData(this._skills, `${this.apiUrl}/skills`);
+  }
+
+  /**
+   * Helper to fetch data and update a signal.
+   * Handles loading state and errors.
+   */
+  private async fetchData<T>(signal: any, url: string): Promise<void> {
     this._isLoading.set(true);
     this._error.set(null);
-
     try {
-      const [projects, experiences, about, hero, settings, specialties, technologies, categories] = await Promise.all([
-        firstValueFrom(this.http.get<Project[]>(`${this.apiUrl}/projects`)),
-        firstValueFrom(this.http.get<Experience[]>(`${this.apiUrl}/experiences`)),
-        firstValueFrom(this.http.get<AboutContent>(`${this.apiUrl}/about`)),
-        firstValueFrom(this.http.get<HeroContent>(`${this.apiUrl}/hero`)),
-        firstValueFrom(this.http.get<PortfolioSettings>(`${this.apiUrl}/settings`)),
-        firstValueFrom(this.http.get<Specialty[]>(`${this.apiUrl}/specialties`)),
-        firstValueFrom(this.http.get<Technology[]>(`${this.apiUrl}/technologies`)),
-        firstValueFrom(this.http.get<Category[]>(`${this.apiUrl}/categories`)),
-      ]);
-
-      this._projects.set(projects || []);
-      // this._skills.set(skills || []); // Deprecated
-      this._experiences.set(experiences || []);
-      this._about.set(about);
-      this._hero.set(hero);
-      this._settings.set(settings);
-      this._specialties.set(specialties || []);
-      this._technologies.set(technologies || []);
-      this._categories.set(categories || []);
-    } catch (err) {
-      console.error('Failed to load content', err);
-      this._error.set('Error al cargar el contenido');
+        const data = await firstValueFrom(this.http.get<T>(url));
+        signal.set(data || (Array.isArray(data) ? [] : null));
+    } catch (err: any) {
+        console.error(`Error loading ${url}`, err);
+        this._error.set(err.message || 'Error loading content');
     } finally {
-      this._isLoading.set(false);
+        this._isLoading.set(false);
     }
   }
 
-  async refreshProjects(): Promise<void> {
-    const projects = await firstValueFrom(this.http.get<Project[]>(`${this.apiUrl}/projects`));
-    this._projects.set(projects || []);
+  /**
+   * @deprecated Use granular load methods instead.
+   */
+  async loadAllContent(): Promise<void> {
+    this._isLoading.set(true);
+    try {
+      await Promise.all([
+        this.loadProjects(),
+        this.loadExperiences(),
+        this.loadAbout(),
+        this.loadHero(),
+        this.loadSettings(),
+        this.loadSpecialties(),
+        this.loadTechnologies(),
+        this.loadCategories()
+      ]);
+    } catch (err) {
+      console.error('Failed to load content', err);
+    } finally {
+        this._isLoading.set(false);
+    }
   }
 
-  async refreshSkills(): Promise<void> {
-    const skills = await firstValueFrom(this.http.get<Skill[]>(`${this.apiUrl}/skills`));
-    this._skills.set(skills || []);
-  }
-
-  async refreshSpecialties(): Promise<void> {
-    const specialties = await firstValueFrom(this.http.get<Specialty[]>(`${this.apiUrl}/specialties`));
-    this._specialties.set(specialties || []);
-  }
-  
-  async refreshTechnologies(): Promise<void> {
-    const technologies = await firstValueFrom(this.http.get<Technology[]>(`${this.apiUrl}/technologies`));
-    this._technologies.set(technologies || []);
-  }
-
-  async refreshCategories(): Promise<void> {
-    const categories = await firstValueFrom(this.http.get<Category[]>(`${this.apiUrl}/categories`));
-    this._categories.set(categories || []);
-  }
+  // Wrappers for backward compatibility or explicit refresh
+  async refreshProjects() { await this.loadProjects(true); }
+  async refreshSkills() { await this.loadSkills(true); }
+  async refreshSpecialties() { await this.loadSpecialties(true); }
+  async refreshTechnologies() { await this.loadTechnologies(true); }
+  async refreshCategories() { await this.loadCategories(true); }
 }
