@@ -5,6 +5,10 @@ export class UpdateAboutDto {
   @IsOptional()
   bio?: string;
 
+  @IsString()
+  @IsOptional()
+  bio_en?: string;
+
   @IsUrl()
   @IsOptional()
   image_url?: string;
@@ -13,4 +17,9 @@ export class UpdateAboutDto {
   @IsString({ each: true })
   @IsOptional()
   highlights?: string[];
+
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  highlights_en?: string[];
 }

@@ -36,3 +36,19 @@ yarn-error.log
 # Agent artifacts
 .agent
 .gemini
+
+# Angular cache
+.angular
+
+# Application Data
+uploads
+
+# Deployment scripts
+deploy
+
+# Testing & Documentation
+test
+spec
+e2e
+*.md
+LICENSE
