@@ -1,7 +1,7 @@
-import { Component, inject, signal, effect } from '@angular/core';
+import { Component, inject, signal, effect, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, finalize, switchMap } from 'rxjs';
 import { ContentService } from '../../core/services/content.service';
 import { ToastService } from '../../core/services/toast.service';
 import { FileUploadComponent } from '../../shared/components/file-upload/file-upload.component';
@@ -12,10 +12,14 @@ import { FileUploadComponent } from '../../shared/components/file-upload/file-up
   imports: [FormsModule, FileUploadComponent],
   templateUrl: './settings.component.html',
 })
-export class AdminSettingsComponent {
+export class AdminSettingsComponent implements OnInit {
   private http = inject(HttpClient);
   content = inject(ContentService);
   private toast = inject(ToastService);
+
+  ngOnInit() {
+    this.content.loadSettings().subscribe();
+  }
 
   isSaving = signal(false);
   isSendingTest = signal(false);
@@ -82,45 +86,48 @@ export class AdminSettingsComponent {
     }, { allowSignalWrites: true });
   }
 
-  async save() {
+  save() {
     this.isSaving.set(true);
-    try {
-      const data = {
-        site_title: this.form.site_title,
-        main_photo_url: this.form.main_photo_url || null,
-        hero_background_url: this.form.hero_background_url || null,
-        seo_image_url: this.form.seo_image_url || null,
-        meta_description: this.form.meta_description,
-        linkedin_url: this.form.linkedin_url || null,
-        github_url: this.form.github_url || null,
-        email: this.form.email || null,
-        favicon_type: this.form.favicon_type,
-        accent_color: this.form.accent_color,
-        show_admin_link: this.form.show_admin_link,
-        
-        enable_contact_form: this.form.enable_contact_form,
-        enable_email_sending: this.form.enable_email_sending,
-        enable_database_storage: this.form.enable_database_storage,
-        smtp_host: this.form.smtp_host || null,
-        smtp_port: this.form.smtp_port || 587,
-        smtp_user: this.form.smtp_user || null,
-        smtp_pass: this.form.smtp_pass || null,
-        smtp_secure: this.form.smtp_secure,
-        smtp_require_tls: this.form.smtp_require_tls,
-        smtp_from: this.form.smtp_from || null,
-      };
-      await firstValueFrom(this.http.put('/api/settings', data));
-      await this.content.loadAllContent();
+
+    const data = {
+      site_title: this.form.site_title,
+      main_photo_url: this.form.main_photo_url || null,
+      hero_background_url: this.form.hero_background_url || null,
+      seo_image_url: this.form.seo_image_url || null,
+      meta_description: this.form.meta_description,
+      linkedin_url: this.form.linkedin_url || null,
+      github_url: this.form.github_url || null,
+      email: this.form.email || null,
+      favicon_type: this.form.favicon_type,
+      accent_color: this.form.accent_color,
+      show_admin_link: this.form.show_admin_link,
       
-      this.initialForm = JSON.parse(JSON.stringify(this.form));
-      this.checkDirty();
-      
-      this.toast.success('Configuración guardada correctamente');
-    } catch (err) { 
-      console.error('Error saving settings', err);
-      this.toast.error('Error al guardar la configuración');
-    }
-    finally { this.isSaving.set(false); }
+      enable_contact_form: this.form.enable_contact_form,
+      enable_email_sending: this.form.enable_email_sending,
+      enable_database_storage: this.form.enable_database_storage,
+      smtp_host: this.form.smtp_host || null,
+      smtp_port: this.form.smtp_port || 587,
+      smtp_user: this.form.smtp_user || null,
+      smtp_pass: this.form.smtp_pass || null,
+      smtp_secure: this.form.smtp_secure,
+      smtp_require_tls: this.form.smtp_require_tls,
+      smtp_from: this.form.smtp_from || null,
+    };
+
+    this.http.put('/api/settings', data).pipe(
+      switchMap(() => this.content.loadSettings(true)),
+      finalize(() => this.isSaving.set(false))
+    ).subscribe({
+      next: () => {
+        this.initialForm = JSON.parse(JSON.stringify(this.form));
+        this.checkDirty();
+        this.toast.success('Configuración guardada correctamente');
+      },
+      error: (err) => {
+        console.error('Error saving settings', err);
+        this.toast.error('Error al guardar la configuración');
+      }
+    });
   }
   
   checkDirty() {
@@ -134,38 +141,40 @@ export class AdminSettingsComponent {
     }
   }
 
-  async sendTestEmail() {
+  sendTestEmail() {
     this.isSendingTest.set(true);
-    try {
-      // First save settings to ensure backend has latest config to test with
-      // Or we could pass current form data to test endpoint. 
-      // Let's passed form data since we might want to test without saving yet?
-      // Actually usually user saves first. Let's send current form data to the test endpoint.
-      const data = {
-        host: this.form.smtp_host,
-        port: this.form.smtp_port,
-        user: this.form.smtp_user,
-        pass: this.form.smtp_pass,
-        secure: this.form.smtp_secure,
-        require_tls: this.form.smtp_require_tls,
-        from: this.form.smtp_from,
-        to: this.form.email // Send to the configured contact email or logged in user? 
-                            // Using contact email if available, otherwise maybe alert user.
-      };
-      
-      if (!data.to) {
-        this.toast.error('Configura un "Email de Contacto" para recibir la prueba');
-        return;
-      }
-
-      await firstValueFrom(this.http.post('/api/admin/contact/test-email', data));
-      this.toast.success(`Correo de prueba enviado a ${data.to}`);
-    } catch (err: any) {
-      console.error('Error sending test email', err);
-      const errorMsg = err.error?.message || 'Error al enviar correo de prueba';
-      this.toast.error(errorMsg);
-    } finally {
+    
+    // First save settings to ensure backend has latest config to test with
+    // Or we could pass current form data to test endpoint. 
+    // Let's passed form data since we might want to test without saving yet?
+    // Actually usually user saves first. Let's send current form data to the test endpoint.
+    const data = {
+      host: this.form.smtp_host,
+      port: this.form.smtp_port,
+      user: this.form.smtp_user,
+      pass: this.form.smtp_pass,
+      secure: this.form.smtp_secure,
+      require_tls: this.form.smtp_require_tls,
+      from: this.form.smtp_from,
+      to: this.form.email // Send to the configured contact email or logged in user? 
+                          // Using contact email if available, otherwise maybe alert user.
+    };
+    
+    if (!data.to) {
+      this.toast.error('Configura un "Email de Contacto" para recibir la prueba');
       this.isSendingTest.set(false);
+      return;
     }
+
+    this.http.post('/api/admin/contact/test-email', data)
+      .pipe(finalize(() => this.isSendingTest.set(false)))
+      .subscribe({
+        next: () => this.toast.success(`Correo de prueba enviado a ${data.to}`),
+        error: (err: any) => {
+          console.error('Error sending test email', err);
+          const errorMsg = err.error?.message || 'Error al enviar correo de prueba';
+          this.toast.error(errorMsg);
+        }
+      });
   }
 }

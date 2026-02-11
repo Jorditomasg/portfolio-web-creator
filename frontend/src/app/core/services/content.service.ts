@@ -1,6 +1,6 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, Observable, of, forkJoin, finalize, catchError, map, tap } from 'rxjs';
 import {
   Project,
   Skill,
@@ -127,96 +127,97 @@ export class ContentService {
 
   // --- Granular Fetch Methods ---
 
-  async loadProjects(force: boolean = false): Promise<void> {
-    if (!force && this._projects().length > 0) return;
-    await this.fetchData(this._projects, `${this.apiUrl}/projects`);
+  loadProjects(force: boolean = false): Observable<void> {
+    if (!force && this._projects().length > 0) return of(void 0);
+    return this.fetchData(this._projects, `${this.apiUrl}/projects`);
   }
 
-  async loadExperiences(force: boolean = false): Promise<void> {
-    if (!force && this._experiences().length > 0) return;
-    await this.fetchData(this._experiences, `${this.apiUrl}/experiences`);
+  loadExperiences(force: boolean = false): Observable<void> {
+    if (!force && this._experiences().length > 0) return of(void 0);
+    return this.fetchData(this._experiences, `${this.apiUrl}/experiences`);
   }
 
-  async loadAbout(force: boolean = false): Promise<void> {
-    if (!force && this._about()) return;
-    await this.fetchData(this._about, `${this.apiUrl}/about`);
+  loadAbout(force: boolean = false): Observable<void> {
+    if (!force && this._about()) return of(void 0);
+    return this.fetchData(this._about, `${this.apiUrl}/about`);
   }
 
-  async loadHero(force: boolean = false): Promise<void> {
-    if (!force && this._hero()) return;
-    await this.fetchData(this._hero, `${this.apiUrl}/hero`);
+  loadHero(force: boolean = false): Observable<void> {
+    if (!force && this._hero()) return of(void 0);
+    return this.fetchData(this._hero, `${this.apiUrl}/hero`);
   }
 
-  async loadSettings(force: boolean = false): Promise<void> {
-    if (!force && this._settings()) return;
-    await this.fetchData(this._settings, `${this.apiUrl}/settings`);
+  loadSettings(force: boolean = false): Observable<void> {
+    if (!force && this._settings()) return of(void 0);
+    return this.fetchData(this._settings, `${this.apiUrl}/settings`);
   }
 
-  async loadSpecialties(force: boolean = false): Promise<void> {
-    if (!force && this._specialties().length > 0) return;
-    await this.fetchData(this._specialties, `${this.apiUrl}/specialties`);
+  loadSpecialties(force: boolean = false): Observable<void> {
+    if (!force && this._specialties().length > 0) return of(void 0);
+    return this.fetchData(this._specialties, `${this.apiUrl}/specialties`);
   }
 
-  async loadTechnologies(force: boolean = false): Promise<void> {
-    if (!force && this._technologies().length > 0) return;
-    await this.fetchData(this._technologies, `${this.apiUrl}/technologies`);
+  loadTechnologies(force: boolean = false): Observable<void> {
+    if (!force && this._technologies().length > 0) return of(void 0);
+    return this.fetchData(this._technologies, `${this.apiUrl}/technologies`);
   }
 
-  async loadCategories(force: boolean = false): Promise<void> {
-    if (!force && this._categories().length > 0) return;
-    await this.fetchData(this._categories, `${this.apiUrl}/categories`);
+  loadCategories(force: boolean = false): Observable<void> {
+    if (!force && this._categories().length > 0) return of(void 0);
+    return this.fetchData(this._categories, `${this.apiUrl}/categories`);
   }
 
-  async loadSkills(force: boolean = false): Promise<void> {
-    if (!force && this._skills().length > 0) return;
-    await this.fetchData(this._skills, `${this.apiUrl}/skills`);
+  loadSkills(force: boolean = false): Observable<void> {
+    if (!force && this._skills().length > 0) return of(void 0);
+    return this.fetchData(this._skills, `${this.apiUrl}/skills`);
   }
 
   /**
    * Helper to fetch data and update a signal.
    * Handles loading state and errors.
    */
-  private async fetchData<T>(signal: any, url: string): Promise<void> {
+  private fetchData<T>(signal: any, url: string): Observable<void> {
     this._isLoading.set(true);
     this._error.set(null);
-    try {
-        const data = await firstValueFrom(this.http.get<T>(url));
-        signal.set(data || (Array.isArray(data) ? [] : null));
-    } catch (err: any) {
+    return this.http.get<T>(url).pipe(
+      tap(data => signal.set(data || (Array.isArray(data) ? [] : null))),
+      map(() => void 0),
+      catchError(err => {
         console.error(`Error loading ${url}`, err);
         this._error.set(err.message || 'Error loading content');
-    } finally {
-        this._isLoading.set(false);
-    }
+        return of(void 0);
+      }),
+      finalize(() => this._isLoading.set(false))
+    );
   }
 
   /**
    * @deprecated Use granular load methods instead.
    */
-  async loadAllContent(): Promise<void> {
+  loadAllContent(): Observable<void> {
     this._isLoading.set(true);
-    try {
-      await Promise.all([
-        this.loadProjects(),
-        this.loadExperiences(),
-        this.loadAbout(),
-        this.loadHero(),
-        this.loadSettings(),
-        this.loadSpecialties(),
-        this.loadTechnologies(),
-        this.loadCategories()
-      ]);
-    } catch (err) {
-      console.error('Failed to load content', err);
-    } finally {
-        this._isLoading.set(false);
-    }
+    return forkJoin([
+      this.loadProjects(),
+      this.loadExperiences(),
+      this.loadAbout(),
+      this.loadHero(),
+      this.loadSettings(),
+      this.loadSpecialties(),
+      this.loadTechnologies(),
+      this.loadCategories()
+    ]).pipe(
+      map(() => void 0),
+      catchError(err => {
+        console.error('Failed to load content', err);
+        return of(void 0);
+      }),
+      finalize(() => this._isLoading.set(false))
+    );
   }
 
-  // Wrappers for backward compatibility or explicit refresh
-  async refreshProjects() { await this.loadProjects(true); }
-  async refreshSkills() { await this.loadSkills(true); }
-  async refreshSpecialties() { await this.loadSpecialties(true); }
-  async refreshTechnologies() { await this.loadTechnologies(true); }
-  async refreshCategories() { await this.loadCategories(true); }
+  refreshProjects() { this.loadProjects(true).subscribe(); }
+  refreshSkills() { this.loadSkills(true).subscribe(); }
+  refreshSpecialties() { this.loadSpecialties(true).subscribe(); }
+  refreshTechnologies() { this.loadTechnologies(true).subscribe(); }
+  refreshCategories() { this.loadCategories(true).subscribe(); }
 }

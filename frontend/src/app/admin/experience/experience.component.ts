@@ -1,9 +1,9 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { ContentService } from '../../core/services/content.service';
 import { ToastService } from '../../core/services/toast.service';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, forkJoin, switchMap, finalize } from 'rxjs';
 import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Experience } from '../../core/models/api.models';
 import { FileUploadComponent } from '../../shared/components/file-upload/file-upload.component';
@@ -14,10 +14,14 @@ import { FileUploadComponent } from '../../shared/components/file-upload/file-up
   imports: [FormsModule, DragDropModule, FileUploadComponent],
   templateUrl: './experience.component.html',
 })
-export class AdminExperienceComponent {
+export class AdminExperienceComponent implements OnInit {
   private http = inject(HttpClient);
   private toast = inject(ToastService);
   content = inject(ContentService);
+  
+  ngOnInit() {
+    this.content.loadExperiences().subscribe();
+  }
   
   showModal = signal(false);
   editing = signal<number | null>(null);
@@ -71,7 +75,7 @@ export class AdminExperienceComponent {
     this.showModal.set(true);
   }
 
-  async save() {
+  save() {
     // Validate required fields (only title and company)
     if (!this.form.title || !this.form.company) {
       this.toast.error('Por favor completa los campos obligatorios (Título, Empresa)');
@@ -79,7 +83,7 @@ export class AdminExperienceComponent {
     }
 
     this.isSaving.set(true);
-    
+
     // Calculate period string
     const formatPeriodDateLocal = (d: string) => {
       if (!d) return '';
@@ -116,57 +120,59 @@ export class AdminExperienceComponent {
     delete data.id;
     delete data.created_at;
     delete data.updated_at;
-    
-    try {
-      if (this.editing()) { 
-        await firstValueFrom(this.http.patch(`/api/experiences/${this.editing()}`, data)); 
-        this.toast.success('Experiencia actualizada');
+
+    const req = this.editing() 
+      ? this.http.patch(`/api/experiences/${this.editing()}`, data)
+      : this.http.post('/api/experiences', data);
+
+    req.pipe(
+      switchMap(() => this.content.loadExperiences(true)),
+      finalize(() => this.isSaving.set(false))
+    ).subscribe({
+      next: () => {
+        this.toast.success(this.editing() ? 'Experiencia actualizada' : 'Experiencia creada');
+        this.closeModal();
+      },
+      error: (e: any) => {
+        console.error(e);
+        const msg = e.error?.message || 'Error al guardar la experiencia';
+        this.toast.error(typeof msg === 'string' ? msg : (Array.isArray(msg) ? msg.join(', ') : JSON.stringify(msg)));
       }
-      else { 
-        await firstValueFrom(this.http.post('/api/experiences', data)); 
-        this.toast.success('Experiencia creada');
-      }
-      await this.content.loadAllContent();
-      this.closeModal();
-    } catch (e: any) { 
-      console.error(e);
-      const msg = e.error?.message || 'Error al guardar la experiencia';
-      this.toast.error(typeof msg === 'string' ? msg : (Array.isArray(msg) ? msg.join(', ') : JSON.stringify(msg)));
-    } finally {
-      this.isSaving.set(false);
-    }
+    });
   }
 
-  async drop(event: CdkDragDrop<Experience[]>) {
-    
+  drop(event: CdkDragDrop<Experience[]>) {
     const experiences = [...this.sortedExperiences()];
     moveItemInArray(experiences, event.previousIndex, event.currentIndex);
     
-    try {
-      await Promise.all(experiences.map((exp, index) => 
-        firstValueFrom(this.http.patch(`/api/experiences/${exp.id}`, { display_order: index }))
-      ));
-      await this.content.loadAllContent();
-      this.toast.success('Orden actualizado');
-    } catch (e) {
-      console.error(e);
-      this.toast.error('Error al actualizar orden');
-    }
+    const updates = experiences.map((exp, index) => 
+      this.http.patch(`/api/experiences/${exp.id}`, { display_order: index })
+    );
+
+    forkJoin(updates).pipe(
+      switchMap(() => this.content.loadExperiences(true))
+    ).subscribe({
+      next: () => this.toast.success('Orden actualizado'),
+      error: (e) => {
+        console.error(e);
+        this.toast.error('Error al actualizar orden');
+      }
+    });
   }
 
-  async deleteExp(id: number) {
+  deleteExp(id: number) {
     if (confirm('¿Eliminar esta experiencia?')) {
       this.isDeletingVal.set(id);
-      try {
-        await firstValueFrom(this.http.delete(`/api/experiences/${id}`));
-        await this.content.loadAllContent();
-        this.toast.success('Experiencia eliminada');
-      } catch (e) {
-        console.error(e);
-        this.toast.error('Error al eliminar');
-      } finally {
-        this.isDeletingVal.set(null);
-      }
+      this.http.delete(`/api/experiences/${id}`).pipe(
+        switchMap(() => this.content.loadExperiences(true)),
+        finalize(() => this.isDeletingVal.set(null))
+      ).subscribe({
+        next: () => this.toast.success('Experiencia eliminada'),
+        error: (e) => {
+          console.error(e);
+          this.toast.error('Error al eliminar');
+        }
+      });
     }
   }
 

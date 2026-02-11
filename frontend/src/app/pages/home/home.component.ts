@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ContentService } from '../../core/services/content.service';
@@ -84,10 +84,20 @@ const SPECIALTY_ICONS: Record<string, string> = {
   templateUrl: './home.component.html',
   imports: [RouterLink],
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
   content = inject(ContentService);
   i18n = inject(TranslationService);
   private sanitizer = inject(DomSanitizer);
+
+  ngOnInit() {
+    this.content.loadHero().subscribe();
+    this.content.loadAbout().subscribe();
+    this.content.loadProjects().subscribe();
+    this.content.loadSpecialties().subscribe();
+    this.content.loadTechnologies().subscribe();
+    this.content.loadCategories().subscribe();
+    this.content.loadSettings().subscribe();
+  }
 
   getIconForType(type: string | undefined): SafeHtml {
     if (!type) {

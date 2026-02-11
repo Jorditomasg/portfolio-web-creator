@@ -17,17 +17,20 @@ export class DashboardComponent implements OnInit {
   unreadMessages = signal(0);
   totalMessages = signal(0);
 
-  async ngOnInit() {
+  ngOnInit() {
+    this.content.loadProjects().subscribe();
+    this.content.loadTechnologies().subscribe();
+    this.content.loadExperiences().subscribe();
     this.fetchMessages();
   }
 
-  async fetchMessages() {
-    try {
-      const messages = await firstValueFrom(this.http.get<any[]>('/api/admin/contacts'));
-      this.totalMessages.set(messages.length);
-      this.unreadMessages.set(messages.filter(m => !m.read).length);
-    } catch (e) {
-      console.error('Error loading messages stats', e);
-    }
+  fetchMessages() {
+    this.http.get<any[]>('/api/admin/contacts').subscribe({
+      next: (messages) => {
+        this.totalMessages.set(messages.length);
+        this.unreadMessages.set(messages.filter(m => !m.read).length);
+      },
+      error: (e) => console.error('Error loading messages stats', e)
+    });
   }
 }

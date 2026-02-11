@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { ContentService } from '../../core/services/content.service';
 import { TranslationService } from '../../core/services/translation.service';
 
@@ -6,9 +6,15 @@ import { TranslationService } from '../../core/services/translation.service';
   selector: 'app-projects',
   templateUrl: './projects.component.html',
 })
-export class ProjectsComponent {
+export class ProjectsComponent implements OnInit {
   content = inject(ContentService);
   i18n = inject(TranslationService);
+
+  ngOnInit() {
+    this.content.loadProjects().subscribe();
+    this.content.loadTechnologies().subscribe();
+    this.content.loadSettings().subscribe();
+  }
 
   openProject(project: any) {
     // Open demo_url first, fallback to github_url

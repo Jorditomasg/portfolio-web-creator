@@ -1,9 +1,9 @@
-import { Component, inject, signal, effect, computed } from '@angular/core';
+import { Component, inject, signal, effect, computed, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { ContentService } from '../../core/services/content.service';
 import { ToastService } from '../../core/services/toast.service';
-import { firstValueFrom } from 'rxjs';
+import { forkJoin, switchMap, finalize, tap, of } from 'rxjs';
 import { FileUploadComponent } from '../../shared/components/file-upload/file-upload.component';
 
 @Component({
@@ -13,7 +13,7 @@ import { FileUploadComponent } from '../../shared/components/file-upload/file-up
 
   templateUrl: './about.component.html',
 })
-export class AdminAboutComponent {
+export class AdminAboutComponent implements OnInit {
   private http = inject(HttpClient);
   content = inject(ContentService);
   private toast = inject(ToastService);
@@ -67,6 +67,11 @@ export class AdminAboutComponent {
     }, { allowSignalWrites: true });
   }
 
+  ngOnInit() {
+    this.content.loadAbout().subscribe();
+    this.content.loadHero().subscribe();
+  }
+
   checkDirtyAbout() {
     this.isDirtyAbout.set(JSON.stringify(this.aboutForm) !== JSON.stringify(this.initialAboutForm));
   }
@@ -75,49 +80,63 @@ export class AdminAboutComponent {
     this.isDirtyHero.set(JSON.stringify(this.heroForm) !== JSON.stringify(this.initialHeroForm));
   }
 
-  async save() {
+  save() {
     if (!this.isDirty()) return;
-    
+
     this.isSaving.set(true);
-    try {
-      const promises = [];
-      
-      if (this.isDirtyAbout()) {
-        const aboutPayload = {
+
+    const tasks: any[] = [];
+
+    if (this.isDirtyAbout()) {
+      const aboutPayload = {
         bio: this.aboutForm.bio,
         bio_en: this.aboutForm.bio_en,
         highlights: this.aboutForm.highlightsText.split('\n').map(h => h.trim()).filter(h => h),
         highlights_en: this.aboutForm.highlightsText_en.split('\n').map(h => h.trim()).filter(h => h)
       };
-        promises.push(
-          firstValueFrom(this.http.put('/api/about', aboutPayload))
-            .then(() => {
-              this.initialAboutForm = JSON.parse(JSON.stringify(this.aboutForm));
-              this.checkDirtyAbout();
-            })
-        );
-      }
-
-      if (this.isDirtyHero()) {
-        const payload = { ...this.heroForm };
-        
-        promises.push(
-          firstValueFrom(this.http.put('/api/hero', payload))
-            .then(() => {
-              this.initialHeroForm = JSON.parse(JSON.stringify(this.heroForm));
-              this.checkDirtyHero();
-            })
-        );
-      }
-
-      await Promise.all(promises);
-      await this.content.loadAllContent();
-      this.toast.success('Cambios guardados correctamente');
-    } catch (e) {
-      console.error(e);
-      this.toast.error('Error al guardar los cambios');
-    } finally {
-      this.isSaving.set(false);
+      
+      tasks.push(
+        this.http.put('/api/about', aboutPayload).pipe(
+          tap(() => {
+            this.initialAboutForm = JSON.parse(JSON.stringify(this.aboutForm));
+            this.checkDirtyAbout();
+          })
+        )
+      );
     }
+
+    if (this.isDirtyHero()) {
+      const heroPayload = { ...this.heroForm };
+      
+      tasks.push(
+        this.http.put('/api/hero', heroPayload).pipe(
+          tap(() => {
+            this.initialHeroForm = JSON.parse(JSON.stringify(this.heroForm));
+            this.checkDirtyHero();
+          })
+        )
+      );
+    }
+
+    if (tasks.length === 0) {
+      this.isSaving.set(false);
+      return;
+    }
+
+    forkJoin(tasks).pipe(
+      switchMap(() => forkJoin([
+        this.content.loadAbout(true),
+        this.content.loadHero(true)
+      ])),
+      finalize(() => this.isSaving.set(false))
+    ).subscribe({
+      next: () => {
+        this.toast.success('Cambios guardados correctamente');
+      },
+      error: (e) => {
+        console.error(e);
+        this.toast.error('Error al guardar los cambios');
+      }
+    });
   }
 }

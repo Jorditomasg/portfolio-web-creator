@@ -147,14 +147,16 @@
                       <p class="text-gray-400">{{ exp.company }}</p>
                     </div>
                   </div>
-                  <span class="text-primary text-sm font-mono bg-primary/10 px-3 py-1 rounded-full whitespace-nowrap">
-                    {{ formatDate(exp.start_date) }} 
-                    @if (exp.is_current) {
-                        - {{ i18n.isSpanish() ? 'Presente' : 'Present' }}
-                    } @else if (exp.end_date) {
-                        - {{ formatDate(exp.end_date) }}
-                    }
-                  </span>
+                  @if (exp.start_date) {
+                    <span class="text-primary text-sm font-mono bg-primary/10 px-3 py-1 rounded-full whitespace-nowrap">
+                        {{ formatDate(exp.start_date) }} 
+                        @if (exp.is_current) {
+                            - {{ i18n.isSpanish() ? 'Presente' : 'Present' }}
+                        } @else if (exp.end_date) {
+                            - {{ formatDate(exp.end_date) }}
+                        }
+                    </span>
+                  }
                 </div>
                 <p class="text-gray-300 mb-4">{{ exp.description }}</p>
                 @if (exp.achievements.length) {

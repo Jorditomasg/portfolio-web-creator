@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ContentService } from '../../core/services/content.service';
 import { TranslationService } from '../../core/services/translation.service';
@@ -82,10 +82,18 @@ const SPECIALTY_ICONS: Record<string, string> = {
   selector: 'app-about',
   templateUrl: './about.component.html',
 })
-export class AboutComponent {
+export class AboutComponent implements OnInit {
   content = inject(ContentService);
   i18n = inject(TranslationService);
   private sanitizer = inject(DomSanitizer);
+
+  ngOnInit() {
+    this.content.loadAbout().subscribe();
+    this.content.loadExperiences().subscribe();
+    this.content.loadTechnologies().subscribe();
+    this.content.loadCategories().subscribe();
+    this.content.loadSettings().subscribe();
+  }
 
   getIconForType(type: string | undefined): SafeHtml {
     if (!type) {

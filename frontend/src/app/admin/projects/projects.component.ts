@@ -1,10 +1,10 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { ContentService } from '../../core/services/content.service';
 import { ToastService } from '../../core/services/toast.service';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, forkJoin, switchMap, finalize } from 'rxjs';
 import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { FileUploadComponent } from '../../shared/components/file-upload/file-upload.component';
 
@@ -14,42 +14,66 @@ import { FileUploadComponent } from '../../shared/components/file-upload/file-up
   imports: [FormsModule, RouterLink, DragDropModule, FileUploadComponent],
   templateUrl: './projects.component.html',
 })
-export class AdminProjectsComponent {
+export class AdminProjectsComponent implements OnInit {
   private http = inject(HttpClient);
   private toast = inject(ToastService);
   content = inject(ContentService);
-  
+
+  ngOnInit() {
+    this.content.loadProjects().subscribe();
+    this.content.loadTechnologies().subscribe();
+  }
+
   showModal = signal(false);
+  isSaving = signal(false);
   editing = signal<number | null>(null);
-  form: any = { 
-    title: '', title_en: '',
-    description: '', description_en: '',
-    long_description: '', long_description_en: '',
-    image_url: '', demo_url: '', github_url: '', 
-    technologies: '', featured: false, is_in_progress: false,
-    start_date: '', end_date: ''
+  form: any = {
+    title: '',
+    title_en: '',
+    description: '',
+    description_en: '',
+    long_description: '',
+    long_description_en: '',
+    image_url: '',
+    demo_url: '',
+    github_url: '',
+    technologies: '',
+    featured: false,
+    is_in_progress: false,
+    start_date: '',
+    end_date: '',
   };
 
-  openModal() { 
-    this.form = { 
-      title: '', title_en: '',
-      description: '', description_en: '',
-      long_description: '', long_description_en: '',
-      image_url: '', demo_url: '', github_url: '', 
-      technologies: '', featured: false, is_in_progress: false,
-      start_date: '', end_date: ''
-    }; 
-    this.editing.set(null); 
-    this.showModal.set(true); 
+  openModal() {
+    this.form = {
+      title: '',
+      title_en: '',
+      description: '',
+      description_en: '',
+      long_description: '',
+      long_description_en: '',
+      image_url: '',
+      demo_url: '',
+      github_url: '',
+      technologies: '',
+      featured: false,
+      is_in_progress: false,
+      start_date: '',
+      end_date: '',
+    };
+    this.editing.set(null);
+    this.showModal.set(true);
   }
-  
-  closeModal() { this.showModal.set(false); }
+
+  closeModal() {
+    this.showModal.set(false);
+  }
 
   edit(project: any) {
-    const fmtDate = (d: any) => d ? new Date(d).toISOString().substring(0, 7) : '';
+    const fmtDate = (d: any) => (d ? new Date(d).toISOString().substring(0, 7) : '');
 
     // Only keep editable fields, not id, created_at, updated_at
-    this.form = { 
+    this.form = {
       title: project.title || '',
       title_en: project.title_en || '',
       description: project.description || '',
@@ -64,41 +88,51 @@ export class AdminProjectsComponent {
       is_in_progress: project.is_in_progress || false,
       display_order: project.display_order || 0,
       start_date: fmtDate(project.start_date),
-      end_date: fmtDate(project.end_date)
+      end_date: fmtDate(project.end_date),
     };
     this.editing.set(project.id);
     this.showModal.set(true);
   }
 
-  async save() {
+  save() {
     if (!this.form.title) {
       this.toast.error('Por favor completa el campo obligatorio (Título)');
       return;
     }
 
-    const data = { 
-      ...this.form, 
-      technologies: this.form.technologies ? this.form.technologies.split(',').map((t: string) => t.trim()).filter((t: string) => t) : []
+    const data = {
+      ...this.form,
+      technologies: this.form.technologies
+        ? this.form.technologies
+            .split(',')
+            .map((t: string) => t.trim())
+            .filter((t: string) => t)
+        : [],
     };
-    try {
-      if (this.editing()) { 
-        await firstValueFrom(this.http.put(`/api/projects/${this.editing()}`, data)); 
-        this.toast.success('Proyecto actualizado correctamente');
-      } else { 
-        await firstValueFrom(this.http.post('/api/projects', data)); 
-        this.toast.success('Proyecto creado correctamente');
+    
+    this.isSaving.set(true);
+    const req = this.editing() 
+      ? this.http.put(`/api/projects/${this.editing()}`, data)
+      : this.http.post('/api/projects', data);
+
+    req.pipe(
+      switchMap(() => this.content.loadProjects(true)),
+      finalize(() => this.isSaving.set(false))
+    ).subscribe({
+      next: () => {
+        this.toast.success(this.editing() ? 'Proyecto actualizado correctamente' : 'Proyecto creado correctamente');
+        this.closeModal();
+      },
+      error: (e) => {
+        console.error(e);
+        this.toast.error('Error al guardar el proyecto');
       }
-      await this.content.loadAllContent();
-      this.closeModal();
-    } catch (e) { 
-      console.error(e); 
-      this.toast.error('Error al guardar el proyecto');
-    }
+    });
   }
 
   // Tag Management
   newTechInput = signal('');
-  
+
   // Filtered technologies for autocomplete
   filteredTechnologies = signal<any[]>([]);
 
@@ -108,17 +142,26 @@ export class AdminProjectsComponent {
       this.filteredTechnologies.set([]);
       return;
     }
-    
+
     const all = this.content.technologies();
-    const current = this.form.technologies ? this.form.technologies.split(',').map((t: string) => t.trim().toLowerCase()) : [];
-    
+    const current = this.form.technologies
+      ? this.form.technologies.split(',').map((t: string) => t.trim().toLowerCase())
+      : [];
+
     this.filteredTechnologies.set(
-      all.filter(t => t.name.toLowerCase().includes(input) && !current.includes(t.name.toLowerCase()))
+      all.filter(
+        (t) => t.name.toLowerCase().includes(input) && !current.includes(t.name.toLowerCase()),
+      ),
     );
   }
 
   addTech(techName: string) {
-    const current = this.form.technologies ? this.form.technologies.split(',').map((t: string) => t.trim()).filter((t: string) => t) : [];
+    const current = this.form.technologies
+      ? this.form.technologies
+          .split(',')
+          .map((t: string) => t.trim())
+          .filter((t: string) => t)
+      : [];
     if (!current.includes(techName)) {
       current.push(techName);
       this.form.technologies = current.join(', ');
@@ -128,7 +171,12 @@ export class AdminProjectsComponent {
   }
 
   removeTech(techName: string) {
-    const current = this.form.technologies ? this.form.technologies.split(',').map((t: string) => t.trim()).filter((t: string) => t) : [];
+    const current = this.form.technologies
+      ? this.form.technologies
+          .split(',')
+          .map((t: string) => t.trim())
+          .filter((t: string) => t)
+      : [];
     this.form.technologies = current.filter((t: string) => t !== techName).join(', ');
   }
 
@@ -142,13 +190,13 @@ export class AdminProjectsComponent {
 
   deleteProject(id: number) {
     if (confirm('¿Eliminar este proyecto?')) {
-      // ... existing delete logic ...
-      this.http.delete(`/api/projects/${id}`).subscribe({
+      this.http.delete(`/api/projects/${id}`).pipe(
+        switchMap(() => this.content.loadProjects(true))
+      ).subscribe({
         next: () => {
-             this.content.loadAllContent();
-             this.toast.success('Proyecto eliminado');
+          this.toast.success('Proyecto eliminado');
         },
-        error: () => this.toast.error('Error al eliminar el proyecto')
+        error: () => this.toast.error('Error al eliminar el proyecto'),
       });
     }
   }
@@ -165,19 +213,22 @@ export class AdminProjectsComponent {
     return date.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' });
   }
 
-  async drop(event: CdkDragDrop<any[]>) {
+  drop(event: CdkDragDrop<any[]>) {
     const projects = [...this.getSortedProjects()];
     moveItemInArray(projects, event.previousIndex, event.currentIndex);
-    
-    try {
-      await Promise.all(projects.map((project, index) => 
-        firstValueFrom(this.http.put(`/api/projects/${project.id}`, { display_order: index }))
-      ));
-      await this.content.loadAllContent();
-      this.toast.success('Orden actualizado');
-    } catch (e) {
-      console.error(e);
-      this.toast.error('Error al actualizar orden');
-    }
+
+    const updates = projects.map((project, index) =>
+      this.http.put(`/api/projects/${project.id}`, { display_order: index })
+    );
+
+    forkJoin(updates).pipe(
+      switchMap(() => this.content.loadProjects(true))
+    ).subscribe({
+      next: () => this.toast.success('Orden actualizado'),
+      error: (e) => {
+        console.error(e);
+        this.toast.error('Error al actualizar orden');
+      }
+    });
   }
 }

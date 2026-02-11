@@ -89,14 +89,14 @@ export class LoginComponent {
     password: '',
   };
 
-  async onSubmit() {
-    const success = await this.authService.login(
+  onSubmit() {
+    this.authService.login(
       this.credentials.username,
       this.credentials.password
-    );
-
-    if (success) {
-      this.router.navigate(['/admin/dashboard']);
-    }
+    ).subscribe(success => {
+      if (success) {
+        this.router.navigate(['/admin/dashboard']);
+      }
+    });
   }
 }

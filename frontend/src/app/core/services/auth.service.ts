@@ -1,7 +1,7 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { firstValueFrom } from 'rxjs';
+import { Observable, tap, catchError, of, finalize, map } from 'rxjs';
 import { LoginResponse } from '../models/api.models';
 
 @Injectable({ providedIn: 'root' })
@@ -30,27 +30,26 @@ export class AuthService {
     return null;
   }
 
-  async login(username: string, password: string): Promise<boolean> {
+  login(username: string, password: string): Observable<boolean> {
     this._isLoading.set(true);
     this._error.set(null);
 
-    try {
-      const response = await firstValueFrom(
-        this.http.post<LoginResponse>(`${this.apiUrl}/auth/login`, { username, password })
-      );
-
-      this._token.set(response.access_token);
-      this._user.set(response.user);
-      localStorage.setItem('jwt_token', response.access_token);
-
-      return true;
-    } catch (err: any) {
-      console.error('Login failed', err);
-      this._error.set(err?.error?.message || 'Credenciales inválidas');
-      return false;
-    } finally {
-      this._isLoading.set(false);
-    }
+    return this.http.post<LoginResponse>(`${this.apiUrl}/auth/login`, { username, password }).pipe(
+      tap(response => {
+        this._token.set(response.access_token);
+        this._user.set(response.user);
+        if (typeof localStorage !== 'undefined') {
+          localStorage.setItem('jwt_token', response.access_token);
+        }
+      }),
+      map(() => true),
+      catchError((err: any) => {
+        console.error('Login failed', err);
+        this._error.set(err?.error?.message || 'Credenciales inválidas');
+        return of(false);
+      }),
+      finalize(() => this._isLoading.set(false))
+    );
   }
 
   logout(): void {

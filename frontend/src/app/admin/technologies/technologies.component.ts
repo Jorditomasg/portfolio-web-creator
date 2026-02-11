@@ -7,7 +7,7 @@ import { ContentService } from '../../core/services/content.service';
 import { ToastService } from '../../core/services/toast.service';
 import { Technology } from '../../core/models/technology.model';
 import { Category } from '../../core/models/api.models';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, forkJoin, switchMap, finalize, tap, catchError, of, map } from 'rxjs';
 import { DragDropModule, CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { DOCUMENT } from '@angular/common'; // Import DOCUMENT
 
@@ -219,40 +219,54 @@ export class AdminTechnologiesComponent implements OnInit {
 
 
   ngOnInit() {
-    this.loadData();
+    this.loadData().subscribe();
   }
 
-  async loadData() {
-    await Promise.all([this.loadCategories(), this.loadTechnologies()]);
-    // Set initial active tab if not set
-    if (!this.activeTab() && this.categoryKeys().length > 0) {
-      this.activeTab.set(this.categoryKeys()[0]);
-    }
+  loadData() {
+    return forkJoin([
+      this.loadCategories(),
+      this.loadTechnologies()
+    ]).pipe(
+      tap(() => {
+        // Set initial active tab if not set
+        if (!this.activeTab() && this.categoryKeys().length > 0) {
+          this.activeTab.set(this.categoryKeys()[0]);
+        }
+      })
+    );
   }
 
-  async loadCategories() {
-    try {
-      const cats = await firstValueFrom(this.catService.getCategories());
-      this.categories.set(cats.sort((a, b) => (a.display_order || 0) - (b.display_order || 0)));
-    } catch (err) {
-      console.error('Error loading categories', err);
-      this.toast.error('Error al cargar categorías');
-    }
+  loadCategories() {
+    return this.catService.getCategories().pipe(
+      tap(cats => {
+        this.categories.set(cats.sort((a, b) => (a.display_order || 0) - (b.display_order || 0)));
+      }),
+      catchError(err => {
+        console.error('Error loading categories', err);
+        this.toast.error('Error al cargar categorías');
+        return of([]);
+      }),
+      map(() => void 0)
+    );
   }
 
-  async loadTechnologies() {
-    try {
-      const techs = await firstValueFrom(this.techService.getTechnologies());
-      // Ensure we have a defined category for every tech
-      const processedTechs = techs.map(t => ({
-        ...t,
-        category: t.category || 'other'
-      }));
-      this.technologies.set(processedTechs);
-    } catch (err) {
-      console.error('Error loading technologies', err);
-      this.toast.error('Error al cargar tecnologías');
-    }
+  loadTechnologies() {
+    return this.techService.getTechnologies().pipe(
+      tap(techs => {
+        // Ensure we have a defined category for every tech
+        const processedTechs = techs.map(t => ({
+          ...t,
+          category: t.category || 'other'
+        }));
+        this.technologies.set(processedTechs);
+      }),
+      catchError(err => {
+        console.error('Error loading technologies', err);
+        this.toast.error('Error al cargar tecnologías');
+        return of([]);
+      }),
+      map(() => void 0)
+    );
   }
 
   openModal() {
@@ -319,7 +333,7 @@ export class AdminTechnologiesComponent implements OnInit {
     this.editingCategoryId.set(null);
   }
 
-  async saveCategory() {
+  saveCategory() {
     // If short_title is missing, we can't properly generate the slug or show it
     if (!this.categoryForm.short_title) {
       this.toast.error('El título corto es requerido');
@@ -329,40 +343,44 @@ export class AdminTechnologiesComponent implements OnInit {
     // Always regenerate name from short_title to ensure consistency
     this.categoryForm.name = this.slugify(this.categoryForm.short_title);
     
-    try {
-      if (this.isEditingCategory() && this.editingCategoryId()) {
-        await firstValueFrom(this.catService.update(this.editingCategoryId()!, this.categoryForm));
-        this.toast.success('Categoría actualizada');
-      } else {
-        // Calculate next display order
-        const maxOrder = Math.max(...this.categories().map(c => c.display_order || 0), 0);
-        const newCategory = { ...this.categoryForm, display_order: maxOrder + 1 };
-        await firstValueFrom(this.catService.create(newCategory));
-        this.toast.success('Categoría creada');
-      }
-      await this.loadCategories(); // Reload to get updates/new IDs
-      
-      // Refresh global content
-      this.contentService.refreshCategories();
-      this.contentService.refreshTechnologies();
-
-      // If we renamed the category, we might need to update activeTab if it was the edited one
-      // But for now let's keep it simple. User can click tab again.
-      if (this.isEditingCategory() && this.categoryForm.name === this.activeTab()) {
-         // keep active
-      } else {
-         // switch to new/renamed category
-         this.activeTab.set(this.categoryForm.name!);
-      }
-
-      this.closeCategoryModal();
-    } catch (e) {
-      console.error(e);
-      this.toast.error('Error al guardar categoría');
+    let req;
+    if (this.isEditingCategory() && this.editingCategoryId()) {
+      req = this.catService.update(this.editingCategoryId()!, this.categoryForm);
+    } else {
+      // Calculate next display order
+      const maxOrder = Math.max(...this.categories().map(c => c.display_order || 0), 0);
+      const newCategory = { ...this.categoryForm, display_order: maxOrder + 1 };
+      req = this.catService.create(newCategory);
     }
+
+    req.pipe(
+      switchMap(() => this.loadCategories())
+    ).subscribe({
+      next: () => {
+        this.toast.success(this.isEditingCategory() ? 'Categoría actualizada' : 'Categoría creada');
+        
+        // Refresh global content
+        this.contentService.refreshCategories();
+        this.contentService.refreshTechnologies();
+
+        // If we renamed the category, we might need to update activeTab if it was the edited one
+        if (this.isEditingCategory() && this.categoryForm.name === this.activeTab()) {
+           // keep active
+        } else {
+           // switch to new/renamed category
+           this.activeTab.set(this.categoryForm.name!);
+        }
+
+        this.closeCategoryModal();
+      },
+      error: (e) => {
+        console.error(e);
+        this.toast.error('Error al guardar categoría');
+      }
+    });
   }
 
-  async deleteCategory(categoryName: string) {
+  deleteCategory(categoryName: string) {
     const category = this.categories().find(c => c.name === categoryName);
     if (!category) return;
 
@@ -373,30 +391,32 @@ export class AdminTechnologiesComponent implements OnInit {
 
     if (!confirm(confirmMessage)) return;
 
-    try {
-      await firstValueFrom(this.catService.delete(category.id));
-      this.toast.success('Categoría eliminada');
-      
-      // Remove from local state and select another tab if needed
-      this.categories.update(cats => cats.filter(c => c.id !== category.id));
-      
-      // Update grouped technologies locally (remove them)
-      this.technologies.update(techs => techs.filter(t => t.category !== category.name));
-      
-      // Refresh global content as well
-      this.contentService.refreshCategories();
-      this.contentService.refreshTechnologies();
+    this.catService.delete(category.id).subscribe({
+      next: () => {
+        this.toast.success('Categoría eliminada');
+        
+        // Remove from local state and select another tab if needed
+        this.categories.update(cats => cats.filter(c => c.id !== category.id));
+        
+        // Update grouped technologies locally (remove them)
+        this.technologies.update(techs => techs.filter(t => t.category !== category.name));
+        
+        // Refresh global content as well
+        this.contentService.refreshCategories();
+        this.contentService.refreshTechnologies();
 
-      // Switch tab
-      if (this.categoryKeys().length > 0) {
-        this.activeTab.set(this.categoryKeys()[0]);
-      } else {
-        this.activeTab.set('');
+        // Switch tab
+        if (this.categoryKeys().length > 0) {
+          this.activeTab.set(this.categoryKeys()[0]);
+        } else {
+          this.activeTab.set('');
+        }
+      },
+      error: (e) => {
+        console.error(e);
+        this.toast.error('Error al eliminar categoría');
       }
-    } catch (e) {
-      console.error(e);
-      this.toast.error('Error al eliminar categoría');
-    }
+    });
   }
 
   // Category ordering modal
@@ -427,20 +447,25 @@ export class AdminTechnologiesComponent implements OnInit {
     this.categoriesForOrdering.set(newCats);
   }
 
-  async saveCategoryOrder() {
+  saveCategoryOrder() {
     const cats = this.categoriesForOrdering();
-    try {
-      await Promise.all(cats.map((cat, index) => 
-        firstValueFrom(this.catService.update(cat.id, { display_order: index }))
-      ));
-      await this.loadCategories();
-      this.contentService.refreshCategories(); // Sync global
-      this.toast.success('Orden de categorías actualizado');
-      this.closeCategoryOrderModal();
-    } catch (e) {
-      console.error(e);
-      this.toast.error('Error al actualizar orden');
-    }
+    const updates = cats.map((cat, index) => 
+      this.catService.update(cat.id, { display_order: index })
+    );
+
+    forkJoin(updates).pipe(
+      switchMap(() => this.loadCategories())
+    ).subscribe({
+      next: () => {
+        this.contentService.refreshCategories(); // Sync global
+        this.toast.success('Orden de categorías actualizado');
+        this.closeCategoryOrderModal();
+      },
+      error: (e) => {
+        console.error(e);
+        this.toast.error('Error al actualizar orden');
+      }
+    });
   }
 
   editTechnology(tech: Technology) {
@@ -477,58 +502,68 @@ export class AdminTechnologiesComponent implements OnInit {
     this.searchResults.set([]);
   }
 
-  async save() {
-    // Allow empty icon for "No Icon" support (or use a placeholder logic if preferred)
+  save() {
+    // Allow empty icon for 'No Icon' support
     const iconToSave = this.form.icon || ''; 
 
     if (!this.form.name) return;
     
     this.isSaving.set(true);
-    try {
-      const techData = { ...this.form, icon: iconToSave };
+    const techData = { ...this.form, icon: iconToSave };
 
-      if (this.isEditing() && this.form.id) {
-        const updated = await firstValueFrom(this.techService.updateTechnology(this.form.id, techData as Technology));
-        this.technologies.update(techs => 
-          techs.map(t => t.id === updated.id ? updated : t)
-        );
-        this.toast.success('Tecnología actualizada');
-      } else {
-        const created = await firstValueFrom(this.techService.createTechnology(techData));
-        this.technologies.update(techs => [...techs, created]);
-        this.toast.success('Tecnología creada');
-      }
-      
-      this.contentService.refreshTechnologies(); // Sync global
-      this.closeModal();
-    } catch (err) {
-      console.error('Error saving technology', err);
-      this.toast.error('Error al guardar tecnología');
-    } finally {
-      this.isSaving.set(false);
+    let req;
+    if (this.isEditing() && this.form.id) {
+      req = this.techService.updateTechnology(this.form.id, techData as Technology);
+    } else {
+      req = this.techService.createTechnology(techData);
     }
+
+    req.pipe(
+      finalize(() => this.isSaving.set(false))
+    ).subscribe({
+      next: (result) => {
+        if (this.isEditing() && this.form.id) {
+          this.technologies.update(techs => 
+            techs.map(t => t.id === result.id ? result : t)
+          );
+          this.toast.success('Tecnología actualizada');
+        } else {
+          this.technologies.update(techs => [...techs, result]);
+          this.toast.success('Tecnología creada');
+        }
+        
+        this.contentService.refreshTechnologies(); // Sync global
+        this.closeModal();
+      },
+      error: (err) => {
+        console.error('Error saving technology', err);
+        this.toast.error('Error al guardar tecnología');
+      }
+    });
   }
 
-  async deleteTechnology(tech: Technology) {
+  deleteTechnology(tech: Technology) {
     if (!confirm(`¿Estás seguro de eliminar ${tech.name}?`)) return;
 
-    try {
-      await firstValueFrom(this.techService.deleteTechnology(tech.id!));
-      this.technologies.update(techs => techs.filter(t => t.id !== tech.id));
-      this.contentService.refreshTechnologies(); // Sync global
-      this.toast.success('Tecnología eliminada');
-    } catch (err) {
-      console.error('Error deleting technology', err);
-      this.toast.error('Error al eliminar tecnología');
-    }
+    this.techService.deleteTechnology(tech.id!).subscribe({
+      next: () => {
+        this.technologies.update(techs => techs.filter(t => t.id !== tech.id));
+        this.contentService.refreshTechnologies(); // Sync global
+        this.toast.success('Tecnología eliminada');
+      },
+      error: (err) => {
+        console.error('Error deleting technology', err);
+        this.toast.error('Error al eliminar tecnología');
+      }
+    });
   }
 
   // Drag and Drop implementation
-  async drop(event: CdkDragDrop<Technology[]>, category: string) {
+  drop(event: CdkDragDrop<Technology[]>, category: string) {
     if (event.previousContainer === event.container) {
       moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
       // Update display_order for all items in this category container
-      await this.updateOrder(event.container.data);
+      this.updateOrder(event.container.data).subscribe();
     } else {
       transferArrayItem(
         event.previousContainer.data,
@@ -539,75 +574,86 @@ export class AdminTechnologiesComponent implements OnInit {
       
       // Update category and order
       const item = event.container.data[event.currentIndex];
-      // We need to update the item in the backend immediately for category change
-      try {
-        await firstValueFrom(this.techService.updateTechnology(item.id!, { category }));
-        
-        // Update local state to reflect category change across the app
-        this.technologies.update(techs => 
-          techs.map(t => t.id === item.id ? { ...t, category } : t)
-        );
-
-        await this.updateOrder(event.container.data);
-        this.contentService.refreshTechnologies(); // Sync global
-      } catch (err) {
-        this.toast.error('Error al mover la tecnología');
-      }
-    }
-  }
-
-  async updateOrder(items: Technology[]) {
-    // Prepare updates
-    const updates = items.map((tech, index) => ({
-      id: tech.id!,
-      display_order: index
-    }));
-
-    try {
-      // Optimistically update backend
-      await Promise.all(updates.map(u => 
-        firstValueFrom(this.techService.updateTechnology(u.id, { display_order: u.display_order }))
-      ));
       
-      // Refresh local signal to ensure consistency
-      this.technologies.update(allTechs => {
-        return allTechs.map(t => {
-           const updated = updates.find(u => u.id === t.id);
-           if (updated) return { ...t, display_order: updated.display_order };
-           return t;
-        });
+      // We need to update the item in the backend immediately for category change
+      this.techService.updateTechnology(item.id!, { category }).pipe(
+        tap(() => {
+          // Update local state to reflect category change across the app
+          this.technologies.update(techs => 
+            techs.map(t => t.id === item.id ? { ...t, category } : t)
+          );
+        }),
+        switchMap(() => this.updateOrder(event.container.data))
+      ).subscribe({
+        next: () => {
+          this.contentService.refreshTechnologies(); // Sync global
+        },
+        error: (err) => {
+          console.error('Error moving technology', err);
+          this.toast.error('Error al mover la tecnología');
+        }
       });
-      // this.contentService.refreshTechnologies(); // Maybe overkill to sync order detail instantly, but helpful
-
-    } catch (err) {
-      console.error('Error updating order', err);
-      this.toast.error('Error al guardar el orden');
     }
   }
 
-  async dropCategory(event: CdkDragDrop<Category[]>) {
+  updateOrder(items: Technology[]) {
+    // Prepare updates
+    const updates = items.map((tech, index) => 
+      this.techService.updateTechnology(tech.id!, { display_order: index })
+    );
+
+    // Optimistically update backend
+    return forkJoin(updates).pipe(
+      tap(() => {
+        // Refresh local signal to ensure consistency
+        this.technologies.update(allTechs => {
+          return allTechs.map(t => {
+             // Find if this tech is in the updated list
+             const updatedItem = items.find(item => item.id === t.id);
+             if (updatedItem) {
+               // Find index in items
+               const index = items.indexOf(updatedItem);
+               return { ...t, display_order: index };
+             }
+             return t;
+          });
+        });
+      }),
+      map(() => void 0),
+      catchError(err => {
+        console.error('Error updating order', err);
+        this.toast.error('Error al guardar el orden');
+        return of(void 0);
+      })
+    );
+  }
+
+  dropCategory(event: CdkDragDrop<Category[]>) {
     if (event.previousContainer === event.container) {
       moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
       
       const cats = event.container.data;
-      try {
-        await Promise.all(cats.map((cat, index) => 
-          firstValueFrom(this.catService.update(cat.id, { display_order: index }))
-        ));
-        
-        // Refresh global categories
-        await this.loadCategories();
-        this.contentService.refreshCategories(); // Sync global
-        this.toast.success('Orden de categorías actualizado');
-      } catch (e) {
-        console.error(e);
-        this.toast.error('Error al actualizar orden de categorías');
-      }
+      const updates = cats.map((cat, index) => 
+        this.catService.update(cat.id, { display_order: index })
+      );
+
+      forkJoin(updates).pipe(
+        switchMap(() => this.loadCategories())
+      ).subscribe({
+        next: () => {
+          this.contentService.refreshCategories(); // Sync global
+          this.toast.success('Orden de categorías actualizado');
+        },
+        error: (e) => {
+          console.error(e);
+          this.toast.error('Error al actualizar orden de categorías');
+        }
+      });
     }
   }
 
   // Inline updates - synced: level 0 = eye off, level > 0 = eye on
-  async toggleShowInAbout(tech: Technology, event: Event) {
+  toggleShowInAbout(tech: Technology, event: Event) {
     event.stopPropagation();
     const newValue = !tech.show_in_about;
     const newLevel = newValue ? (tech.level || 1) : 0; // If enabling, keep level or set to 1; if disabling, set to 0
@@ -617,19 +663,22 @@ export class AdminTechnologiesComponent implements OnInit {
       techs.map(t => t.id === tech.id ? { ...t, show_in_about: newValue, level: newLevel } : t)
     );
 
-    try {
-      await firstValueFrom(this.techService.updateTechnology(tech.id!, { show_in_about: newValue, level: newLevel }));
-      this.contentService.refreshTechnologies(); // Sync global
-    } catch(err) {
-      this.toast.error('Error al actualizar');
-      // Revert on error
-      this.technologies.update(techs => 
-        techs.map(t => t.id === tech.id ? { ...t, show_in_about: !newValue, level: tech.level } : t)
-      );
-    }
+    this.techService.updateTechnology(tech.id!, { show_in_about: newValue, level: newLevel }).subscribe({
+      next: () => {
+        this.contentService.refreshTechnologies(); // Sync global
+      },
+      error: (err) => {
+        console.error('Error updating show_in_about', err);
+        this.toast.error('Error al actualizar');
+        // Revert on error
+        this.technologies.update(techs => 
+          techs.map(t => t.id === tech.id ? { ...t, show_in_about: !newValue, level: tech.level } : t)
+        );
+      }
+    });
   }
 
-  async updateLevel(tech: Technology, newLevel: number) {
+  updateLevel(tech: Technology, newLevel: number) {
     if (tech.level === newLevel) return;
     
     const oldLevel = tech.level;
@@ -641,15 +690,18 @@ export class AdminTechnologiesComponent implements OnInit {
       techs.map(t => t.id === tech.id ? { ...t, level: newLevel, show_in_about: newShowInAbout } : t)
     );
 
-    try {
-       await firstValueFrom(this.techService.updateTechnology(tech.id!, { level: newLevel, show_in_about: newShowInAbout }));
-       this.contentService.refreshTechnologies(); // Sync global
-    } catch (err) {
-       this.toast.error('Error al actualizar nivel');
-       // Revert
-       this.technologies.update(techs => 
-        techs.map(t => t.id === tech.id ? { ...t, level: oldLevel, show_in_about: oldShowInAbout } : t)
-      );
-    }
+    this.techService.updateTechnology(tech.id!, { level: newLevel, show_in_about: newShowInAbout }).subscribe({
+      next: () => {
+        this.contentService.refreshTechnologies(); // Sync global
+      },
+      error: (err) => {
+        console.error('Error updating level', err);
+        this.toast.error('Error al actualizar nivel');
+        // Revert
+        this.technologies.update(techs => 
+          techs.map(t => t.id === tech.id ? { ...t, level: oldLevel, show_in_about: oldShowInAbout } : t)
+        );
+      }
+    });
   }
 }
