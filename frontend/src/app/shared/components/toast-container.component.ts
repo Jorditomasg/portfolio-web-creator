@@ -3,7 +3,6 @@ import { ToastService } from '../../core/services/toast.service';
 
 @Component({
   selector: 'app-toast-container',
-  standalone: true,
   template: `
     <div class="fixed bottom-6 right-6 z-[100] flex flex-col gap-3">
       @for (toast of toastService.toasts(); track toast.id) {

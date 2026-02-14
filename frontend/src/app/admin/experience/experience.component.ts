@@ -3,14 +3,13 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { ContentService } from '../../core/services/content.service';
 import { ToastService } from '../../core/services/toast.service';
-import { firstValueFrom, forkJoin, switchMap, finalize } from 'rxjs';
+import { forkJoin, switchMap, finalize } from 'rxjs';
 import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Experience } from '../../core/models/api.models';
 import { FileUploadComponent } from '../../shared/components/file-upload/file-upload.component';
 
 @Component({
   selector: 'app-admin-experience',
-  standalone: true,
   imports: [FormsModule, DragDropModule, FileUploadComponent],
   templateUrl: './experience.component.html',
 })

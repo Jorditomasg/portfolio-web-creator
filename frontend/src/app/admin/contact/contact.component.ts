@@ -1,5 +1,4 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { ToastService } from '../../core/services/toast.service';
 
@@ -15,8 +14,6 @@ interface ContactMessage {
 
 @Component({
   selector: 'app-admin-contact',
-  standalone: true,
-  imports: [CommonModule],
   templateUrl: './contact.component.html',
 })
 export class AdminContactComponent implements OnInit {

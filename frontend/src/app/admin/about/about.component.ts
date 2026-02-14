@@ -4,14 +4,11 @@ import { HttpClient } from '@angular/common/http';
 import { ContentService } from '../../core/services/content.service';
 import { ToastService } from '../../core/services/toast.service';
 import { forkJoin, switchMap, finalize, tap, of } from 'rxjs';
-import { FileUploadComponent } from '../../shared/components/file-upload/file-upload.component';
 
 @Component({
   selector: 'app-admin-about',
-  standalone: true,
-  imports: [FormsModule, FileUploadComponent],
-
   templateUrl: './about.component.html',
+  imports: [FormsModule],
 })
 export class AdminAboutComponent implements OnInit {
   private http = inject(HttpClient);

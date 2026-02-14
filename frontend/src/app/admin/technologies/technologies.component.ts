@@ -7,9 +7,8 @@ import { ContentService } from '../../core/services/content.service';
 import { ToastService } from '../../core/services/toast.service';
 import { Technology } from '../../core/models/technology.model';
 import { Category } from '../../core/models/api.models';
-import { firstValueFrom, forkJoin, switchMap, finalize, tap, catchError, of, map } from 'rxjs';
+import { forkJoin, switchMap, finalize, tap, catchError, of, map } from 'rxjs';
 import { DragDropModule, CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
-import { DOCUMENT } from '@angular/common'; // Import DOCUMENT
 
 // SVG icons for specialty types (matching AboutComponent)
 const SPECIALTY_ICONS: Record<string, string> = {
@@ -88,7 +87,6 @@ const SPECIALTY_ICONS: Record<string, string> = {
 
 @Component({
   selector: 'app-admin-technologies',
-  standalone: true,
   imports: [FormsModule, DragDropModule],
   templateUrl: './technologies.component.html',
 })

@@ -1,14 +1,13 @@
 import { Component, inject, signal, effect, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { firstValueFrom, finalize, switchMap } from 'rxjs';
+import { finalize, switchMap } from 'rxjs';
 import { ContentService } from '../../core/services/content.service';
 import { ToastService } from '../../core/services/toast.service';
 import { FileUploadComponent } from '../../shared/components/file-upload/file-upload.component';
 
 @Component({
   selector: 'app-admin-settings',
-  standalone: true,
   imports: [FormsModule, FileUploadComponent],
   templateUrl: './settings.component.html',
 })

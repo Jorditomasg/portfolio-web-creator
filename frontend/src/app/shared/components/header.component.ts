@@ -17,9 +17,8 @@ const FAVICON_ICONS: Record<string, string> = {
 
 @Component({
   selector: 'app-header',
-  standalone: true,
-  imports: [RouterLink, RouterLinkActive],
   templateUrl: './header.component.html',
+  imports: [RouterLink, RouterLinkActive],
 })
 export class HeaderComponent {
   contentService = inject(ContentService);

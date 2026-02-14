@@ -1,11 +1,8 @@
 import { Component, Input, Output, EventEmitter, inject, signal, effect } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { UploadService } from '../../../core/services/upload.service';
 
 @Component({
   selector: 'app-file-upload',
-  standalone: true,
-  imports: [CommonModule],
   template: `
     <div class="flex flex-col gap-2 w-full">
       <label class="text-sm font-medium text-gray-300 mb-1">{{ label || 'Imagen' }}</label>

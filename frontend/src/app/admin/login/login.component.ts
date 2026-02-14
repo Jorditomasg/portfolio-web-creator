@@ -1,11 +1,10 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject} from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-login',
-  standalone: true,
   imports: [FormsModule],
   template: `
     <div class="min-h-screen bg-dark-bg flex items-center justify-center px-6">

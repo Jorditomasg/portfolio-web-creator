@@ -31,7 +31,7 @@
             <div class="flex items-center gap-3 text-sm text-gray-400 mt-1">
               <!-- Date removed -->
               <div class="flex gap-1">
-                @for (tech of project.technologies?.slice(0, 3) || []; track tech) {
+                @for (tech of project?.technologies?.slice(0, 3) || []; track tech) {
                   <span class="px-1.5 py-0.5 bg-dark-bg text-xs rounded">{{ tech }}</span>
                 }
               </div>
