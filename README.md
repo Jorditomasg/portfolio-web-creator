@@ -2,7 +2,7 @@
 
 A modern, customizable portfolio website builder with **Angular** (frontend) and **NestJS** (backend). Features a complete admin panel, internationalization, and dynamic theming.
 
-![Angular](https://img.shields.io/badge/Angular-19-DD0031?logo=angular)
+![Angular](https://img.shields.io/badge/Angular-21-DD0031?logo=angular)
 ![NestJS](https://img.shields.io/badge/NestJS-10-E0234E?logo=nestjs)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql)
 ![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker)
@@ -11,7 +11,7 @@ A modern, customizable portfolio website builder with **Angular** (frontend) and
 ## ✨ Features
 
 ### Frontend
-- **Angular 19** with zoneless change detection for optimal performance
+- **Angular 21** with zoneless change detection for optimal performance
 - **Tailwind CSS** for modern, responsive styling
 - **i18n System**: Built-in Spanish/English translation with browser detection
 - **Dark Theme**: Premium dark mode design with smooth animations
