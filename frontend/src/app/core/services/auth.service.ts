@@ -45,7 +45,7 @@ export class AuthService {
       map(() => true),
       catchError((err: any) => {
         console.error('Login failed', err);
-        this._error.set(err?.error?.message || 'Credenciales inválidas');
+        this._error.set(err?.error?.message || 'Invalid credentials');
         return of(false);
       }),
       finalize(() => this._isLoading.set(false))

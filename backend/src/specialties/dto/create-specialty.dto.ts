@@ -4,16 +4,10 @@ export class CreateSpecialtyDto {
   @IsString()
   title: string;
 
-  @IsString()
-  @IsOptional()
-  title_en?: string;
 
   @IsString()
   description: string;
 
-  @IsString()
-  @IsOptional()
-  description_en?: string;
 
   @IsString()
   @IsOptional()

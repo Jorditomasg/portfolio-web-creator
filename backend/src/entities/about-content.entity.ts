@@ -8,15 +8,11 @@ export class AboutContent {
   @Column({ type: 'text', nullable: true })
   bio: string;
 
-  @Column({ type: 'text', nullable: true })
-  bio_en: string;
 
 
   @Column({ type: 'text', array: true, default: [] })
   highlights: string[];
 
-  @Column({ type: 'text', array: true, default: [] })
-  highlights_en: string[];
 
   @CreateDateColumn()
   created_at: Date;

@@ -13,24 +13,15 @@ export class HeroContent {
   @Column({ nullable: true })
   title_highlight: string;
 
-  // English versions
-  @Column({ nullable: true })
-  title_en: string;
 
-  @Column({ nullable: true })
-  title_highlight_en: string;
 
   @Column({ nullable: true })
   subtitle: string;
 
-  @Column({ nullable: true })
-  subtitle_en: string;
 
   @Column({ type: 'text', nullable: true })
   description: string;
 
-  @Column({ type: 'text', nullable: true })
-  description_en: string;
 
 
   @CreateDateColumn()

@@ -9,20 +9,14 @@ export class Project {
   @Column()
   title: string;
 
-  @Column({ nullable: true })
-  title_en: string;
 
   @Column({ type: 'text', nullable: true })
   description: string;
 
-  @Column({ type: 'text', nullable: true })
-  description_en: string;
 
   @Column({ type: 'text', nullable: true })
   long_description: string;
 
-  @Column({ type: 'text', nullable: true })
-  long_description_en: string;
 
   @Column({ length: 500, nullable: true })
   image_url: string;

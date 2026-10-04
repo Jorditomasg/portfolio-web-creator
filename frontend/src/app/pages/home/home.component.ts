@@ -2,7 +2,6 @@ import { Component, inject, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ContentService } from '../../core/services/content.service';
-import { TranslationService } from '../../core/services/translation.service';
 
 // SVG icons for specialty types (fixed, not editable)
 const SPECIALTY_ICONS: Record<string, string> = {
@@ -86,7 +85,6 @@ const SPECIALTY_ICONS: Record<string, string> = {
 })
 export class HomeComponent implements OnInit {
   content = inject(ContentService);
-  i18n = inject(TranslationService);
   private sanitizer = inject(DomSanitizer);
 
   ngOnInit() {

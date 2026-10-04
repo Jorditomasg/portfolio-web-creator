@@ -18,14 +18,8 @@ export class Category {
   @Column({ type: 'text', nullable: true })
   description: string;
 
-  @Column({ nullable: true })
-  long_title_en: string;
 
-  @Column({ nullable: true })
-  short_title_en: string;
 
-  @Column({ type: 'text', nullable: true })
-  description_en: string;
 
   @Column({ nullable: true })
   icon: string; // SVG content or icon identifier

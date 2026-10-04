@@ -5,25 +5,16 @@ export class CreateProjectDto {
   @IsString()
   title: string;
 
-  @IsString()
-  @IsOptional()
-  title_en?: string;
 
   @IsString()
   @IsOptional()
   description?: string;
 
-  @IsString()
-  @IsOptional()
-  description_en?: string;
 
   @IsString()
   @IsOptional()
   long_description?: string;
 
-  @IsString()
-  @IsOptional()
-  long_description_en?: string;
 
   @IsString()
   @IsOptional()

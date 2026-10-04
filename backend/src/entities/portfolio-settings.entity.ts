@@ -41,37 +41,12 @@ export class PortfolioSettings {
   @Column({ default: true })
   show_admin_link: boolean;
 
-  // Contact System Configuration
-  @Column({ default: true })
-  enable_contact_form: boolean;
+  // Umami analytics (self-hosted). Both set = tracker script injected on the public site.
+  @Column({ length: 500, nullable: true })
+  umami_url: string;
 
-  @Column({ default: false })
-  enable_email_sending: boolean;
-
-  @Column({ default: true })
-  enable_database_storage: boolean;
-
-  // SMTP Settings (Optional, for email sending)
-  @Column({ nullable: true })
-  smtp_host: string;
-
-  @Column({ nullable: true })
-  smtp_port: number;
-
-  @Column({ nullable: true })
-  smtp_user: string;
-
-  @Column({ nullable: true })
-  smtp_pass: string;
-
-  @Column({ default: false })
-  smtp_secure: boolean;
-
-  @Column({ default: true })
-  smtp_require_tls: boolean;
-
-  @Column({ nullable: true })
-  smtp_from: string;
+  @Column({ length: 100, nullable: true })
+  umami_website_id: string;
 
   @CreateDateColumn()
   created_at: Date;

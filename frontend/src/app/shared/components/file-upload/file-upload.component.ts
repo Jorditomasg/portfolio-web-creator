@@ -5,7 +5,7 @@ import { UploadService } from '../../../core/services/upload.service';
   selector: 'app-file-upload',
   template: `
     <div class="flex flex-col gap-2 w-full">
-      <label class="text-sm font-medium text-gray-300 mb-1">{{ label || 'Imagen' }}</label>
+      <label class="text-sm font-medium text-gray-300 mb-1">{{ label || 'Image' }}</label>
       
       <div class="flex gap-4 items-start p-3 bg-dark-surface rounded-lg border border-dark-border group hover:border-primary/50 transition-colors">
         <!-- Preview / Placeholder -->
@@ -32,7 +32,7 @@ import { UploadService } from '../../../core/services/upload.service';
         <div class="flex-1 min-w-0 flex flex-col justify-center gap-2">
           @if (!previewUrl()) {
             <div class="text-xs text-gray-500">
-              <p>Formatos: JPG, PNG, WEBP</p>
+              <p>Formats: JPG, PNG, WEBP</p>
               <p>Max: 5MB</p>
             </div>
             <button type="button" 
@@ -41,10 +41,10 @@ import { UploadService } from '../../../core/services/upload.service';
                     class="w-fit px-3 py-1.5 bg-dark-bg hover:bg-dark-border border border-dark-border rounded text-sm text-gray-300 transition-colors flex items-center gap-2">
               @if (isUploading()) {
                 <svg class="animate-spin h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                Subiendo...
+                Uploading...
               } @else {
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                Seleccionar Archivo
+                Select File
               }
             </button>
           } @else {
@@ -53,7 +53,7 @@ import { UploadService } from '../../../core/services/upload.service';
              </div>
              <p class="text-xs text-green-500 flex items-center gap-1">
                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-               Listo
+               Done
              </p>
           }
         </div>
@@ -111,7 +111,7 @@ export class FileUploadComponent {
       },
       error: (err) => {
         this.isUploading.set(false);
-        this.error.set('Error subiendo archivo');
+        this.error.set('Error uploading file');
         console.error(err);
       }
     });

@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsUrl, ValidateIf, IsEmail, IsBoolean, IsIn } from 'class-validator';
+import { IsString, IsOptional, IsUrl, ValidateIf, IsEmail, IsBoolean, IsIn, IsUUID } from 'class-validator';
 
 export class UpdateSettingsDto {
   @IsString()
@@ -52,44 +52,14 @@ export class UpdateSettingsDto {
   @IsOptional()
   show_admin_link?: boolean;
 
-  // Contact System Configuration
-  @IsBoolean()
+  // Umami analytics
+  @ValidateIf(o => o.umami_url !== '' && o.umami_url != null)
+  @IsUrl({ require_tld: false })
   @IsOptional()
-  enable_contact_form?: boolean;
+  umami_url?: string;
 
-  @IsBoolean()
+  @ValidateIf(o => o.umami_website_id !== '' && o.umami_website_id != null)
+  @IsUUID()
   @IsOptional()
-  enable_email_sending?: boolean;
-
-  @IsBoolean()
-  @IsOptional()
-  enable_database_storage?: boolean;
-
-  // SMTP Settings
-  @IsString()
-  @IsOptional()
-  smtp_host?: string;
-
-  @IsOptional() // TypeORM might return string or number
-  smtp_port?: number;
-
-  @IsString()
-  @IsOptional()
-  smtp_user?: string;
-
-  @IsString()
-  @IsOptional()
-  smtp_pass?: string;
-
-  @IsBoolean()
-  @IsOptional()
-  smtp_secure?: boolean;
-
-  @IsBoolean()
-  @IsOptional()
-  smtp_require_tls?: boolean;
-
-  @IsString()
-  @IsOptional()
-  smtp_from?: string;
+  umami_website_id?: string;
 }

@@ -12,14 +12,14 @@ import { AuthService } from '../../core/services/auth.service';
         <div class="bg-dark-surface rounded-2xl border border-dark-border p-8">
           <!-- Header -->
           <div class="text-center mb-8">
-            <h1 class="text-2xl font-bold mb-2 text-white">Panel de Administración</h1>
-            <p class="text-gray-400">Inicia sesión para continuar</p>
+            <h1 class="text-2xl font-bold mb-2 text-white">Admin Panel</h1>
+            <p class="text-gray-400">Sign in to continue</p>
           </div>
 
           <!-- Form -->
           <form (ngSubmit)="onSubmit()" class="space-y-6">
             <div>
-              <label for="username" class="block text-sm font-medium text-gray-300 mb-2">Usuario</label>
+              <label for="username" class="block text-sm font-medium text-gray-300 mb-2">Username</label>
               <input 
                 type="text" 
                 id="username" 
@@ -32,7 +32,7 @@ import { AuthService } from '../../core/services/auth.service';
             </div>
 
             <div>
-              <label for="password" class="block text-sm font-medium text-gray-300 mb-2">Contraseña</label>
+              <label for="password" class="block text-sm font-medium text-gray-300 mb-2">Password</label>
               <input 
                 type="password" 
                 id="password" 
@@ -55,9 +55,9 @@ import { AuthService } from '../../core/services/auth.service';
               [disabled]="authService.isLoading()"
               class="w-full py-4 bg-primary hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-all">
               @if (authService.isLoading()) {
-                Iniciando sesión...
+                Signing in...
               } @else {
-                Iniciar Sesión
+                Sign In
               }
             </button>
           </form>
@@ -65,7 +65,7 @@ import { AuthService } from '../../core/services/auth.service';
           <!-- Back link -->
           <div class="mt-6 text-center">
             <a href="/" class="text-gray-400 hover:text-primary text-sm transition-colors">
-              ← Volver al portfolio
+              ← Back to portfolio
             </a>
           </div>
         </div>

@@ -1,6 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { ContentService } from '../../core/services/content.service';
-import { TranslationService } from '../../core/services/translation.service';
 
 @Component({
   selector: 'app-projects',
@@ -8,7 +7,6 @@ import { TranslationService } from '../../core/services/translation.service';
 })
 export class ProjectsComponent implements OnInit {
   content = inject(ContentService);
-  i18n = inject(TranslationService);
 
   ngOnInit() {
     this.content.loadProjects().subscribe();
@@ -45,7 +43,7 @@ export class ProjectsComponent implements OnInit {
     if (!dateStr) return '';
     const date = new Date(dateStr);
     // Capitalize first letter of month
-    const fmt = new Intl.DateTimeFormat(this.i18n.isSpanish() ? 'es-ES' : 'en-US', { month: 'short', year: 'numeric' }).format(date);
+    const fmt = new Intl.DateTimeFormat('en-US', { month: 'short', year: 'numeric' }).format(date);
     return fmt.charAt(0).toUpperCase() + fmt.slice(1);
   }
 }

@@ -19,15 +19,15 @@ export class AdminAboutComponent implements OnInit {
   isDirtyAbout = signal(false);
   isDirtyHero = signal(false);
 
-  aboutForm: { bio: string; bio_en: string; highlightsText: string; highlightsText_en: string } = { 
-    bio: '', bio_en: '', highlightsText: '', highlightsText_en: '' 
+  aboutForm: { bio: string; highlightsText: string } = { 
+    bio: '', highlightsText: '' 
   };
 
   initialAboutForm: any = {};
 
   heroForm: any = { 
-    title: '', title_highlight: '', title_en: '', title_highlight_en: '', 
-    subtitle: '', subtitle_en: '', description: '', description_en: '' 
+    title: '', title_highlight: '', 
+    subtitle: '', description: '' 
   };
 
   initialHeroForm: any = {};
@@ -39,9 +39,7 @@ export class AdminAboutComponent implements OnInit {
       const about = this.content.about();
       if (about) { 
         this.aboutForm.bio = about.bio || '';
-        this.aboutForm.bio_en = about.bio_en || '';
         this.aboutForm.highlightsText = about.highlights?.join('\n') || '';
-        this.aboutForm.highlightsText_en = about.highlights_en?.join('\n') || '';
         this.initialAboutForm = JSON.parse(JSON.stringify(this.aboutForm));
         this.checkDirtyAbout();
       }
@@ -52,12 +50,8 @@ export class AdminAboutComponent implements OnInit {
       if (hero) { 
         this.heroForm.title = hero.title || '';
         this.heroForm.title_highlight = hero.title_highlight || '';
-        this.heroForm.title_en = hero.title_en || '';
-        this.heroForm.title_highlight_en = hero.title_highlight_en || '';
         this.heroForm.subtitle = hero.subtitle || '';
-        this.heroForm.subtitle_en = hero.subtitle_en || '';
         this.heroForm.description = hero.description || '';
-        this.heroForm.description_en = hero.description_en || '';
         this.initialHeroForm = JSON.parse(JSON.stringify(this.heroForm));
         this.checkDirtyHero();
       }
@@ -87,9 +81,7 @@ export class AdminAboutComponent implements OnInit {
     if (this.isDirtyAbout()) {
       const aboutPayload = {
         bio: this.aboutForm.bio,
-        bio_en: this.aboutForm.bio_en,
-        highlights: this.aboutForm.highlightsText.split('\n').map(h => h.trim()).filter(h => h),
-        highlights_en: this.aboutForm.highlightsText_en.split('\n').map(h => h.trim()).filter(h => h)
+        highlights: this.aboutForm.highlightsText.split('\n').map(h => h.trim()).filter(h => h)
       };
       
       tasks.push(
@@ -128,11 +120,11 @@ export class AdminAboutComponent implements OnInit {
       finalize(() => this.isSaving.set(false))
     ).subscribe({
       next: () => {
-        this.toast.success('Cambios guardados correctamente');
+        this.toast.success('Changes saved successfully');
       },
       error: (e) => {
         console.error(e);
-        this.toast.error('Error al guardar los cambios');
+        this.toast.error('Error saving changes');
       }
     });
   }

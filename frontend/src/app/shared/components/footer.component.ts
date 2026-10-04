@@ -1,5 +1,4 @@
-import { Component, inject } from '@angular/core';
-import { TranslationService } from '../../core/services/translation.service';
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-footer',
@@ -7,13 +6,12 @@ import { TranslationService } from '../../core/services/translation.service';
     <footer class="py-8 bg-dark-bg border-t border-dark-border">
       <div class="container mx-auto px-6 text-center">
         <p class="text-gray-500 text-sm">
-          © {{ currentYear }} Portfolio Web Creator. {{ i18n.t('footer.rights') }}
+          © {{ currentYear }} Portfolio Web Creator. All rights reserved.
         </p>
       </div>
     </footer>
   `,
 })
 export class FooterComponent {
-  i18n = inject(TranslationService);
   currentYear = new Date().getFullYear();
 }

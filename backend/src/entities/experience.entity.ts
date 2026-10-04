@@ -8,8 +8,6 @@ export class Experience {
   @Column()
   title: string;
 
-  @Column({ nullable: true })
-  title_en: string;
 
   @Column({ nullable: true })
   company: string;
@@ -23,14 +21,10 @@ export class Experience {
   @Column({ type: 'text', nullable: true })
   description: string;
 
-  @Column({ type: 'text', nullable: true })
-  description_en: string;
 
   @Column({ type: 'text', array: true, default: [] })
   achievements: string[];
 
-  @Column({ type: 'text', array: true, default: [] })
-  achievements_en: string[];
 
   @Column({ type: 'date', nullable: true })
   start_date: Date;

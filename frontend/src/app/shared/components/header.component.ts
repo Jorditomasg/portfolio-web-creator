@@ -2,7 +2,6 @@ import { Component, inject, signal, effect } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { DomSanitizer, SafeHtml, Title } from '@angular/platform-browser';
 import { ContentService } from '../../core/services/content.service';
-import { TranslationService } from '../../core/services/translation.service';
 import { DOCUMENT } from '@angular/common';
 
 // Favicon SVG icons
@@ -22,7 +21,6 @@ const FAVICON_ICONS: Record<string, string> = {
 })
 export class HeaderComponent {
   contentService = inject(ContentService);
-  i18n = inject(TranslationService);
   private titleService = inject(Title);
   private document = inject(DOCUMENT);
   private sanitizer = inject(DomSanitizer);

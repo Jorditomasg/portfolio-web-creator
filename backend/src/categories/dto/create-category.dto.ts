@@ -17,17 +17,8 @@ export class CreateCategoryDto {
   @IsOptional()
   description?: string;
 
-  @IsString()
-  @IsOptional()
-  long_title_en?: string;
 
-  @IsString()
-  @IsOptional()
-  short_title_en?: string;
 
-  @IsString()
-  @IsOptional()
-  description_en?: string;
 
   @IsString()
   @IsOptional()

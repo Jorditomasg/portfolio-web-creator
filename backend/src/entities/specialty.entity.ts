@@ -8,14 +8,10 @@ export class Specialty {
   @Column({ length: 100 })
   title: string;
 
-  @Column({ length: 100, nullable: true })
-  title_en: string;
 
   @Column({ type: 'text' })
   description: string;
 
-  @Column({ type: 'text', nullable: true })
-  description_en: string;
 
   @Column({ length: 50, default: 'primary' })
   color: string; // primary, green, blue

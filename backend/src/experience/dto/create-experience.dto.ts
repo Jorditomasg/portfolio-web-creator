@@ -5,9 +5,6 @@ export class CreateExperienceDto {
   @IsString()
   title: string;
 
-  @IsString()
-  @IsOptional()
-  title_en?: string;
 
   @IsString()
   company: string;
@@ -37,19 +34,12 @@ export class CreateExperienceDto {
   @IsOptional()
   description?: string;
 
-  @IsString()
-  @IsOptional()
-  description_en?: string;
 
   @IsArray()
   @IsString({ each: true })
   @IsOptional()
   achievements?: string[];
 
-  @IsArray()
-  @IsString({ each: true })
-  @IsOptional()
-  achievements_en?: string[];
 
   @IsInt()
   @Min(0)

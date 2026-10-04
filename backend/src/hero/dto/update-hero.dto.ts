@@ -9,29 +9,17 @@ export class UpdateHeroDto {
   @IsOptional()
   title_highlight?: string;
 
-  @IsString()
-  @IsOptional()
-  title_en?: string;
 
-  @IsString()
-  @IsOptional()
-  title_highlight_en?: string;
 
   @IsString()
   @IsOptional()
   subtitle?: string;
 
-  @IsString()
-  @IsOptional()
-  subtitle_en?: string;
 
   @IsString()
   @IsOptional()
   description?: string;
 
-  @IsString()
-  @IsOptional()
-  description_en?: string;
 
   @ValidateIf(o => o.background_image_url !== '' && o.background_image_url != null)
   @IsUrl()

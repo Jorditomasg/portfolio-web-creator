@@ -1,8 +1,8 @@
 <div class="p-8">
   <div class="flex justify-between items-center mb-8">
-    <h1 class="text-2xl font-bold text-white">Gestión de Proyectos</h1>
+    <h1 class="text-2xl font-bold text-white">Project Management</h1>
     <button (click)="openModal()" class="px-4 py-2 bg-primary hover:bg-primary-dark text-dark-bg font-medium rounded-lg transition-colors">
-      + Nuevo Proyecto
+      + New Project
     </button>
   </div>
 
@@ -40,12 +40,12 @@
           
           <!-- Actions -->
           <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-            <button (click)="edit(project)" class="p-2 text-gray-400 hover:text-primary rounded-lg transition-colors" title="Editar">
+            <button (click)="edit(project)" class="p-2 text-gray-400 hover:text-primary rounded-lg transition-colors" title="Edit">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
               </svg>
             </button>
-            <button (click)="deleteProject(project.id)" class="p-2 text-gray-400 hover:text-red-400 rounded-lg transition-colors" title="Eliminar">
+            <button (click)="deleteProject(project.id)" class="p-2 text-gray-400 hover:text-red-400 rounded-lg transition-colors" title="Delete">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
               </svg>
@@ -55,7 +55,7 @@
       </div>
     } @empty {
       <div class="text-center py-12 text-gray-500 bg-dark-surface rounded-xl border border-dashed border-dark-border">
-        No hay proyectos. ¡Añade tu primer proyecto!
+        No projects yet. Add your first project!
       </div>
     }
   </div>
@@ -65,47 +65,32 @@
     <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
       <div class="bg-dark-surface rounded-xl border border-dark-border w-full max-w-3xl max-h-[90vh] overflow-y-auto">
         <div class="p-6 border-b border-dark-border">
-          <h2 class="text-xl font-bold text-white">{{ editing() ? 'Editar' : 'Nuevo' }} Proyecto</h2>
+          <h2 class="text-xl font-bold text-white">{{ editing() ? 'Edit' : 'New' }} Project</h2>
         </div>
         <form (ngSubmit)="save()" class="p-6 space-y-4">
-          <!-- Title with EN version -->
-          <div class="grid grid-cols-2 gap-4">
+          <!-- Title -->
+          <div class="grid grid-cols-1 gap-4">
             <div>
-              <label class="block text-sm text-gray-400 mb-1">Título (ES) <span class="text-red-500">*</span></label>
+              <label class="block text-sm text-gray-400 mb-1">Title <span class="text-red-500">*</span></label>
               <input [(ngModel)]="form.title" name="title" required
-                     class="w-full px-4 py-2 bg-dark-bg border border-dark-border rounded-lg focus:border-primary outline-none text-white">
-            </div>
-            <div>
-              <label class="block text-sm text-gray-400 mb-1">Title (EN)</label>
-              <input [(ngModel)]="form.title_en" name="title_en"
                      class="w-full px-4 py-2 bg-dark-bg border border-dark-border rounded-lg focus:border-primary outline-none text-white">
             </div>
           </div>
           
-          <!-- Short Description with EN version -->
-          <div class="grid grid-cols-2 gap-4">
+          <!-- Short Description -->
+          <div class="grid grid-cols-1 gap-4">
             <div>
-              <label class="block text-sm text-gray-400 mb-1">Descripción corta (ES)</label>
+              <label class="block text-sm text-gray-400 mb-1">Short description</label>
               <textarea [(ngModel)]="form.description" name="description" rows="2"
-                        class="w-full px-4 py-2 bg-dark-bg border border-dark-border rounded-lg focus:border-primary outline-none text-white resize-none"></textarea>
-            </div>
-            <div>
-              <label class="block text-sm text-gray-400 mb-1">Short description (EN)</label>
-              <textarea [(ngModel)]="form.description_en" name="description_en" rows="2"
                         class="w-full px-4 py-2 bg-dark-bg border border-dark-border rounded-lg focus:border-primary outline-none text-white resize-none"></textarea>
             </div>
           </div>
 
-          <!-- Long Description with EN version -->
-          <div class="grid grid-cols-2 gap-4">
+          <!-- Long Description -->
+          <div class="grid grid-cols-1 gap-4">
             <div>
-              <label class="block text-sm text-gray-400 mb-1">Descripción larga (ES)</label>
+              <label class="block text-sm text-gray-400 mb-1">Long description</label>
               <textarea [(ngModel)]="form.long_description" name="long_description" rows="3"
-                        class="w-full px-4 py-2 bg-dark-bg border border-dark-border rounded-lg focus:border-primary outline-none text-white resize-none"></textarea>
-            </div>
-            <div>
-              <label class="block text-sm text-gray-400 mb-1">Long description (EN)</label>
-              <textarea [(ngModel)]="form.long_description_en" name="long_description_en" rows="3"
                         class="w-full px-4 py-2 bg-dark-bg border border-dark-border rounded-lg focus:border-primary outline-none text-white resize-none"></textarea>
             </div>
           </div>
@@ -115,7 +100,7 @@
              <!-- Full width image upload -->
             <div>
               <app-file-upload 
-                label="Imagen de Portada" 
+                label="Cover Image" 
                 [currentPath]="form.image_url" 
                 (pathChange)="form.image_url = $event">
               </app-file-upload>
@@ -137,7 +122,7 @@
           
           <!-- Technologies Tag Input -->
           <div>
-            <label class="block text-sm text-gray-400 mb-2">Tecnologías Usadas</label>
+            <label class="block text-sm text-gray-400 mb-2">Technologies Used</label>
             
             <div class="bg-dark-bg border border-dark-border rounded-lg p-3 min-h-[3rem] focus-within:border-primary transition-colors">
               <div class="flex flex-wrap gap-2 mb-2">
@@ -160,7 +145,7 @@
                        (keydown.enter)="onTechEnter($event)"
                        name="newTech"
                        class="w-full bg-transparent outline-none text-white placeholder-gray-500"
-                       placeholder="Escribe para buscar o añadir..." autocomplete="off">
+                       placeholder="Type to search or add..." autocomplete="off">
                 
                 <!-- Autocomplete Dropdown -->
                 @if (filteredTechnologies().length > 0) {
@@ -178,17 +163,17 @@
                 <!-- "Create New" Helper if no match -->
                  @if (newTechInput() && filteredTechnologies().length === 0) {
                    <div class="absolute top-full left-0 w-full mt-1 bg-dark-surface border border-dark-border rounded-lg shadow-xl z-50 p-2 text-sm text-gray-400">
-                     <p class="mb-2">No encontrado. Presiona Enter para añadir texto simple.</p>
+                     <p class="mb-2">Not found. Press Enter to add as plain text.</p>
                      <a routerLink="/admin/technologies" target="_blank" class="text-primary hover:underline flex items-center gap-1">
                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                       Gestionar Tecnologías (Añadir nuevo icono)
+                       Manage Technologies (Add new icon)
                      </a>
                    </div>
                  }
               </div>
             </div>
             <p class="mt-1 text-xs text-gray-500">
-              Las tecnologías añadidas aquí que coincidan con las registradas en "Gestión de Tecnologías" mostrarán su icono automáticamente.
+              Technologies added here that match those registered in "Technology Management" will show their icon automatically.
             </p>
           </div>
           
@@ -196,12 +181,12 @@
           <div class="space-y-3">
             <div class="flex items-center gap-4">
               <div class="flex-1">
-                <label class="block text-sm text-gray-400 mb-1">Fecha Inicio</label>
+                <label class="block text-sm text-gray-400 mb-1">Start Date</label>
                 <input type="month" [(ngModel)]="form.start_date" name="start_date"
                        class="w-full px-4 py-2 bg-dark-bg border border-dark-border rounded-lg focus:border-primary outline-none text-white">
               </div>
               <div class="flex-1">
-                <label class="block text-sm text-gray-400 mb-1">Fecha Fin</label>
+                <label class="block text-sm text-gray-400 mb-1">End Date</label>
                 <input type="month" [(ngModel)]="form.end_date" name="end_date"
                        [disabled]="form.is_in_progress"
                        [class.opacity-50]="form.is_in_progress"
@@ -211,7 +196,7 @@
             <div class="flex items-center gap-2">
               <input type="checkbox" [(ngModel)]="form.is_in_progress" name="is_in_progress" id="is_in_progress" class="w-4 h-4 accent-blue-500">
               <label for="is_in_progress" class="text-gray-300 flex items-center gap-2">
-                🔨 En desarrollo <span class="text-gray-500 text-sm">(deshabilita fecha fin)</span>
+                🔨 In progress <span class="text-gray-500 text-sm">(disables end date)</span>
               </label>
             </div>
           </div>
@@ -219,12 +204,12 @@
           <div class="flex items-center gap-4">
             <div class="flex items-center gap-2">
               <input type="checkbox" [(ngModel)]="form.featured" name="featured" id="featured" class="w-4 h-4 accent-yellow-500">
-              <label for="featured" class="text-gray-300">⭐ Proyecto destacado</label>
+              <label for="featured" class="text-gray-300">⭐ Featured project</label>
             </div>
           </div>
           <div class="flex justify-end gap-3 pt-4">
-            <button type="button" (click)="closeModal()" class="px-4 py-2 text-gray-400 hover:text-white transition-colors">Cancelar</button>
-            <button type="submit" class="px-6 py-2 bg-primary hover:bg-primary-dark text-dark-bg font-medium rounded-lg transition-colors">Guardar</button>
+            <button type="button" (click)="closeModal()" class="px-4 py-2 text-gray-400 hover:text-white transition-colors">Cancel</button>
+            <button type="submit" class="px-6 py-2 bg-primary hover:bg-primary-dark text-dark-bg font-medium rounded-lg transition-colors">Save</button>
           </div>
         </form>
       </div>

@@ -1,6 +1,5 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
-import { contactGuard } from './core/guards/contact.guard';
 
 export const routes: Routes = [
   // Public routes
@@ -18,7 +17,6 @@ export const routes: Routes = [
   },
   {
     path: 'contact',
-    canActivate: [contactGuard],
     loadComponent: () => import('./pages/contact/contact.component').then(m => m.ContactComponent),
   },
 
@@ -62,10 +60,6 @@ export const routes: Routes = [
       {
         path: 'technologies',
         loadComponent: () => import('./admin/technologies/technologies.component').then(m => m.AdminTechnologiesComponent),
-      },
-      {
-        path: 'contact',
-        loadComponent: () => import('./admin/contact/contact.component').then(m => m.AdminContactComponent),
       },
     ],
   },

@@ -170,9 +170,6 @@ export class AdminTechnologiesComponent implements OnInit {
     short_title: '',
     long_title: '',
     description: '',
-    short_title_en: '',
-    long_title_en: '',
-    description_en: '',
     icon: ''
   };
 
@@ -241,7 +238,7 @@ export class AdminTechnologiesComponent implements OnInit {
       }),
       catchError(err => {
         console.error('Error loading categories', err);
-        this.toast.error('Error al cargar categorías');
+        this.toast.error('Error loading categories');
         return of([]);
       }),
       map(() => void 0)
@@ -260,7 +257,7 @@ export class AdminTechnologiesComponent implements OnInit {
       }),
       catchError(err => {
         console.error('Error loading technologies', err);
-        this.toast.error('Error al cargar tecnologías');
+        this.toast.error('Error loading technologies');
         return of([]);
       }),
       map(() => void 0)
@@ -302,10 +299,7 @@ export class AdminTechnologiesComponent implements OnInit {
       short_title: '',
       long_title: '',
       description: '',
-      short_title_en: '',
-      long_title_en: '',
-      description_en: '',
-      icon: ''
+            icon: ''
     };
     this.showCategoryModal.set(true);
   }
@@ -334,7 +328,7 @@ export class AdminTechnologiesComponent implements OnInit {
   saveCategory() {
     // If short_title is missing, we can't properly generate the slug or show it
     if (!this.categoryForm.short_title) {
-      this.toast.error('El título corto es requerido');
+      this.toast.error('Short title is required');
       return;
     }
 
@@ -355,7 +349,7 @@ export class AdminTechnologiesComponent implements OnInit {
       switchMap(() => this.loadCategories())
     ).subscribe({
       next: () => {
-        this.toast.success(this.isEditingCategory() ? 'Categoría actualizada' : 'Categoría creada');
+        this.toast.success(this.isEditingCategory() ? 'Category updated' : 'Category created');
         
         // Refresh global content
         this.contentService.refreshCategories();
@@ -373,7 +367,7 @@ export class AdminTechnologiesComponent implements OnInit {
       },
       error: (e) => {
         console.error(e);
-        this.toast.error('Error al guardar categoría');
+        this.toast.error('Error saving category');
       }
     });
   }
@@ -384,14 +378,14 @@ export class AdminTechnologiesComponent implements OnInit {
 
     const techCount = this.groupedTechnologies()[categoryName]?.length || 0;
     const confirmMessage = techCount > 0 
-      ? `¿Estás seguro de eliminar la categoría "${categoryName}"?\nSe eliminarán TAMBIÉN las ${techCount} tecnologías que contiene.`
-      : `¿Estás seguro de eliminar la categoría "${categoryName}"?`;
+      ? `Are you sure you want to delete the category "${categoryName}"?\nThe ${techCount} technologies it contains will ALSO be deleted.`
+      : `Are you sure you want to delete the category "${categoryName}"?`;
 
     if (!confirm(confirmMessage)) return;
 
     this.catService.delete(category.id).subscribe({
       next: () => {
-        this.toast.success('Categoría eliminada');
+        this.toast.success('Category deleted');
         
         // Remove from local state and select another tab if needed
         this.categories.update(cats => cats.filter(c => c.id !== category.id));
@@ -412,7 +406,7 @@ export class AdminTechnologiesComponent implements OnInit {
       },
       error: (e) => {
         console.error(e);
-        this.toast.error('Error al eliminar categoría');
+        this.toast.error('Error deleting category');
       }
     });
   }
@@ -456,12 +450,12 @@ export class AdminTechnologiesComponent implements OnInit {
     ).subscribe({
       next: () => {
         this.contentService.refreshCategories(); // Sync global
-        this.toast.success('Orden de categorías actualizado');
+        this.toast.success('Category order updated');
         this.closeCategoryOrderModal();
       },
       error: (e) => {
         console.error(e);
-        this.toast.error('Error al actualizar orden');
+        this.toast.error('Error updating order');
       }
     });
   }
@@ -524,10 +518,10 @@ export class AdminTechnologiesComponent implements OnInit {
           this.technologies.update(techs => 
             techs.map(t => t.id === result.id ? result : t)
           );
-          this.toast.success('Tecnología actualizada');
+          this.toast.success('Technology updated');
         } else {
           this.technologies.update(techs => [...techs, result]);
-          this.toast.success('Tecnología creada');
+          this.toast.success('Technology created');
         }
         
         this.contentService.refreshTechnologies(); // Sync global
@@ -535,23 +529,23 @@ export class AdminTechnologiesComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error saving technology', err);
-        this.toast.error('Error al guardar tecnología');
+        this.toast.error('Error saving technology');
       }
     });
   }
 
   deleteTechnology(tech: Technology) {
-    if (!confirm(`¿Estás seguro de eliminar ${tech.name}?`)) return;
+    if (!confirm(`Are you sure you want to delete ${tech.name}?`)) return;
 
     this.techService.deleteTechnology(tech.id!).subscribe({
       next: () => {
         this.technologies.update(techs => techs.filter(t => t.id !== tech.id));
         this.contentService.refreshTechnologies(); // Sync global
-        this.toast.success('Tecnología eliminada');
+        this.toast.success('Technology deleted');
       },
       error: (err) => {
         console.error('Error deleting technology', err);
-        this.toast.error('Error al eliminar tecnología');
+        this.toast.error('Error deleting technology');
       }
     });
   }
@@ -588,7 +582,7 @@ export class AdminTechnologiesComponent implements OnInit {
         },
         error: (err) => {
           console.error('Error moving technology', err);
-          this.toast.error('Error al mover la tecnología');
+          this.toast.error('Error moving technology');
         }
       });
     }
@@ -620,7 +614,7 @@ export class AdminTechnologiesComponent implements OnInit {
       map(() => void 0),
       catchError(err => {
         console.error('Error updating order', err);
-        this.toast.error('Error al guardar el orden');
+        this.toast.error('Error saving order');
         return of(void 0);
       })
     );
@@ -640,11 +634,11 @@ export class AdminTechnologiesComponent implements OnInit {
       ).subscribe({
         next: () => {
           this.contentService.refreshCategories(); // Sync global
-          this.toast.success('Orden de categorías actualizado');
+          this.toast.success('Category order updated');
         },
         error: (e) => {
           console.error(e);
-          this.toast.error('Error al actualizar orden de categorías');
+          this.toast.error('Error updating category order');
         }
       });
     }
@@ -667,7 +661,7 @@ export class AdminTechnologiesComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error updating show_in_about', err);
-        this.toast.error('Error al actualizar');
+        this.toast.error('Error updating');
         // Revert on error
         this.technologies.update(techs => 
           techs.map(t => t.id === tech.id ? { ...t, show_in_about: !newValue, level: tech.level } : t)
@@ -694,7 +688,7 @@ export class AdminTechnologiesComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error updating level', err);
-        this.toast.error('Error al actualizar nivel');
+        this.toast.error('Error updating level');
         // Revert
         this.technologies.update(techs => 
           techs.map(t => t.id === tech.id ? { ...t, level: oldLevel, show_in_about: oldShowInAbout } : t)

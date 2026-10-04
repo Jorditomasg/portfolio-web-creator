@@ -13,7 +13,7 @@ A modern, customizable portfolio website builder with **Angular** (frontend) and
 ### Frontend
 - **Angular 21** with zoneless change detection for optimal performance
 - **Tailwind CSS** for modern, responsive styling
-- **i18n System**: Built-in Spanish/English translation with browser detection
+- **Visitor analytics**: Optional self-hosted [Umami](https://umami.is) (countries, cities, referrers, devices)
 - **Dark Theme**: Premium dark mode design with smooth animations
 - **Dynamic Theming**: Customizable accent colors and favicons
 
@@ -159,23 +159,14 @@ docker compose up -d
 | **Favicon Type** | terminal, code, rocket, star, briefcase, user |
 | **Accent Color** | Primary color for buttons and highlights |
 | **Show Admin Link** | Toggle "Admin" in navigation menu |
-| **Contact System** | Toggle Form, Email sending, Database storage |
-| **SMTP Config** | Host, Port, User, Pass for email notifications |
+| **Umami URL / Website ID** | Enables the analytics tracker. Leave empty to disable |
 
-### Translation System
+### Analytics (Umami)
 
-**Browser detection**: The app detects browser language and defaults to English for non-Spanish browsers. Users can toggle manually.
-
-**Static translations** in `frontend/src/app/core/services/translation.service.ts`:
-```typescript
-const translations = {
-  'nav.home': { es: 'Inicio', en: 'Home' },
-  'nav.about': { es: 'Sobre mí', en: 'About' },
-  // ...
-};
-```
-
-**Database content** supports `_en` suffixed fields for bilingual content.
+`docker-compose.yml` ships an `umami` service (own database, port 3001). Open it, change the default
+`admin` / `umami` password, add a website, then paste the Umami public URL and the Website ID in
+**Admin → Settings → Analytics**. To exclude your own visits run `localStorage.setItem('umami.disabled', 1)`
+in the browser console on your site.
 
 ## 🔒 Security Best Practices
 

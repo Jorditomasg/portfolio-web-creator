@@ -21,34 +21,32 @@ export class AdminSettingsComponent implements OnInit {
   }
 
   isSaving = signal(false);
-  isSendingTest = signal(false);
   isDirty = signal(false);
   initialForm: any = {};
 
   faviconOptions = [
     { value: 'terminal', label: 'Terminal', emoji: '💻' },
-    { value: 'code', label: 'Código', emoji: '</>' },
-    { value: 'rocket', label: 'Cohete', emoji: '🚀' },
-    { value: 'star', label: 'Estrella', emoji: '⭐' },
-    { value: 'briefcase', label: 'Maletín', emoji: '💼' },
-    { value: 'user', label: 'Usuario', emoji: '👤' },
+    { value: 'code', label: 'Code', emoji: '</>' },
+    { value: 'rocket', label: 'Rocket', emoji: '🚀' },
+    { value: 'star', label: 'Star', emoji: '⭐' },
+    { value: 'briefcase', label: 'Briefcase', emoji: '💼' },
+    { value: 'user', label: 'User', emoji: '👤' },
   ];
 
   accentColors = [
-    { value: '#F5A623', label: 'Amarillo' },
-    { value: '#10B981', label: 'Verde' },
-    { value: '#3B82F6', label: 'Azul' },
-    { value: '#8B5CF6', label: 'Morado' },
-    { value: '#EC4899', label: 'Rosa' },
-    { value: '#EF4444', label: 'Rojo' },
+    { value: '#F5A623', label: 'Yellow' },
+    { value: '#10B981', label: 'Green' },
+    { value: '#3B82F6', label: 'Blue' },
+    { value: '#8B5CF6', label: 'Purple' },
+    { value: '#EC4899', label: 'Pink' },
+    { value: '#EF4444', label: 'Red' },
   ];
 
   form: any = { 
     site_title: '', main_photo_url: '', meta_description: '', seo_image_url: '', hero_background_url: '',
     linkedin_url: '', github_url: '', email: '',
     favicon_type: 'terminal', accent_color: '#F5A623', show_admin_link: false,
-    enable_contact_form: true, enable_email_sending: false, enable_database_storage: true,
-    smtp_host: '', smtp_port: 587, smtp_user: '', smtp_pass: '', smtp_secure: false, smtp_require_tls: true, smtp_from: ''
+    umami_url: '', umami_website_id: ''
   };
 
   constructor() {
@@ -67,17 +65,8 @@ export class AdminSettingsComponent implements OnInit {
         this.form.accent_color = settings.accent_color || '#F5A623';
         this.form.show_admin_link = settings.show_admin_link || false;
         
-        // Contact & SMTP
-        this.form.enable_contact_form = settings.enable_contact_form ?? true;
-        this.form.enable_email_sending = settings.enable_email_sending ?? false;
-        this.form.enable_database_storage = settings.enable_database_storage ?? true;
-        this.form.smtp_host = settings.smtp_host || '';
-        this.form.smtp_port = settings.smtp_port || 587;
-        this.form.smtp_user = settings.smtp_user || '';
-        this.form.smtp_pass = settings.smtp_pass || '';
-        this.form.smtp_secure = settings.smtp_secure ?? false;
-        this.form.smtp_require_tls = settings.smtp_require_tls ?? true;
-        this.form.smtp_from = settings.smtp_from || '';
+        this.form.umami_url = settings.umami_url || '';
+        this.form.umami_website_id = settings.umami_website_id || '';
 
         this.initialForm = JSON.parse(JSON.stringify(this.form));
         this.checkDirty();
@@ -101,16 +90,8 @@ export class AdminSettingsComponent implements OnInit {
       accent_color: this.form.accent_color,
       show_admin_link: this.form.show_admin_link,
       
-      enable_contact_form: this.form.enable_contact_form,
-      enable_email_sending: this.form.enable_email_sending,
-      enable_database_storage: this.form.enable_database_storage,
-      smtp_host: this.form.smtp_host || null,
-      smtp_port: this.form.smtp_port || 587,
-      smtp_user: this.form.smtp_user || null,
-      smtp_pass: this.form.smtp_pass || null,
-      smtp_secure: this.form.smtp_secure,
-      smtp_require_tls: this.form.smtp_require_tls,
-      smtp_from: this.form.smtp_from || null,
+      umami_url: this.form.umami_url || null,
+      umami_website_id: this.form.umami_website_id || null,
     };
 
     this.http.put('/api/settings', data).pipe(
@@ -120,11 +101,11 @@ export class AdminSettingsComponent implements OnInit {
       next: () => {
         this.initialForm = JSON.parse(JSON.stringify(this.form));
         this.checkDirty();
-        this.toast.success('Configuración guardada correctamente');
+        this.toast.success('Settings saved successfully');
       },
       error: (err) => {
         console.error('Error saving settings', err);
-        this.toast.error('Error al guardar la configuración');
+        this.toast.error('Error saving settings');
       }
     });
   }
@@ -133,47 +114,4 @@ export class AdminSettingsComponent implements OnInit {
     this.isDirty.set(JSON.stringify(this.form) !== JSON.stringify(this.initialForm));
   }
   
-  onContactFormToggle() {
-    if (!this.form.enable_contact_form) {
-      this.form.enable_email_sending = false;
-      this.form.enable_database_storage = false;
-    }
-  }
-
-  sendTestEmail() {
-    this.isSendingTest.set(true);
-    
-    // First save settings to ensure backend has latest config to test with
-    // Or we could pass current form data to test endpoint. 
-    // Let's passed form data since we might want to test without saving yet?
-    // Actually usually user saves first. Let's send current form data to the test endpoint.
-    const data = {
-      host: this.form.smtp_host,
-      port: this.form.smtp_port,
-      user: this.form.smtp_user,
-      pass: this.form.smtp_pass,
-      secure: this.form.smtp_secure,
-      require_tls: this.form.smtp_require_tls,
-      from: this.form.smtp_from,
-      to: this.form.email // Send to the configured contact email or logged in user? 
-                          // Using contact email if available, otherwise maybe alert user.
-    };
-    
-    if (!data.to) {
-      this.toast.error('Configura un "Email de Contacto" para recibir la prueba');
-      this.isSendingTest.set(false);
-      return;
-    }
-
-    this.http.post('/api/admin/contact/test-email', data)
-      .pipe(finalize(() => this.isSendingTest.set(false)))
-      .subscribe({
-        next: () => this.toast.success(`Correo de prueba enviado a ${data.to}`),
-        error: (err: any) => {
-          console.error('Error sending test email', err);
-          const errorMsg = err.error?.message || 'Error al enviar correo de prueba';
-          this.toast.error(errorMsg);
-        }
-      });
-  }
 }

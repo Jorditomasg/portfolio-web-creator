@@ -1,7 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ContentService } from '../../core/services/content.service';
-import { TranslationService } from '../../core/services/translation.service';
 
 // SVG icons for specialty types (fixed, not editable)
 const SPECIALTY_ICONS: Record<string, string> = {
@@ -84,7 +83,6 @@ const SPECIALTY_ICONS: Record<string, string> = {
 })
 export class AboutComponent implements OnInit {
   content = inject(ContentService);
-  i18n = inject(TranslationService);
   private sanitizer = inject(DomSanitizer);
 
   ngOnInit() {
@@ -120,23 +118,8 @@ export class AboutComponent implements OnInit {
   formatDate(dateStr: string | null | undefined): string {
     if (!dateStr) return '';
     const date = new Date(dateStr);
-    const fmt = new Intl.DateTimeFormat(this.i18n.isSpanish() ? 'es-ES' : 'en-US', { month: 'short', year: 'numeric' }).format(date);
+    const fmt = new Intl.DateTimeFormat('en-US', { month: 'short', year: 'numeric' }).format(date);
     return fmt.charAt(0).toUpperCase() + fmt.slice(1);
   }
 
-  // Helper methods for experience translations
-  getExpTitle(exp: any): string {
-    return this.i18n.isSpanish() ? exp.title : (exp.title_en || exp.title);
-  }
-
-  getExpDescription(exp: any): string {
-    return this.i18n.isSpanish() ? exp.description : (exp.description_en || exp.description);
-  }
-
-  getExpAchievements(exp: any): string[] {
-    if (this.i18n.isSpanish()) {
-      return exp.achievements || [];
-    }
-    return (exp.achievements_en && exp.achievements_en.length) ? exp.achievements_en : (exp.achievements || []);
-  }
 }

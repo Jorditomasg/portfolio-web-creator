@@ -29,14 +29,11 @@ export class AdminExperienceComponent implements OnInit {
 
   form: any = { 
     title: '', 
-    title_en: '',
     company: '', 
     company_logo: '',
     period: '', 
     description: '', 
-    description_en: '',
     achievementsText: '',
-    achievementsTextEn: '',
     start_date: '',
     end_date: '',
     is_current: false
@@ -49,8 +46,8 @@ export class AdminExperienceComponent implements OnInit {
 
   openModal() { 
     this.form = { 
-      title: '', title_en: '', company: '', company_logo: '', 
-      description: '', description_en: '', achievementsText: '', achievementsTextEn: '',
+      title: '', company: '', company_logo: '', 
+      description: '', achievementsText: '',
       start_date: '', end_date: '', is_current: false 
     }; 
     this.editing.set(null); 
@@ -66,7 +63,6 @@ export class AdminExperienceComponent implements OnInit {
     this.form = { 
       ...exp, 
       achievementsText: exp.achievements?.join('\n') || '',
-      achievementsTextEn: exp.achievements_en?.join('\n') || '',
       start_date: fmtDate(exp.start_date),
       end_date: fmtDate(exp.end_date)
     };
@@ -77,7 +73,7 @@ export class AdminExperienceComponent implements OnInit {
   save() {
     // Validate required fields (only title and company)
     if (!this.form.title || !this.form.company) {
-      this.toast.error('Por favor completa los campos obligatorios (Título, Empresa)');
+      this.toast.error('Please fill in the required fields (Title, Company)');
       return;
     }
 
@@ -109,13 +105,11 @@ export class AdminExperienceComponent implements OnInit {
       period,
       start_date: this.form.start_date ? this.form.start_date + '-01' : null,
       end_date: this.form.is_current ? null : (this.form.end_date ? this.form.end_date + '-01' : null),
-      achievements: this.form.achievementsText.split('\n').map((a: string) => a.trim()).filter((a: string) => a),
-      achievements_en: this.form.achievementsTextEn?.split('\n').map((a: string) => a.trim()).filter((a: string) => a) || []
+      achievements: this.form.achievementsText.split('\n').map((a: string) => a.trim()).filter((a: string) => a)
     };
     
     // Remove temporary and read-only fields
     delete data.achievementsText;
-    delete data.achievementsTextEn;
     delete data.id;
     delete data.created_at;
     delete data.updated_at;
@@ -129,12 +123,12 @@ export class AdminExperienceComponent implements OnInit {
       finalize(() => this.isSaving.set(false))
     ).subscribe({
       next: () => {
-        this.toast.success(this.editing() ? 'Experiencia actualizada' : 'Experiencia creada');
+        this.toast.success(this.editing() ? 'Experience updated' : 'Experience created');
         this.closeModal();
       },
       error: (e: any) => {
         console.error(e);
-        const msg = e.error?.message || 'Error al guardar la experiencia';
+        const msg = e.error?.message || 'Error saving experience';
         this.toast.error(typeof msg === 'string' ? msg : (Array.isArray(msg) ? msg.join(', ') : JSON.stringify(msg)));
       }
     });
@@ -151,25 +145,25 @@ export class AdminExperienceComponent implements OnInit {
     forkJoin(updates).pipe(
       switchMap(() => this.content.loadExperiences(true))
     ).subscribe({
-      next: () => this.toast.success('Orden actualizado'),
+      next: () => this.toast.success('Order updated'),
       error: (e) => {
         console.error(e);
-        this.toast.error('Error al actualizar orden');
+        this.toast.error('Error updating order');
       }
     });
   }
 
   deleteExp(id: number) {
-    if (confirm('¿Eliminar esta experiencia?')) {
+    if (confirm('Delete this experience?')) {
       this.isDeletingVal.set(id);
       this.http.delete(`/api/experiences/${id}`).pipe(
         switchMap(() => this.content.loadExperiences(true)),
         finalize(() => this.isDeletingVal.set(null))
       ).subscribe({
-        next: () => this.toast.success('Experiencia eliminada'),
+        next: () => this.toast.success('Experience deleted'),
         error: (e) => {
           console.error(e);
-          this.toast.error('Error al eliminar');
+          this.toast.error('Error deleting');
         }
       });
     }

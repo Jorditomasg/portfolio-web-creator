@@ -28,11 +28,8 @@ export class AdminProjectsComponent implements OnInit {
   editing = signal<number | null>(null);
   form: any = {
     title: '',
-    title_en: '',
     description: '',
-    description_en: '',
     long_description: '',
-    long_description_en: '',
     image_url: '',
     demo_url: '',
     github_url: '',
@@ -46,12 +43,9 @@ export class AdminProjectsComponent implements OnInit {
   openModal() {
     this.form = {
       title: '',
-      title_en: '',
-      description: '',
-      description_en: '',
-      long_description: '',
-      long_description_en: '',
-      image_url: '',
+        description: '',
+        long_description: '',
+        image_url: '',
       demo_url: '',
       github_url: '',
       technologies: '',
@@ -74,11 +68,8 @@ export class AdminProjectsComponent implements OnInit {
     // Only keep editable fields, not id, created_at, updated_at
     this.form = {
       title: project.title || '',
-      title_en: project.title_en || '',
       description: project.description || '',
-      description_en: project.description_en || '',
       long_description: project.long_description || '',
-      long_description_en: project.long_description_en || '',
       image_url: project.image_url || '',
       demo_url: project.demo_url || '',
       github_url: project.github_url || '',
@@ -95,7 +86,7 @@ export class AdminProjectsComponent implements OnInit {
 
   save() {
     if (!this.form.title) {
-      this.toast.error('Por favor completa el campo obligatorio (Título)');
+      this.toast.error('Please fill in the required field (Title)');
       return;
     }
 
@@ -119,12 +110,12 @@ export class AdminProjectsComponent implements OnInit {
       finalize(() => this.isSaving.set(false))
     ).subscribe({
       next: () => {
-        this.toast.success(this.editing() ? 'Proyecto actualizado correctamente' : 'Proyecto creado correctamente');
+        this.toast.success(this.editing() ? 'Project updated successfully' : 'Project created successfully');
         this.closeModal();
       },
       error: (e) => {
         console.error(e);
-        this.toast.error('Error al guardar el proyecto');
+        this.toast.error('Error saving project');
       }
     });
   }
@@ -188,14 +179,14 @@ export class AdminProjectsComponent implements OnInit {
   }
 
   deleteProject(id: number) {
-    if (confirm('¿Eliminar este proyecto?')) {
+    if (confirm('Delete this project?')) {
       this.http.delete(`/api/projects/${id}`).pipe(
         switchMap(() => this.content.loadProjects(true))
       ).subscribe({
         next: () => {
-          this.toast.success('Proyecto eliminado');
+          this.toast.success('Project deleted');
         },
-        error: () => this.toast.error('Error al eliminar el proyecto'),
+        error: () => this.toast.error('Error deleting project'),
       });
     }
   }
@@ -209,7 +200,7 @@ export class AdminProjectsComponent implements OnInit {
   formatDate(dateStr: string): string {
     if (!dateStr) return '';
     const date = new Date(dateStr);
-    return date.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' });
+    return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
   }
 
   drop(event: CdkDragDrop<any[]>) {
@@ -223,10 +214,10 @@ export class AdminProjectsComponent implements OnInit {
     forkJoin(updates).pipe(
       switchMap(() => this.content.loadProjects(true))
     ).subscribe({
-      next: () => this.toast.success('Orden actualizado'),
+      next: () => this.toast.success('Order updated'),
       error: (e) => {
         console.error(e);
-        this.toast.error('Error al actualizar orden');
+        this.toast.error('Error updating order');
       }
     });
   }
