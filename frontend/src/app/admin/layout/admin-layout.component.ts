@@ -14,6 +14,15 @@ export class AdminLayoutComponent {
   authService = inject(AuthService);
   content = inject(ContentService);
 
+  links = [
+    { path: '/admin/dashboard', label: 'Dashboard' },
+    { path: '/admin/projects', label: 'Projects' },
+    { path: '/admin/about', label: 'About me' },
+    { path: '/admin/technologies', label: 'Tech stack' },
+    { path: '/admin/experience', label: 'Experience' },
+    { path: '/admin/settings', label: 'Settings' },
+  ];
+
   constructor() {
     this.content.loadSettings().subscribe();
   }

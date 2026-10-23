@@ -1,27 +1,29 @@
-<section class="max-w-screen-xl mx-auto px-6 md:px-8 pt-24 pb-28">
-  <p class="mb-6 font-mono text-sm uppercase tracking-wider text-ink-muted">Index of work</p>
-  <h1 class="mb-6 text-[clamp(48px,8vw,120px)] leading-[0.95] font-semibold tracking-[-0.045em]">Projects</h1>
-  <p class="mb-20 max-w-xl text-xl leading-relaxed text-ink-soft">A selection of work showcasing my skills.</p>
+<section class="max-w-screen-xl mx-auto px-6 md:px-8 pt-16 md:pt-20 pb-24">
+  <header class="mb-14 flex flex-wrap items-end justify-between gap-6">
+    <div>
+      <p class="mb-4 font-mono text-[13px] uppercase tracking-wider text-ink-muted">Index of work</p>
+      <h1 class="text-[clamp(40px,6vw,80px)] leading-none font-semibold tracking-[-0.04em]">Projects</h1>
+    </div>
+    <p class="max-w-md text-lg leading-relaxed text-ink-soft text-pretty">A selection of work showcasing my skills.</p>
+  </header>
 
   @if (featured(); as project) {
-    <article class="mb-20 pb-20 border-b border-line flex flex-wrap gap-x-14 gap-y-8">
-      <div class="flex-[3_1_520px] aspect-[16/10] rounded-[4px] overflow-hidden bg-stone">
+    <article class="mb-16 pb-16 border-b border-line grid gap-10 lg:grid-cols-12 lg:items-center">
+      <div class="lg:col-span-7 aspect-[16/10] rounded-[4px] overflow-hidden bg-stone">
         @if (project.image_url) {
           <img [src]="project.image_url" alt="" class="w-full h-full object-cover">
         }
       </div>
-      <div class="flex-[2_1_320px] flex flex-col justify-end gap-5">
-        <p class="flex items-center gap-2.5 font-mono text-[13px] uppercase tracking-wider text-ink-muted">
+      <div class="lg:col-span-5 flex flex-col gap-5">
+        <p class="flex flex-wrap items-center gap-2.5 font-mono text-[13px] uppercase tracking-wider text-ink-muted">
           <span aria-hidden="true" class="w-2 h-2 rounded-full bg-primary"></span>
           Featured
-          @if (project.start_date) {
-            · {{ project.start_date | date: 'MMM y' }} — {{ project.is_in_progress ? 'Present' : (project.end_date | date: 'MMM y') }}
-          }
+          @if (period(project); as p) {<span>· {{ p }}</span>}
         </p>
-        <h2 class="text-[44px] leading-[1.05] font-semibold tracking-tight">{{ project.title }}</h2>
-        <p class="text-[17px] leading-relaxed text-ink-soft">{{ project.long_description || project.description }}</p>
+        <h2 class="text-[clamp(32px,3.6vw,44px)] leading-[1.05] font-semibold tracking-tight text-balance">{{ project.title }}</h2>
+        <p class="text-[17px] leading-relaxed text-ink-soft text-pretty line-clamp-[8]">{{ project.long_description || project.description }}</p>
         <p class="font-mono text-[13px] text-ink-muted">{{ project.technologies.join(' / ') }}</p>
-        <div class="mt-2 flex flex-wrap gap-3">
+        <div class="mt-1 flex flex-wrap gap-3">
           @if (project.demo_url) {
             <a [href]="project.demo_url" target="_blank" rel="noopener" class="inline-flex items-center gap-2.5 min-h-[48px] px-5 rounded-full bg-ink text-paper text-[15px] font-medium hover:bg-ink-soft transition-colors">
               Live demo
@@ -29,7 +31,7 @@
             </a>
           }
           @if (project.github_url) {
-            <a [href]="project.github_url" target="_blank" rel="noopener" class="inline-flex items-center min-h-[48px] px-5 rounded-full border border-ink text-[15px] font-medium hover:bg-ink hover:text-paper transition-colors">
+            <a [href]="project.github_url" target="_blank" rel="noopener" class="inline-flex items-center min-h-[48px] px-5 rounded-full border border-ink/80 text-[15px] font-medium hover:bg-ink hover:text-paper transition-colors">
               Source code
             </a>
           }
@@ -38,40 +40,34 @@
     </article>
   }
 
-  <div class="grid gap-x-8 gap-y-16 grid-cols-[repeat(auto-fit,minmax(min(100%,360px),1fr))]">
+  <div class="grid gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
     @for (project of rest(); track project.id) {
-      <article class="flex flex-col gap-3.5">
-        <div class="aspect-[4/3] rounded-[4px] overflow-hidden bg-stone">
+      <article class="flex flex-col gap-3">
+        <div class="aspect-[16/10] rounded-[4px] overflow-hidden bg-stone">
           @if (project.image_url) {
             <img [src]="project.image_url" alt="" class="w-full h-full object-cover">
           }
         </div>
-        <div class="mt-1.5 flex justify-between gap-3 font-mono text-[13px] text-ink-muted">
-          <span>
-            @if (project.start_date) {
-              {{ project.start_date | date: 'MMM y' }} — {{ project.is_in_progress ? 'Present' : (project.end_date | date: 'MMM y') }}
-            }
-          </span>
+        <div class="mt-2 min-h-[20px] flex justify-between gap-3 font-mono text-[13px] text-ink-muted">
+          <span>{{ period(project) }}</span>
           @if (project.is_in_progress) {
             <span class="inline-flex items-center gap-1.5 text-ink">
               <span aria-hidden="true" class="w-1.5 h-1.5 rounded-full bg-primary"></span>In progress
             </span>
           }
         </div>
-        <h3 class="text-2xl font-medium tracking-tight">{{ project.title }}</h3>
-        <p class="leading-relaxed text-ink-soft line-clamp-3">{{ project.description }}</p>
+        <h3 class="text-xl font-medium tracking-tight text-balance">{{ project.title }}</h3>
+        <p class="leading-relaxed text-ink-soft text-pretty line-clamp-3">{{ project.description }}</p>
         <p class="font-mono text-[13px] text-ink-muted">{{ project.technologies.join(' / ') }}</p>
-        <div class="mt-1 flex gap-5">
+        <div class="mt-auto flex gap-5">
           @if (project.demo_url) {
             <a [href]="project.demo_url" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 min-h-[44px] text-[15px] font-medium hover:text-ink-muted">
-              Demo
-              <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M8 7h9v9"/></svg>
+              Demo <span aria-hidden="true">↗</span>
             </a>
           }
           @if (project.github_url) {
             <a [href]="project.github_url" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 min-h-[44px] text-[15px] font-medium hover:text-ink-muted">
-              Code
-              <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M8 7h9v9"/></svg>
+              Code <span aria-hidden="true">↗</span>
             </a>
           }
         </div>

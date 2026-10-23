@@ -25,12 +25,12 @@ export class AdminSettingsComponent implements OnInit {
   initialForm: any = {};
 
   faviconOptions = [
-    { value: 'terminal', label: 'Terminal', emoji: '💻' },
-    { value: 'code', label: 'Code', emoji: '</>' },
-    { value: 'rocket', label: 'Rocket', emoji: '🚀' },
-    { value: 'star', label: 'Star', emoji: '⭐' },
-    { value: 'briefcase', label: 'Briefcase', emoji: '💼' },
-    { value: 'user', label: 'User', emoji: '👤' },
+    { value: 'terminal', label: 'Terminal' },
+    { value: 'code', label: 'Code' },
+    { value: 'rocket', label: 'Rocket' },
+    { value: 'star', label: 'Star' },
+    { value: 'briefcase', label: 'Briefcase' },
+    { value: 'user', label: 'User' },
   ];
 
   accentColors = [

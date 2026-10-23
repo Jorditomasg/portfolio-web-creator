@@ -1,61 +1,99 @@
 @if (content.hero(); as hero) {
-  <section class="max-w-screen-xl mx-auto px-6 md:px-8 pt-20 md:pt-28 pb-24">
-    @if (hero.subtitle) {
-      <p class="mb-8 flex items-center gap-3 font-mono text-sm uppercase tracking-wider text-ink-muted">
-        <span aria-hidden="true" class="w-2 h-2 rounded-full bg-primary"></span>
-        {{ hero.subtitle }}
-      </p>
-    }
-    <h1 class="text-[clamp(56px,10vw,152px)] leading-[0.92] font-semibold tracking-[-0.045em]">
-      {{ hero.title }}
-      @if (hero.title_highlight) {
-        <br><span class="bg-[linear-gradient(transparent_62%,var(--color-primary)_62%)] box-decoration-clone">{{ hero.title_highlight }}</span>
+  <section class="max-w-screen-xl mx-auto px-6 md:px-8 pt-16 md:pt-24 pb-20 grid gap-12 lg:grid-cols-12 lg:items-end">
+    <div class="lg:col-span-8">
+      @if (hero.subtitle) {
+        <p class="mb-6 flex items-center gap-3 font-mono text-[13px] uppercase tracking-wider text-ink-muted">
+          <span aria-hidden="true" class="w-2 h-2 shrink-0 rounded-full bg-primary"></span>
+          {{ hero.subtitle }}
+        </p>
       }
-    </h1>
-    <div class="mt-16 flex flex-wrap items-end justify-between gap-12">
-      <p class="flex-[1_1_420px] max-w-xl text-xl leading-relaxed text-ink-soft">{{ hero.description }}</p>
-      <div class="flex flex-wrap gap-3">
-        <a routerLink="/projects" class="inline-flex items-center gap-2.5 min-h-[52px] px-6 rounded-full bg-ink text-paper font-medium hover:bg-ink-soft transition-colors">
+      <h1 class="text-[clamp(36px,6vw,88px)] leading-[0.98] font-semibold tracking-[-0.04em] text-balance">
+        {{ hero.title }}
+        @if (hero.title_highlight) {
+          <span class="underline decoration-[var(--color-primary)] decoration-[0.08em] underline-offset-[0.14em] [text-decoration-skip-ink:none]">{{ hero.title_highlight }}</span>
+        }
+      </h1>
+      <p class="mt-8 max-w-2xl text-lg md:text-xl leading-relaxed text-ink-soft text-pretty">{{ hero.description }}</p>
+      <div class="mt-10 flex flex-wrap gap-3">
+        <a routerLink="/projects" class="inline-flex items-center gap-2.5 min-h-[48px] px-6 rounded-full bg-ink text-paper font-medium hover:bg-ink-soft transition-colors">
           View projects
           <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
         </a>
-        <a routerLink="/contact" class="inline-flex items-center min-h-[52px] px-6 rounded-full border border-ink font-medium hover:bg-ink hover:text-paper transition-colors">
+        <a routerLink="/contact" class="inline-flex items-center min-h-[48px] px-6 rounded-full border border-ink/80 font-medium hover:bg-ink hover:text-paper transition-colors">
           Get in touch
         </a>
       </div>
     </div>
+
+    <aside aria-label="At a glance" class="lg:col-span-4 rounded-lg border border-line bg-surface divide-y divide-line text-[15px]">
+      @if (current(); as job) {
+        <div class="p-5">
+          <p class="mb-2 font-mono text-[12px] uppercase tracking-wider text-ink-muted">Currently</p>
+          <p class="font-medium text-pretty">{{ job.title }}</p>
+          <p class="text-ink-soft">{{ job.company }}@if (job.start_date) {<span class="text-ink-muted"> · since {{ job.start_date | date: 'y' }}</span>}</p>
+        </div>
+      }
+      @if (strongest().length) {
+        <div class="p-5">
+          <p class="mb-3 font-mono text-[12px] uppercase tracking-wider text-ink-muted">Strongest skills</p>
+          <ul class="flex flex-wrap gap-1.5">
+            @for (tech of strongest(); track tech.id) {
+              <li class="inline-flex items-center gap-1.5 h-8 px-2.5 rounded-full border border-line text-[13px]">
+                @if (tech.icon) {
+                  <img [src]="tech.icon" alt="" class="w-3.5 h-3.5 object-contain">
+                }
+                {{ tech.name }}
+              </li>
+            }
+          </ul>
+        </div>
+      }
+      @if (content.settings(); as settings) {
+        <div class="p-5 flex flex-wrap gap-x-5 gap-y-1">
+          @if (settings.github_url) {
+            <a [href]="settings.github_url" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 min-h-[44px] font-medium hover:text-ink-muted">GitHub <span aria-hidden="true">↗</span></a>
+          }
+          @if (settings.linkedin_url) {
+            <a [href]="settings.linkedin_url" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 min-h-[44px] font-medium hover:text-ink-muted">LinkedIn <span aria-hidden="true">↗</span></a>
+          }
+          @if (settings.email) {
+            <a [href]="'mailto:' + settings.email" class="inline-flex items-center gap-1.5 min-h-[44px] font-medium hover:text-ink-muted">Email <span aria-hidden="true">↗</span></a>
+          }
+        </div>
+      }
+    </aside>
   </section>
 }
 
 @if (content.specialtyCategories().length) {
   <section aria-labelledby="specialties-heading" class="border-t border-line">
-    <div class="max-w-screen-xl mx-auto px-6 md:px-8 py-24">
-      <h2 id="specialties-heading" class="mb-12 text-4xl font-semibold tracking-tight">Specialties</h2>
-      @for (group of content.specialtyCategories(); track group.category.id) {
-        <div class="flex flex-wrap gap-x-12 gap-y-6 py-8 border-t border-line">
-          <span class="flex-[0_0_64px] pt-2 font-mono text-sm text-ink-muted">{{ $index + 1 | number: '2.0' }}</span>
-          <h3 class="flex-[1_1_280px] text-[28px] font-medium tracking-tight">{{ group.category.long_title || group.category.name }}</h3>
-          <div class="flex-[2_1_420px]">
-            <p class="mb-4 text-[17px] leading-relaxed text-ink-soft">{{ group.category.description }}</p>
-            <p class="font-mono text-[13px] text-ink-muted">{{ skillNames(group.skills) }}</p>
+    <div class="max-w-screen-xl mx-auto px-6 md:px-8 py-14 md:py-20">
+      <h2 id="specialties-heading" class="mb-10 text-3xl md:text-4xl font-semibold tracking-tight">Specialties</h2>
+      <div class="grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+        @for (group of content.specialtyCategories(); track group.category.id) {
+          <div class="pt-5 border-t border-ink">
+            <p class="mb-4 font-mono text-[13px] text-ink-muted">{{ $index + 1 | number: '2.0' }}</p>
+            <h3 class="mb-3 text-xl font-medium tracking-tight text-balance">{{ group.category.long_title || group.category.name }}</h3>
+            <p class="mb-5 leading-relaxed text-ink-soft text-pretty">{{ group.category.description }}</p>
+            <p class="font-mono text-[13px] leading-relaxed text-ink-muted">{{ skillNames(group.skills) }}</p>
           </div>
-        </div>
-      }
+        }
+      </div>
     </div>
   </section>
 }
 
 @if (content.featuredProjects().length) {
   <section aria-labelledby="work-heading" class="border-t border-line">
-    <div class="max-w-screen-xl mx-auto px-6 md:px-8 py-24">
-      <div class="mb-12 flex flex-wrap items-baseline justify-between gap-4">
-        <h2 id="work-heading" class="text-4xl font-semibold tracking-tight">Selected work</h2>
+    <div class="max-w-screen-xl mx-auto px-6 md:px-8 py-14 md:py-20">
+      <div class="mb-10 flex flex-wrap items-baseline justify-between gap-4">
+        <h2 id="work-heading" class="text-3xl md:text-4xl font-semibold tracking-tight">Selected work</h2>
         <a routerLink="/projects" class="inline-flex items-center gap-2 min-h-[44px] font-medium border-b border-ink">
           All projects
           <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M8 7h9v9"/></svg>
         </a>
       </div>
-      <div class="grid gap-x-8 gap-y-12 grid-cols-[repeat(auto-fit,minmax(min(100%,480px),1fr))]">
+      <div class="grid gap-x-8 gap-y-12 md:grid-cols-2">
         @for (project of content.featuredProjects().slice(0, 4); track project.id) {
           <article>
             <a routerLink="/projects" class="group block">
@@ -66,10 +104,10 @@
               </div>
               <div class="mt-5 flex justify-between gap-4 font-mono text-[13px] text-ink-muted">
                 <span>{{ project.start_date | date: 'y' }}</span>
-                <span>{{ project.technologies.slice(0, 2).join(' · ') }}</span>
+                <span class="text-right">{{ project.technologies.slice(0, 3).join(' · ') }}</span>
               </div>
-              <h3 class="mt-2 mb-2 text-[26px] font-medium tracking-tight">{{ project.title }}</h3>
-              <p class="leading-relaxed text-ink-soft">{{ project.description }}</p>
+              <h3 class="mt-2 mb-2 text-2xl font-medium tracking-tight text-balance">{{ project.title }}</h3>
+              <p class="leading-relaxed text-ink-soft text-pretty line-clamp-3">{{ project.description }}</p>
             </a>
           </article>
         }
@@ -80,38 +118,42 @@
 
 @if (content.experiences().length) {
   <section aria-labelledby="experience-heading" class="border-t border-line">
-    <div class="max-w-screen-xl mx-auto px-6 md:px-8 py-24">
-      <div class="mb-12 flex flex-wrap items-baseline justify-between gap-4">
-        <h2 id="experience-heading" class="text-4xl font-semibold tracking-tight">Experience</h2>
+    <div class="max-w-screen-xl mx-auto px-6 md:px-8 py-14 md:py-20">
+      <div class="mb-10 flex flex-wrap items-baseline justify-between gap-4">
+        <h2 id="experience-heading" class="text-3xl md:text-4xl font-semibold tracking-tight">Experience</h2>
         <a routerLink="/about" class="inline-flex items-center gap-2 min-h-[44px] font-medium border-b border-ink">
           Full background
           <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M8 7h9v9"/></svg>
         </a>
       </div>
-      @for (exp of content.experiences().slice(0, 3); track exp.id) {
-        <div class="flex flex-wrap items-baseline gap-x-12 gap-y-2 py-7 border-t border-line">
-          <span class="flex-[0_0_200px] font-mono text-sm text-ink-muted">
-            {{ exp.start_date | date: 'y' }} — {{ exp.is_current ? 'Present' : (exp.end_date | date: 'y') }}
-          </span>
-          <span class="flex-[1_1_280px] text-[22px] font-medium tracking-tight">{{ exp.title }}</span>
-          <span class="flex-[1_1_200px] text-[17px] text-ink-soft">{{ exp.company }}</span>
-        </div>
-      }
+      <ul>
+        @for (exp of content.experiences().slice(0, 3); track exp.id) {
+          <li class="grid gap-x-8 gap-y-1 py-6 border-t border-line md:grid-cols-[160px_1fr_auto] md:items-baseline">
+            <span class="font-mono text-[13px] text-ink-muted">
+              {{ exp.start_date | date: 'y' }} — {{ exp.is_current ? 'Present' : (exp.end_date | date: 'y') }}
+            </span>
+            <span class="text-xl font-medium tracking-tight">{{ exp.title }}</span>
+            <span class="text-ink-soft md:text-right">{{ exp.company }}</span>
+          </li>
+        }
+      </ul>
     </div>
   </section>
 }
 
-<section aria-labelledby="cta-heading" class="bg-ink text-paper">
-  <div class="max-w-screen-xl mx-auto px-6 md:px-8 py-28">
-    <p class="mb-6 font-mono text-sm uppercase tracking-wider text-[#A8A8A2]">Have a project in mind?</p>
-    <h2 id="cta-heading" class="mb-12 text-[clamp(44px,7vw,104px)] leading-[0.95] font-semibold tracking-[-0.04em]">Let’s build<br>something solid.</h2>
+<section aria-labelledby="cta-heading" class="bg-band text-band-ink">
+  <div class="max-w-screen-xl mx-auto px-6 md:px-8 py-20 md:py-24 flex flex-wrap items-end justify-between gap-10">
+    <div>
+      <p class="mb-5 font-mono text-[13px] uppercase tracking-wider text-band-muted">Have a project in mind?</p>
+      <h2 id="cta-heading" class="text-[clamp(36px,5vw,72px)] leading-[1] font-semibold tracking-[-0.035em] text-balance">Let’s build something solid.</h2>
+    </div>
     @if (content.settings()?.email; as email) {
-      <a [href]="'mailto:' + email" class="inline-flex items-center gap-3 min-h-[56px] px-7 rounded-full bg-primary text-ink text-[17px] font-medium hover:opacity-90 transition-opacity">
+      <a [href]="'mailto:' + email" class="inline-flex items-center gap-3 min-h-[56px] px-7 rounded-full bg-primary text-[#0E0E0E] text-[17px] font-medium hover:opacity-90 transition-opacity">
         {{ email }}
         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M8 7h9v9"/></svg>
       </a>
     } @else {
-      <a routerLink="/contact" class="inline-flex items-center min-h-[56px] px-7 rounded-full bg-primary text-ink text-[17px] font-medium hover:opacity-90 transition-opacity">Get in touch</a>
+      <a routerLink="/contact" class="inline-flex items-center min-h-[56px] px-7 rounded-full bg-primary text-[#0E0E0E] text-[17px] font-medium hover:opacity-90 transition-opacity">Get in touch</a>
     }
   </div>
 </section>

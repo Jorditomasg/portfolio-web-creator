@@ -1,16 +1,16 @@
 <div>
-<div class="flex items-center justify-between mb-8 sticky top-0 bg-dark-bg/95 backdrop-blur z-20 py-4 border-b border-dark-border px-8">
-    <h1 class="text-2xl font-bold text-white">Technology Management</h1>
+<div class="flex flex-wrap items-center justify-between gap-4 mb-8 sticky top-0 bg-paper/90 backdrop-blur z-20 py-4 border-b border-line px-6 md:px-10">
+    <h1 class="text-2xl md:text-3xl font-semibold tracking-tight text-ink">Tech stack</h1>
     <div class="flex gap-2">
       <button (click)="openCategoryOrderModal()" 
-              class="px-4 py-2 bg-dark-surface hover:bg-dark-border text-gray-300 font-medium rounded-lg transition-colors flex items-center gap-2 border border-dark-border">
+              class="px-4 py-2 bg-surface hover:bg-stone text-ink-soft font-medium rounded-lg transition-colors flex items-center gap-2 border border-line">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
         </svg>
         Sort Categories
       </button>
       <button (click)="openCategoryModal()" 
-              class="px-4 py-2 bg-dark-surface hover:bg-dark-border text-gray-300 font-medium rounded-lg transition-colors flex items-center gap-2 border border-dark-border">
+              class="px-4 py-2 bg-surface hover:bg-stone text-ink-soft font-medium rounded-lg transition-colors flex items-center gap-2 border border-line">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
         </svg>
@@ -20,17 +20,17 @@
   </div>
 
   <!-- Category Tabs -->
-  <div class="px-8">
-    <div class="flex gap-2 mb-4 border-b border-dark-border overflow-x-auto pb-px">
+  <div class="px-6 md:px-10 pb-10">
+    <div class="flex gap-2 mb-4 border-b border-line overflow-x-auto pb-px">
       @for (category of categoryKeys(); track category) {
         <button (click)="activeTab.set(category)"
                 [class]="activeTab() === category 
-                  ? 'border-b-2 border-primary text-primary bg-primary/5' 
-                  : 'text-gray-400 hover:text-white hover:bg-dark-surface'"
+                  ? 'border-b-2 border-ink text-ink bg-primary/5' 
+                  : 'text-ink-muted hover:text-ink hover:bg-surface'"
                 class="px-4 py-3 font-medium rounded-t-lg transition-all whitespace-nowrap flex items-center gap-2">
           <span class="w-3 h-3 rounded-full" [style.backgroundColor]="getCategoryColor(category)"></span>
           {{ category }}
-          <span class="px-1.5 py-0.5 text-xs rounded-full bg-dark-border">{{ groupedTechnologies()[category]?.length || 0 }}</span>
+          <span class="px-1.5 py-0.5 text-xs rounded-full bg-stone">{{ groupedTechnologies()[category]?.length || 0 }}</span>
         </button>
       }
     </div>
@@ -40,16 +40,16 @@
       <div class="flex items-center justify-between mb-4">
         <div class="flex items-center gap-3">
           <span class="w-4 h-4 rounded-full" [style.backgroundColor]="getCategoryColor(activeTab())"></span>
-          <span class="text-lg font-semibold text-white">{{ activeTab() }}</span>
+          <span class="text-lg font-semibold text-ink">{{ activeTab() }}</span>
           <button (click)="editCategoryModal(activeTab())" 
-                  class="p-1.5 text-gray-500 hover:text-white hover:bg-dark-border rounded-lg transition-colors" 
+                  class="p-1.5 text-ink-muted hover:text-ink hover:bg-stone rounded-lg transition-colors" 
                   title="Edit category">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
             </svg>
           </button>
           <button (click)="deleteCategory(activeTab())" 
-                  class="p-1.5 text-gray-500 hover:text-red-400 hover:bg-dark-border rounded-lg transition-colors" 
+                  class="p-1.5 text-ink-muted hover:text-red-600 hover:bg-stone rounded-lg transition-colors" 
                   title="Delete category">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
@@ -58,7 +58,7 @@
 
         </div>
         <button (click)="openModalForCategory(activeTab())" 
-                class="px-4 py-2 bg-primary hover:bg-primary-dark text-dark-bg font-medium rounded-lg transition-colors flex items-center gap-2 shadow-lg shadow-primary/20">
+                class="px-4 py-2 bg-ink hover:bg-ink-soft text-paper font-medium rounded-lg transition-colors flex items-center gap-2 shadow-lg">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
           </svg>
@@ -69,36 +69,36 @@
 
     <!-- Active Tab Content - Vertical List with Drag-Drop -->
     @if (activeTab() && groupedTechnologies()[activeTab()]) {
-      <div class="bg-dark-surface rounded-xl border border-dark-border p-4">
+      <div class="bg-surface rounded-lg border border-line p-4">
         <div cdkDropList 
              [cdkDropListData]="groupedTechnologies()[activeTab()]"
              (cdkDropListDropped)="drop($event, activeTab())"
              class="space-y-2">
           @for (tech of groupedTechnologies()[activeTab()]; track tech.id; let techIndex = $index) {
-            <div cdkDrag class="bg-dark-bg rounded-lg border border-dark-border p-3 hover:border-primary/50 transition-all group flex items-center gap-4">
+            <div cdkDrag class="bg-paper rounded-lg border border-line p-3 hover:border-ink/40 transition-all group flex items-center gap-4">
               
               <!-- Custom Drag Preview -->
-              <div *cdkDragPreview class="bg-dark-bg/95 backdrop-blur rounded-lg border-2 border-primary shadow-2xl p-3 flex items-center gap-2 min-w-[200px]">
+              <div *cdkDragPreview class="bg-paper/90 backdrop-blur rounded-lg border-2 border-ink shadow-[0_20px_60px_rgb(0_0_0/0.25)] p-3 flex items-center gap-2 min-w-[200px]">
                 @if (tech.icon) {
                   <img [src]="tech.icon" [alt]="tech.name" class="w-6 h-6 object-contain">
                 } @else {
-                  <div class="w-6 h-6 bg-dark-border rounded flex items-center justify-center text-gray-500">?</div>
+                  <div class="w-6 h-6 bg-stone rounded flex items-center justify-center text-ink-muted">?</div>
                 }
-                <span class="text-white font-medium">{{ tech.name }}</span>
+                <span class="text-ink font-medium">{{ tech.name }}</span>
               </div>
 
               <!-- Placeholder while dragging -->
-              <div *cdkDragPlaceholder class="bg-dark-border/30 border-2 border-dashed border-primary/50 rounded-lg h-14"></div>
+              <div *cdkDragPlaceholder class="bg-stone/50 border-2 border-dashed border-ink/40 rounded-lg h-14"></div>
 
               <!-- Drag Handle -->
-              <div cdkDragHandle class="cursor-move p-1 hover:bg-dark-border rounded transition-colors" title="Drag to reorder">
-                <svg class="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+              <div cdkDragHandle class="cursor-move p-1 hover:bg-stone rounded transition-colors" title="Drag to reorder">
+                <svg class="w-4 h-4 text-ink-muted" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M7 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 2zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 14zm6-8a2 2 0 1 0-.001-4.001A2 2 0 0 0 13 6zm0 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 14z"/>
                 </svg>
               </div>
 
               <!-- Order Badge -->
-              <div class="w-6 h-6 bg-primary text-dark-bg rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">
+              <div class="w-6 h-6 bg-ink text-paper rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">
                 {{ techIndex + 1 }}
               </div>
               
@@ -107,16 +107,16 @@
                 @if (tech.icon) {
                   <img [src]="tech.icon" [alt]="tech.name" class="w-8 h-8 object-contain" onerror="this.style.display='none'">
                 } @else {
-                  <div class="w-8 h-8 bg-dark-border rounded flex items-center justify-center text-gray-500">?</div>
+                  <div class="w-8 h-8 bg-stone rounded flex items-center justify-center text-ink-muted">?</div>
                 }
-                <span class="text-white font-medium truncate">{{ tech.name }}</span>
+                <span class="text-ink font-medium truncate">{{ tech.name }}</span>
               </div>
 
               <!-- Show in About Toggle -->
               <button type="button"
                       (click)="toggleShowInAbout(tech, $event)"
                       class="flex items-center gap-1 px-2 py-1 rounded transition-colors text-sm"
-                      [class]="tech.show_in_about ? 'bg-primary/20 text-primary' : 'bg-dark-border text-gray-500'"
+                      [class]="tech.show_in_about ? 'bg-primary/20 text-ink' : 'bg-stone text-ink-muted'"
                       title="Show in 'About'">
                 @if (tech.show_in_about) {
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -132,24 +132,24 @@
 
               <!-- Level Slider (RIGHT) - level 0 = hidden -->
               <div class="flex items-center gap-2 flex-1 max-w-[200px]">
-                <span class="text-xs w-8" [class]="tech.level > 0 ? 'text-primary' : 'text-gray-500'">Lv.{{ tech.level }}</span>
+                <span class="text-xs w-8" [class]="tech.level > 0 ? 'text-ink' : 'text-ink-muted'">Lv.{{ tech.level }}</span>
                 <input type="range" 
                        min="0" max="5" 
                        [value]="tech.level"
                        (input)="updateLevel(tech, +$any($event.target).value)"
-                       class="flex-1 h-1.5 bg-dark-border rounded-lg appearance-none cursor-pointer accent-primary">
+                       class="flex-1 h-1.5 bg-stone rounded-lg appearance-none cursor-pointer accent-primary">
               </div>
 
               <!-- Action Buttons -->
               <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button (click)="editTechnology(tech)" 
-                        class="p-1.5 bg-dark-surface text-blue-400 rounded hover:bg-dark-border transition-colors">
+                        class="p-1.5 bg-surface text-ink-muted rounded hover:bg-stone hover:text-ink transition-colors">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
                   </svg>
                 </button>
                 <button (click)="deleteTechnology(tech)" 
-                        class="p-1.5 bg-dark-surface text-red-400 rounded hover:bg-dark-border transition-colors">
+                        class="p-1.5 bg-surface text-red-600 rounded hover:bg-stone transition-colors">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                   </svg>
@@ -163,7 +163,7 @@
   </div>
 
   @if (technologies().length === 0) {
-    <div class="text-center py-12 text-gray-500 px-8">
+    <div class="text-center py-12 text-ink-muted px-8">
       <p>No technologies registered.</p>
     </div>
   }
@@ -172,12 +172,12 @@
 <!-- Modal -->
 @if (showModal()) {
   <div class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
-    <div class="bg-dark-surface rounded-xl border border-dark-border w-full max-w-md shadow-2xl animate-scale-in">
-      <div class="p-6 border-b border-dark-border flex justify-between items-center">
-        <h2 class="text-xl font-bold text-white">
+    <div class="bg-surface rounded-lg border border-line w-full max-w-md shadow-[0_20px_60px_rgb(0_0_0/0.25)] animate-scale-in">
+      <div class="p-6 border-b border-line flex justify-between items-center">
+        <h2 class="text-xl font-bold text-ink">
           {{ isEditing() ? 'Edit Technology' : 'New Technology' }}
         </h2>
-        <button (click)="closeModal()" class="text-gray-400 hover:text-white transition-colors">
+        <button (click)="closeModal()" class="text-ink-muted hover:text-ink transition-colors">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
           </svg>
@@ -187,19 +187,19 @@
       <form (ngSubmit)="save()" class="p-6 space-y-4">
         <div class="space-y-4">
         <div>
-          <label class="block text-sm font-medium mb-1 dark:text-gray-300">Name</label>
+          <label class="block text-sm text-ink-muted mb-2">Name</label>
           <div class="relative">
             <input type="text" [(ngModel)]="form.name" (ngModelChange)="onNameChange()" name="name"
-                   class="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                   class="w-full px-3 py-2.5 bg-paper border border-line rounded-lg focus:border-ink outline-none text-ink transition-colors"
                    placeholder="e.g. Angular" autocomplete="off">
             
             @if (searchResults().length > 0) {
-              <div class="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border dark:border-gray-600 rounded-md shadow-lg max-h-60 overflow-auto">
+              <div class="absolute z-10 w-full mt-1 bg-surface border border-line rounded-lg shadow-lg max-h-60 overflow-auto">
                 @for (result of searchResults(); track result.name) {
                   <button type="button" (click)="selectIcon(result)"
-                          class="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2">
+                          class="w-full text-left px-4 py-2 hover:bg-stone flex items-center gap-2">
                     <img [src]="result.icon" class="w-5 h-5">
-                    <span class="dark:text-white">{{ result.name }}</span>
+                    <span>{{ result.name }}</span>
                   </button>
                 }
               </div>
@@ -208,29 +208,29 @@
         </div>
         
         <div>
-          <label class="block text-sm font-medium mb-1 dark:text-gray-300">Icon URL (optional)</label>
+          <label class="block text-sm text-ink-muted mb-2">Icon URL (optional)</label>
           <div class="flex gap-2">
             <input type="text" [(ngModel)]="form.icon" name="icon"
-                   class="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                   class="w-full px-3 py-2.5 bg-paper border border-line rounded-lg focus:border-ink outline-none text-ink transition-colors"
                    placeholder="Leave empty for no icon">
             @if (form.icon) {
-              <div class="w-10 h-10 p-1 border rounded dark:border-gray-600 flex items-center justify-center bg-gray-50 dark:bg-gray-800">
+              <div class="w-11 h-11 p-1.5 shrink-0 border border-line rounded-lg flex items-center justify-center bg-surface">
                 <img [src]="form.icon" class="w-8 h-8 object-contain">
               </div>
             }
           </div>
-          <p class="text-xs text-gray-500 mt-1">Select from the list, paste a URL, or leave empty.</p>
+          <p class="text-xs text-ink-muted mt-1">Select from the list, paste a URL, or leave empty.</p>
         </div>
         
 
       </div>
         <div class="flex justify-end gap-3 pt-4">
           <button type="button" (click)="closeModal()"
-                  class="px-4 py-2 bg-dark-bg border border-dark-border hover:bg-dark-border/50 text-gray-300 rounded-lg transition-colors">
+                  class="px-4 py-2 bg-paper border border-line hover:bg-stone/60 text-ink-soft rounded-lg transition-colors">
             Cancel
           </button>
           <button type="submit" [disabled]="!form.name || isSaving()"
-                  class="px-4 py-2 bg-primary hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed text-dark-bg font-medium rounded-lg transition-colors flex items-center gap-2">
+                  class="px-4 py-2 bg-ink hover:bg-ink-soft disabled:opacity-50 disabled:cursor-not-allowed text-paper font-medium rounded-lg transition-colors flex items-center gap-2">
             @if (isSaving()) {
               <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -248,10 +248,10 @@
 <!-- Category Modal -->
 @if (showCategoryModal()) {
   <div class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4" (click)="closeCategoryModal()">
-    <div class="bg-dark-surface border border-dark-border rounded-xl shadow-2xl w-full max-w-2xl" (click)="$event.stopPropagation()">
-      <div class="p-6 border-b border-dark-border">
-        <h2 class="text-xl font-bold text-white">{{ isEditingCategory() ? 'Edit Category' : 'New Category' }}</h2>
-        <p class="text-gray-400 text-sm mt-1">{{ isEditingCategory() ? 'Edit category settings' : 'Create a new grouping for technologies' }}</p>
+    <div class="bg-surface border border-line rounded-lg shadow-[0_20px_60px_rgb(0_0_0/0.25)] w-full max-w-2xl" (click)="$event.stopPropagation()">
+      <div class="p-6 border-b border-line">
+        <h2 class="text-xl font-bold text-ink">{{ isEditingCategory() ? 'Edit Category' : 'New Category' }}</h2>
+        <p class="text-ink-muted text-sm mt-1">{{ isEditingCategory() ? 'Edit category settings' : 'Create a new grouping for technologies' }}</p>
       </div>
       
       <form (ngSubmit)="saveCategory()" class="p-6 space-y-6 max-h-[85vh] overflow-y-auto custom-scrollbar">
@@ -261,14 +261,14 @@
           <!-- Removed Internal ID input as requested, it's auto-generated from short_title -->
           
           <div>
-            <label class="block text-sm font-medium mb-1 text-gray-300">Accent color</label>
+            <label class="block text-sm font-medium mb-1 text-ink-soft">Accent color</label>
             <div class="flex items-center gap-3">
-              <div class="relative w-10 h-10 rounded-lg overflow-hidden border border-dark-border shadow-sm flex-shrink-0">
+              <div class="relative w-10 h-10 rounded-lg overflow-hidden border border-line shadow-sm flex-shrink-0">
                 <input type="color" [(ngModel)]="categoryForm.color" name="categoryColor"
                        class="absolute inset-0 w-[150%] h-[150%] -top-1/4 -left-1/4 cursor-pointer p-0 border-0">
               </div>
               <input type="text" [(ngModel)]="categoryForm.color" name="categoryColorText"
-                     class="flex-1 p-2 bg-dark-bg border border-dark-border rounded-lg focus:border-primary focus:outline-none text-white font-mono text-sm uppercase"
+                     class="flex-1 p-2 bg-paper border border-line rounded-lg focus:border-ink focus:outline-none text-ink font-mono text-sm uppercase"
                      placeholder="#F5A623">
             </div>
           </div>
@@ -278,48 +278,48 @@
           <!-- Content -->
           <div class="space-y-4">
             <div>
-              <label class="block text-sm font-medium mb-1 text-gray-300">Short Title (About) *</label>
+              <label class="block text-sm font-medium mb-1 text-ink-soft">Short Title (About) *</label>
               <input type="text" [(ngModel)]="categoryForm.short_title" (ngModelChange)="onCategoryTitleChange($event)" name="short_title" required
-                     class="w-full p-2 bg-dark-bg border border-dark-border rounded-lg focus:border-primary focus:outline-none text-white"
+                     class="w-full p-2 bg-paper border border-line rounded-lg focus:border-ink focus:outline-none text-ink"
                      placeholder="Frontend">
             </div>
             
             <div>
-              <label class="block text-sm font-medium mb-1 text-gray-300">Long Title (Home)</label>
+              <label class="block text-sm font-medium mb-1 text-ink-soft">Long Title (Home)</label>
               <input type="text" [(ngModel)]="categoryForm.long_title" name="long_title"
-                     class="w-full p-2 bg-dark-bg border border-dark-border rounded-lg focus:border-primary focus:outline-none text-white"
+                     class="w-full p-2 bg-paper border border-line rounded-lg focus:border-ink focus:outline-none text-ink"
                      placeholder="Frontend Development">
             </div>
             
             <div>
-              <label class="block text-sm font-medium mb-1 text-gray-300">Description</label>
+              <label class="block text-sm font-medium mb-1 text-ink-soft">Description</label>
               <textarea [(ngModel)]="categoryForm.description" name="description" rows="3"
-                        class="w-full p-2 bg-dark-bg border border-dark-border rounded-lg focus:border-primary focus:outline-none text-white resize-none"
+                        class="w-full p-2 bg-paper border border-line rounded-lg focus:border-ink focus:outline-none text-ink resize-none"
                         placeholder="Description..."></textarea>
             </div>
           </div>
         </div>
 
         <!-- Icon Selection -->
-        <div class="pt-4 border-t border-dark-border">
-           <label class="block text-sm font-medium mb-3 text-gray-300">Representative Icon</label>
+        <div class="pt-4 border-t border-line">
+           <label class="block text-sm font-medium mb-3 text-ink-soft">Representative Icon</label>
            <div class="grid grid-cols-4 sm:grid-cols-6 gap-3 mb-4">
              @for (icon of availableIcons; track icon) {
                <button type="button" (click)="categoryForm.icon = icon"
                        [class.ring-2]="categoryForm.icon === icon"
                        [class.ring-primary]="categoryForm.icon === icon"
                        [class.bg-primary-10]="categoryForm.icon === icon"
-                       class="flex flex-col items-center justify-center p-3 bg-dark-bg border border-dark-border rounded-lg hover:bg-dark-border/50 transition-all group">
+                       class="flex flex-col items-center justify-center p-3 bg-paper border border-line rounded-lg hover:bg-stone/60 transition-all group">
                  
                  <div class="w-10 h-10 rounded-lg flex items-center justify-center mb-2 transition-colors"
-                      [class.text-primary]="categoryForm.icon === icon"
-                      [class.text-gray-400]="categoryForm.icon !== icon"
+                      [class.text-ink]="categoryForm.icon === icon"
+                      [class.text-ink-muted]="categoryForm.icon !== icon"
                       [innerHTML]="getIconForCategory(icon)">
                  </div>
                  
                  <span class="text-[10px] uppercase font-bold tracking-wider"
-                       [class.text-white]="categoryForm.icon === icon"
-                       [class.text-gray-500]="categoryForm.icon !== icon">
+                       [class.text-ink]="categoryForm.icon === icon"
+                       [class.text-ink-muted]="categoryForm.icon !== icon">
                    {{ icon }}
                  </span>
                </button>
@@ -327,13 +327,13 @@
            </div>
         </div>
         
-        <div class="flex justify-end gap-3 pt-4 border-t border-dark-border">
+        <div class="flex justify-end gap-3 pt-4 border-t border-line">
           <button type="button" (click)="closeCategoryModal()"
-                  class="px-5 py-2.5 bg-dark-bg border border-dark-border hover:bg-dark-border/50 text-gray-300 rounded-lg transition-colors font-medium">
+                  class="px-5 py-2.5 bg-paper border border-line hover:bg-stone/60 text-ink-soft rounded-lg transition-colors font-medium">
             Cancel
           </button>
           <button type="submit" [disabled]="!categoryForm.short_title"
-                  class="px-5 py-2.5 bg-primary hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed text-dark-bg font-bold rounded-lg transition-colors shadow-lg shadow-primary/20">
+                  class="px-5 py-2.5 bg-ink hover:bg-ink-soft disabled:opacity-50 disabled:cursor-not-allowed text-paper font-bold rounded-lg transition-colors shadow-lg">
             {{ isEditingCategory() ? 'Save Changes' : 'Create Category' }}
           </button>
         </div>
@@ -345,10 +345,10 @@
 <!-- Category Order Modal -->
 @if (showCategoryOrderModal()) {
   <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-    <div class="bg-dark-surface rounded-xl border border-dark-border w-full max-w-md">
-      <div class="flex items-center justify-between p-4 border-b border-dark-border">
-        <h2 class="text-lg font-bold text-white">Sort Categories</h2>
-        <button (click)="closeCategoryOrderModal()" class="text-gray-500 hover:text-white">
+    <div class="bg-surface rounded-lg border border-line w-full max-w-md">
+      <div class="flex items-center justify-between p-4 border-b border-line">
+        <h2 class="text-lg font-bold text-ink">Sort Categories</h2>
+        <button (click)="closeCategoryOrderModal()" class="text-ink-muted hover:text-ink">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
           </svg>
@@ -360,19 +360,19 @@
            class="p-4 space-y-2 max-h-96 overflow-y-auto custom-scrollbar">
         @for (cat of categoriesForOrdering(); track cat; let i = $index) {
           <div cdkDrag 
-               class="flex items-center gap-3 bg-dark-bg rounded-lg p-3 border border-dark-border cursor-move hover:border-primary/50 group transition-colors">
+               class="flex items-center gap-3 bg-paper rounded-lg p-3 border border-line cursor-move hover:border-ink/40 group transition-colors">
             
             <!-- Custom Drag Preview -->
-            <div *cdkDragPreview class="bg-dark-bg/95 backdrop-blur rounded-lg border-2 border-primary shadow-2xl p-3 flex items-center gap-3 w-64">
+            <div *cdkDragPreview class="bg-paper/90 backdrop-blur rounded-lg border-2 border-ink shadow-[0_20px_60px_rgb(0_0_0/0.25)] p-3 flex items-center gap-3 w-64">
               <span class="w-4 h-4 rounded-full flex-shrink-0" [style.backgroundColor]="cat.color"></span>
-              <span class="text-white font-medium">{{ cat.short_title || cat.name }}</span>
+              <span class="text-ink font-medium">{{ cat.short_title || cat.name }}</span>
             </div>
 
             <!-- Placeholder -->
-            <div *cdkDragPlaceholder class="bg-dark-border/30 border-2 border-dashed border-primary/50 rounded-lg h-12"></div>
+            <div *cdkDragPlaceholder class="bg-stone/50 border-2 border-dashed border-ink/40 rounded-lg h-12"></div>
 
             <!-- Handle -->
-            <div cdkDragHandle class="text-gray-500 group-hover:text-white transition-colors">
+            <div cdkDragHandle class="text-ink-muted group-hover:text-ink transition-colors">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"/>
               </svg>
@@ -380,24 +380,24 @@
 
             <span class="w-4 h-4 rounded-full flex-shrink-0" [style.backgroundColor]="cat.color"></span>
             
-            <span class="flex-1 text-white font-medium select-none">
+            <span class="flex-1 text-ink font-medium select-none">
               {{ cat.long_title || cat.name }} 
-              <span class="text-xs text-gray-500 ml-2 font-mono">({{ cat.short_title || cat.name }})</span>
+              <span class="text-xs text-ink-muted ml-2 font-mono">({{ cat.short_title || cat.name }})</span>
             </span>
 
-            <div class="text-xs text-gray-500 font-mono">
+            <div class="text-xs text-ink-muted font-mono">
               #{{ i + 1 }}
             </div>
           </div>
         }
       </div>
-      <div class="flex justify-end gap-3 p-4 border-t border-dark-border">
+      <div class="flex justify-end gap-3 p-4 border-t border-line">
         <button (click)="closeCategoryOrderModal()" 
-                class="px-4 py-2 text-gray-400 hover:text-white transition-colors">
+                class="px-4 py-2 text-ink-muted hover:text-ink transition-colors">
           Cancel
         </button>
         <button (click)="saveCategoryOrder()" 
-                class="px-4 py-2 bg-primary hover:bg-primary-dark text-dark-bg font-medium rounded-lg transition-colors">
+                class="px-4 py-2 bg-ink hover:bg-ink-soft text-paper font-medium rounded-lg transition-colors">
           Save Order
         </button>
       </div>

@@ -1,3 +1,5 @@
+const token = name => `rgb(var(--c-${name}) / <alpha-value>)`;
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
@@ -16,17 +18,21 @@ module.exports = {
           surface: '#1A1A1A',
           border: '#2D2D2D',
         },
-        paper: '#F4F4F1',
+        paper: token('paper'),
+        surface: token('surface'),
         ink: {
-          DEFAULT: '#0E0E0E',
-          soft: '#3A3A37',
-          muted: '#4A4A46',
+          DEFAULT: token('ink'),
+          soft: token('ink-soft'),
+          muted: token('ink-muted'),
         },
-        line: {
-          DEFAULT: '#D9D9D3',
-          dark: '#2A2A28',
+        line: token('line'),
+        stone: token('stone'),
+        band: {
+          DEFAULT: token('band'),
+          line: token('band-line'),
+          ink: token('band-ink'),
+          muted: token('band-muted'),
         },
-        stone: '#E4E4DF',
         accent: {
           yellow: '#F5A623',
           green: '#4CAF50',

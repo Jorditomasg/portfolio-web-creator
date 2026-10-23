@@ -1,15 +1,15 @@
 <div>
-  <div class="flex items-center justify-between mb-8 sticky top-0 bg-dark-bg/95 backdrop-blur z-20 py-4 border-b border-dark-border px-8">
-    <h1 class="text-2xl font-bold text-white">General Settings</h1>
+  <div class="flex flex-wrap items-center justify-between gap-4 mb-8 sticky top-0 bg-paper/90 backdrop-blur z-20 py-4 border-b border-line px-6 md:px-10">
+    <h1 class="text-2xl md:text-3xl font-semibold tracking-tight text-ink">Settings</h1>
     
     <div class="flex items-center gap-4">
       @if (isDirty()) {
-        <span class="text-gray-400 text-sm animate-pulse">You have unsaved changes</span>
+        <span class="text-ink-muted text-sm animate-pulse">You have unsaved changes</span>
       }
       <button (click)="save()" [disabled]="!isDirty() || isSaving()"
-              class="px-6 py-2.5 bg-primary hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed text-dark-bg font-medium rounded-lg transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/20">
+              class="px-6 py-2.5 bg-ink hover:bg-ink-soft disabled:opacity-50 disabled:cursor-not-allowed text-paper font-medium rounded-lg transition-all flex items-center justify-center gap-2 shadow-lg">
         @if (isSaving()) {
-          <svg class="animate-spin h-5 w-5 text-dark-bg" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <svg class="animate-spin h-5 w-5 text-paper" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
@@ -24,29 +24,29 @@
     </div>
   </div>
 
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 px-8 pb-8">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 px-6 md:px-10 pb-10">
     <!-- General Settings -->
     <!-- General Settings & SEO -->
-    <div class="bg-dark-surface rounded-xl border border-dark-border p-6">
-      <h2 class="text-lg font-semibold text-white mb-4">General & SEO</h2>
+    <div class="bg-surface rounded-lg border border-line p-6">
+      <h2 class="text-lg font-semibold text-ink mb-4">General & SEO</h2>
       <div class="space-y-6">
         <div>
-          <label class="block text-sm text-gray-400 mb-2">Site Title (Meta Title) <span class="text-red-500">*</span></label>
+          <label class="block text-sm text-ink-muted mb-2">Site Title (Meta Title) <span class="text-red-600">*</span></label>
           <input [(ngModel)]="form.site_title" name="site_title" required
-                 class="w-full px-4 py-3 bg-dark-bg border border-dark-border rounded-lg focus:border-primary outline-none text-white transition-colors"
+                 class="w-full px-4 py-3 bg-paper border border-line rounded-lg focus:border-ink outline-none text-ink transition-colors"
                  placeholder="Portfolio Web Creator" (ngModelChange)="checkDirty()">
-          <p class="mt-1 text-xs text-gray-500">Shown in the browser tab and search results</p>
+          <p class="mt-1 text-xs text-ink-muted">Shown in the browser tab and search results</p>
         </div>
 
         <div>
-          <label class="block text-sm text-gray-400 mb-2">Meta Description (SEO)</label>
+          <label class="block text-sm text-ink-muted mb-2">Meta Description (SEO)</label>
           <textarea [(ngModel)]="form.meta_description" name="meta_description" rows="3"
-                    class="w-full px-4 py-3 bg-dark-bg border border-dark-border rounded-lg focus:border-primary outline-none text-white resize-none transition-colors"
+                    class="w-full px-4 py-3 bg-paper border border-line rounded-lg focus:border-ink outline-none text-ink resize-none transition-colors"
                     placeholder="Description for search engines..." (ngModelChange)="checkDirty()"></textarea>
-          <p class="mt-1 text-xs text-gray-500">{{ (form.meta_description || '').length }}/160 recommended characters</p>
+          <p class="mt-1 text-xs text-ink-muted">{{ (form.meta_description || '').length }}/160 recommended characters</p>
         </div>
 
-        <div class="space-y-4 pt-4 border-t border-dark-border">
+        <div class="space-y-4 pt-4 border-t border-line">
           
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="md:col-span-2">
@@ -63,7 +63,7 @@
                 [currentPath]="form.seo_image_url" 
                 (pathChange)="form.seo_image_url = $event; checkDirty()">
               </app-file-upload>
-              <p class="mt-1 text-xs text-gray-500">Image shown when the link is shared on social networks (WhatsApp, LinkedIn, etc.).</p>
+              <p class="mt-1 text-xs text-ink-muted">Image shown when the link is shared on social networks (WhatsApp, LinkedIn, etc.).</p>
             </div>
           </div>
         </div>
@@ -71,128 +71,128 @@
     </div>
 
     <!-- Social Links -->
-    <div class="bg-dark-surface rounded-xl border border-dark-border p-6">
-      <h2 class="text-lg font-semibold text-white mb-4">Social Links & Contact</h2>
-      <p class="text-gray-400 text-sm mb-6">Leave blank any fields you do not want to display</p>
+    <div class="bg-surface rounded-lg border border-line p-6">
+      <h2 class="text-lg font-semibold text-ink mb-4">Social Links & Contact</h2>
+      <p class="text-ink-muted text-sm mb-6">Leave blank any fields you do not want to display</p>
       
       <div class="space-y-5">
         <div>
-          <label class="block text-sm text-gray-400 mb-2">
+          <label class="block text-sm text-ink-muted mb-2">
             <span class="flex items-center gap-2">
               <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linkedin/linkedin-original.svg" class="w-4 h-4">
               LinkedIn URL
             </span>
           </label>
           <input [(ngModel)]="form.linkedin_url" name="linkedin_url"
-                 class="w-full px-4 py-3 bg-dark-bg border border-dark-border rounded-lg focus:border-primary outline-none text-white transition-colors"
+                 class="w-full px-4 py-3 bg-paper border border-line rounded-lg focus:border-ink outline-none text-ink transition-colors"
                  placeholder="https://linkedin.com/in/your-profile" (ngModelChange)="checkDirty()">
         </div>
 
         <div>
-          <label class="block text-sm text-gray-400 mb-2">
+          <label class="block text-sm text-ink-muted mb-2">
             <span class="flex items-center gap-2">
               <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" class="w-4 h-4 invert">
               GitHub URL
             </span>
           </label>
           <input [(ngModel)]="form.github_url" name="github_url"
-                 class="w-full px-4 py-3 bg-dark-bg border border-dark-border rounded-lg focus:border-primary outline-none text-white transition-colors"
+                 class="w-full px-4 py-3 bg-paper border border-line rounded-lg focus:border-ink outline-none text-ink transition-colors"
                  placeholder="https://github.com/your-username" (ngModelChange)="checkDirty()">
         </div>
 
         <div>
-          <label class="block text-sm text-gray-400 mb-2">
+          <label class="block text-sm text-ink-muted mb-2">
             <span class="flex items-center gap-2">
-              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-4 h-4 text-ink-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
               </svg>
               Contact Email
             </span>
           </label>
           <input [(ngModel)]="form.email" name="email" type="email"
-                 class="w-full px-4 py-3 bg-dark-bg border border-dark-border rounded-lg focus:border-primary outline-none text-white transition-colors"
+                 class="w-full px-4 py-3 bg-paper border border-line rounded-lg focus:border-ink outline-none text-ink transition-colors"
                  placeholder="you@email.com" (ngModelChange)="checkDirty()">
         </div>
       </div>
     </div>
 
     <!-- Appearance Settings -->
-    <div class="bg-dark-surface rounded-xl border border-dark-border p-6">
-      <h2 class="text-lg font-semibold text-white mb-4">Appearance</h2>
-      <p class="text-gray-400 text-sm mb-6">Customize the visual look of the portfolio</p>
+    <div class="bg-surface rounded-lg border border-line p-6">
+      <h2 class="text-lg font-semibold text-ink mb-4">Appearance</h2>
+      <p class="text-ink-muted text-sm mb-6">Customize the visual look of the portfolio</p>
       
       <div class="space-y-5">
         <div>
-          <label class="block text-sm text-gray-400 mb-2">Site Icon (Favicon)</label>
+          <label class="block text-sm text-ink-muted mb-2">Site Icon (Favicon)</label>
           <div class="grid grid-cols-3 gap-3">
             @for (icon of faviconOptions; track icon.value) {
               <button type="button" (click)="form.favicon_type = icon.value; checkDirty()"
-                      [class]="'p-4 rounded-xl border-2 flex flex-col items-center gap-2 transition-all ' + 
-                               (form.favicon_type === icon.value ? 'border-primary bg-primary/10' : 'border-dark-border hover:border-gray-600')">
-                <span class="text-2xl">{{ icon.emoji }}</span>
-                <span class="text-xs text-gray-400">{{ icon.label }}</span>
+                      [attr.aria-pressed]="form.favicon_type === icon.value"
+                      [class]="'min-h-[44px] px-3 rounded-lg border text-sm transition-colors ' +
+                               (form.favicon_type === icon.value ? 'border-ink bg-stone font-medium' : 'border-line text-ink-muted hover:border-ink/40 hover:text-ink')">
+                {{ icon.label }}
               </button>
             }
           </div>
         </div>
 
         <div>
-          <label class="block text-sm text-gray-400 mb-2">Accent Color</label>
+          <label class="block text-sm text-ink-muted mb-2">Accent Color</label>
           <div class="flex gap-3">
             @for (color of accentColors; track color.value) {
               <button type="button" (click)="form.accent_color = color.value; checkDirty()"
                       [style.background-color]="color.value"
-                      [class]="'w-12 h-12 rounded-xl border-2 transition-all ' + 
+                      [class]="'w-12 h-12 rounded-lg border-2 transition-all ' + 
                                (form.accent_color === color.value ? 'border-white scale-110' : 'border-transparent hover:scale-105')">
               </button>
             }
             <div class="flex items-center gap-2">
               <input type="color" [(ngModel)]="form.accent_color" name="accent_color" 
                      class="w-12 h-12 rounded-lg cursor-pointer border-0 bg-transparent" (ngModelChange)="checkDirty()">
-              <span class="text-xs text-gray-500">Custom</span>
+              <span class="text-xs text-ink-muted">Custom</span>
             </div>
           </div>
-          <p class="mt-2 text-xs text-gray-500">Current color: <code class="text-primary">{{ form.accent_color }}</code></p>
+          <p class="mt-2 text-xs text-ink-muted">Current color: <code class="text-ink">{{ form.accent_color }}</code></p>
         </div>
       </div>
     </div>
 
     <!-- Navigation Settings -->
-    <div class="bg-dark-surface rounded-xl border border-dark-border p-6">
-      <h2 class="text-lg font-semibold text-white mb-4">Navigation</h2>
-      <p class="text-gray-400 text-sm mb-6">Configure advanced site options</p>
+    <div class="bg-surface rounded-lg border border-line p-6">
+      <h2 class="text-lg font-semibold text-ink mb-4">Navigation</h2>
+      <p class="text-ink-muted text-sm mb-6">Configure advanced site options</p>
       
       <div class="space-y-5">
         <!-- Show Admin Link -->
-        <div class="flex items-center justify-between p-4 bg-dark-bg rounded-lg border border-dark-border">
+        <div class="flex items-center justify-between p-4 bg-paper rounded-lg border border-line">
           <div>
-            <h3 class="text-white font-medium">Show Admin link</h3>
-            <p class="text-xs text-gray-500 mt-1">Adds "Admin" to the navigation menu</p>
+            <h3 class="text-ink font-medium">Show Admin link</h3>
+            <p class="text-xs text-ink-muted mt-1">Adds "Admin" to the navigation menu</p>
           </div>
           <label class="relative inline-flex items-center cursor-pointer">
             <input type="checkbox" [(ngModel)]="form.show_admin_link" name="show_admin_link" class="sr-only peer" (ngModelChange)="checkDirty()">
-            <div class="w-11 h-6 bg-dark-border peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+            <div class="w-11 h-6 bg-stone peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:shadow-sm after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--color-primary)]"></div>
           </label>
         </div>
       </div>
     </div>
 
     <!-- Analytics (Umami) -->
-    <div class="bg-dark-surface rounded-xl border border-dark-border p-6 lg:col-span-2">
-      <h2 class="text-lg font-semibold text-white mb-4">Analytics</h2>
-      <p class="text-gray-400 text-sm mb-6">Self-hosted Umami analytics. Leave empty to disable.</p>
+    <div class="bg-surface rounded-lg border border-line p-6 lg:col-span-2">
+      <h2 class="text-lg font-semibold text-ink mb-4">Analytics</h2>
+      <p class="text-ink-muted text-sm mb-6">Self-hosted Umami analytics. Leave empty to disable.</p>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label class="block text-sm text-gray-400 mb-2">Umami URL</label>
+          <label class="block text-sm text-ink-muted mb-2">Umami URL</label>
           <input [(ngModel)]="form.umami_url" name="umami_url"
-                 class="w-full px-4 py-3 bg-dark-bg border border-dark-border rounded-lg focus:border-primary outline-none text-white transition-colors"
+                 class="w-full px-4 py-3 bg-paper border border-line rounded-lg focus:border-ink outline-none text-ink transition-colors"
                  placeholder="https://stats.example.com" (ngModelChange)="checkDirty()">
         </div>
         <div>
-          <label class="block text-sm text-gray-400 mb-2">Umami Website ID</label>
+          <label class="block text-sm text-ink-muted mb-2">Umami Website ID</label>
           <input [(ngModel)]="form.umami_website_id" name="umami_website_id"
-                 class="w-full px-4 py-3 bg-dark-bg border border-dark-border rounded-lg focus:border-primary outline-none text-white transition-colors"
+                 class="w-full px-4 py-3 bg-paper border border-line rounded-lg focus:border-ink outline-none text-ink transition-colors"
                  placeholder="00000000-0000-0000-0000-000000000000" (ngModelChange)="checkDirty()">
         </div>
       </div>

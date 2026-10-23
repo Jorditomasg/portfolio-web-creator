@@ -7,19 +7,19 @@ import { AuthService } from '../../core/services/auth.service';
   selector: 'app-login',
   imports: [FormsModule],
   template: `
-    <div class="min-h-screen bg-dark-bg flex items-center justify-center px-6">
+    <div class="min-h-screen bg-paper flex items-center justify-center px-6">
       <div class="w-full max-w-md">
-        <div class="bg-dark-surface rounded-2xl border border-dark-border p-8">
+        <div class="bg-surface rounded-lg border border-line p-8">
           <!-- Header -->
           <div class="text-center mb-8">
-            <h1 class="text-2xl font-bold mb-2 text-white">Admin Panel</h1>
-            <p class="text-gray-400">Sign in to continue</p>
+            <h1 class="text-2xl font-semibold tracking-tight mb-1 text-ink">Sign in</h1>
+            <p class="text-ink-muted">Admin panel</p>
           </div>
 
           <!-- Form -->
           <form (ngSubmit)="onSubmit()" class="space-y-6">
             <div>
-              <label for="username" class="block text-sm font-medium text-gray-300 mb-2">Username</label>
+              <label for="username" class="block text-sm font-medium text-ink-soft mb-2">Username</label>
               <input 
                 type="text" 
                 id="username" 
@@ -27,12 +27,12 @@ import { AuthService } from '../../core/services/auth.service';
                 name="username"
                 required
                 autocomplete="username"
-                class="w-full px-4 py-3 bg-dark-bg border border-dark-border rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors text-white placeholder-gray-500"
+                class="w-full px-4 py-3 bg-paper border border-line rounded-lg focus:border-ink focus:ring-1 focus:ring-ink/20 outline-none transition-colors text-ink placeholder:text-ink-muted/60"
                 placeholder="admin">
             </div>
 
             <div>
-              <label for="password" class="block text-sm font-medium text-gray-300 mb-2">Password</label>
+              <label for="password" class="block text-sm font-medium text-ink-soft mb-2">Password</label>
               <input 
                 type="password" 
                 id="password" 
@@ -40,12 +40,12 @@ import { AuthService } from '../../core/services/auth.service';
                 name="password"
                 required
                 autocomplete="current-password"
-                class="w-full px-4 py-3 bg-dark-bg border border-dark-border rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors text-white placeholder-gray-500"
+                class="w-full px-4 py-3 bg-paper border border-line rounded-lg focus:border-ink focus:ring-1 focus:ring-ink/20 outline-none transition-colors text-ink placeholder:text-ink-muted/60"
                 placeholder="••••••••">
             </div>
 
             @if (authService.error()) {
-              <div class="p-4 bg-red-500/20 text-red-400 rounded-lg text-sm text-center">
+              <div class="p-4 bg-red-500/20 text-red-600 rounded-lg text-sm text-center">
                 {{ authService.error() }}
               </div>
             }
@@ -53,7 +53,7 @@ import { AuthService } from '../../core/services/auth.service';
             <button 
               type="submit" 
               [disabled]="authService.isLoading()"
-              class="w-full py-4 bg-primary hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-all">
+              class="w-full min-h-[48px] bg-ink hover:bg-ink-soft disabled:opacity-50 disabled:cursor-not-allowed text-paper font-medium rounded-full transition-all">
               @if (authService.isLoading()) {
                 Signing in...
               } @else {
@@ -64,15 +64,15 @@ import { AuthService } from '../../core/services/auth.service';
 
           <!-- Back link -->
           <div class="mt-6 text-center">
-            <a href="/" class="text-gray-400 hover:text-primary text-sm transition-colors">
+            <a href="/" class="text-ink-muted hover:text-ink text-sm transition-colors">
               ← Back to portfolio
             </a>
           </div>
         </div>
 
         <!-- Footer -->
-        <p class="mt-8 text-center text-gray-600 text-sm">
-          &copy; {{ currentYear }} Portfolio. Todos los derechos reservados.
+        <p class="mt-8 text-center text-ink-muted text-sm">
+          &copy; {{ currentYear }} Portfolio. All rights reserved.
         </p>
       </div>
     </div>

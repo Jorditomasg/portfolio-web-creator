@@ -7,19 +7,39 @@
   --color-primary: #F5A623;
   --color-primary-rgb: 245, 166, 35;
   --color-primary-dark: #D48806;
+
+  --c-paper: 244 244 241;
+  --c-surface: 255 255 255;
+  --c-ink: 14 14 14;
+  --c-ink-soft: 58 58 55;
+  --c-ink-muted: 74 74 70;
+  --c-line: 217 217 211;
+  --c-stone: 228 228 223;
+  --c-band: 14 14 14;
+  --c-band-line: 42 42 40;
+  --c-band-ink: 244 244 241;
+  --c-band-muted: 168 168 162;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --c-paper: 14 14 13;
+    --c-surface: 24 24 22;
+    --c-ink: 236 236 232;
+    --c-ink-soft: 200 200 194;
+    --c-ink-muted: 160 160 154;
+    --c-line: 46 46 43;
+    --c-stone: 34 34 32;
+    --c-band: 24 24 22;
+    --c-band-line: 46 46 43;
+    color-scheme: dark;
+  }
 }
 
 @layer base {
   body {
-    @apply text-white bg-dark-bg;
-  }
-  
-  /* Fix for date/time inputs in dark mode */
-  input[type="date"],
-  input[type="datetime-local"],
-  input[type="month"],
-  input[type="time"] {
-    color-scheme: dark;
+    @apply text-ink bg-paper font-sans antialiased;
   }
 }
 
