@@ -23,6 +23,31 @@ export class AdminProjectsComponent implements OnInit {
     this.content.loadTechnologies().subscribe();
   }
 
+  isSyncing = signal(false);
+  unpairedRepos = signal<any[]>([]);
+  selectedRepos = new Set<string>();
+
+  toggleRepo(name: string) {
+    this.selectedRepos.has(name) ? this.selectedRepos.delete(name) : this.selectedRepos.add(name);
+  }
+
+  // Pairs projects with repos (fills empty fields only); with importSelected, also creates the checked repos.
+  syncGithub(importSelected = false) {
+    this.isSyncing.set(true);
+    const body = { import: importSelected ? [...this.selectedRepos] : [] };
+    this.http.post<any>('/api/projects/sync-github', body).pipe(
+      finalize(() => this.isSyncing.set(false)),
+    ).subscribe({
+      next: res => {
+        this.selectedRepos.clear();
+        this.unpairedRepos.set(res.unpaired);
+        this.toast.success(`Paired ${res.paired}, updated ${res.updated}, imported ${res.imported}`);
+        this.content.refreshProjects();
+      },
+      error: err => this.toast.error(err.error?.message || 'GitHub sync failed'),
+    });
+  }
+
   showModal = signal(false);
   isSaving = signal(false);
   editing = signal<number | null>(null);

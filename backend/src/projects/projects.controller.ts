@@ -12,6 +12,7 @@ import {
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
+import { SyncGithubDto } from './dto/sync-github.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('projects')
@@ -32,6 +33,13 @@ export class ProjectsController {
   @UseGuards(JwtAuthGuard)
   create(@Body() createProjectDto: CreateProjectDto) {
     return this.projectsService.create(createProjectDto);
+  }
+
+  // Pairs existing projects with GitHub repos (fills empty fields only) and imports the selected ones.
+  @Post('sync-github')
+  @UseGuards(JwtAuthGuard)
+  syncGithub(@Body() dto: SyncGithubDto) {
+    return this.projectsService.syncGithub(dto.import ?? []);
   }
 
   @Put(':id')
