@@ -15,9 +15,9 @@ import { map, startWith } from 'rxjs';
   imports: [RouterOutlet, HeaderComponent, FooterComponent],
   template: `
     @if (showLayout()) {
-      <div class="min-h-screen bg-dark-bg text-white flex flex-col">
+      <div class="min-h-screen bg-paper text-ink font-sans flex flex-col">
         <app-header />
-        <main class="flex-1 pt-20">
+        <main class="flex-1">
           <router-outlet />
         </main>
         <app-footer />

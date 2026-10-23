@@ -1,97 +1,85 @@
-<section class="py-20 bg-dark-surface -mt-20 pt-40">
-      <div class="container mx-auto px-6">
-        <div class="max-w-4xl">
-          <h1 class="text-4xl md:text-5xl font-bold mb-6 text-white">My Projects</h1>
-          <p class="text-xl text-gray-400">A selection of work showcasing my skills</p>
-        </div>
+<section class="max-w-screen-xl mx-auto px-6 md:px-8 pt-24 pb-28">
+  <p class="mb-6 font-mono text-sm uppercase tracking-wider text-ink-muted">Index of work</p>
+  <h1 class="mb-6 text-[clamp(48px,8vw,120px)] leading-[0.95] font-semibold tracking-[-0.045em]">Projects</h1>
+  <p class="mb-20 max-w-xl text-xl leading-relaxed text-ink-soft">A selection of work showcasing my skills.</p>
+
+  @if (featured(); as project) {
+    <article class="mb-20 pb-20 border-b border-line flex flex-wrap gap-x-14 gap-y-8">
+      <div class="flex-[3_1_520px] aspect-[16/10] rounded-[4px] overflow-hidden bg-stone">
+        @if (project.image_url) {
+          <img [src]="project.image_url" alt="" class="w-full h-full object-cover">
+        }
       </div>
-    </section>
-
-    <section class="py-24">
-      <div class="container mx-auto px-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          @for (project of getSortedProjects(); track project.id) {
-            <article class="group rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1 cursor-pointer relative"
-                     [class]="project.featured 
-                       ? 'bg-gradient-to-br from-primary/20 via-dark-surface to-dark-surface border-2 border-primary/50 shadow-lg shadow-primary/10' 
-                       : 'bg-dark-surface border border-dark-border hover:border-primary/50'"
-                     (click)="openProject(project)">
-              
-              <!-- Featured Badge -->
-              @if (project.featured) {
-                <div class="absolute top-3 right-3 z-10 px-2 py-1 bg-dark-surface/90 border border-primary/50 text-primary text-xs font-bold rounded-full flex items-center gap-1">
-                  <span class="text-current">⭐</span> Destacado
-                </div>
-              }
-              
-              <!-- In Progress Badge -->
-              @if (project.is_in_progress) {
-                <div class="absolute top-3 z-10 px-2 py-1 bg-blue-500 text-white text-xs font-bold rounded-full flex items-center gap-1"
-                     [class]="project.featured ? 'left-3' : 'right-3'">
-                  🔨 En desarrollo
-                </div>
-              }
-
-              @if (project.image_url) {
-                <div class="aspect-video bg-dark-bg overflow-hidden">
-                  <img [src]="project.image_url" [alt]="project.title" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                </div>
-              } @else {
-                <div class="aspect-video bg-gradient-to-br from-primary/20 to-dark-bg flex items-center justify-center">
-                  <span class="text-6xl opacity-50">📁</span>
-                </div>
-              }
-              <div class="p-6">
-                <!-- Date -->
-                @if (project.start_date) {
-                  <div class="text-xs text-primary font-mono mb-2 uppercase tracking-wide">
-                    {{ formatDate(project.start_date) }} 
-                    @if (project.is_in_progress) {
-                       - Present
-                    } @else if (project.end_date) {
-                       - {{ formatDate(project.end_date) }}
-                    }
-                  </div>
-                }
-                <h3 class="text-xl font-bold text-white mb-3 group-hover:text-primary transition-colors">
-                  {{ project.title }}
-                </h3>
-                <p class="text-gray-400 mb-4 line-clamp-2">
-                  {{ project.description }}
-                </p>
-                
-                <!-- Technologies -->
-                <div class="flex flex-wrap gap-2 mb-6">
-                  @for (tech of project.technologies.slice(0, 5); track tech) {
-                    <span class="flex items-center gap-1 px-2 py-1 bg-dark-bg text-xs text-gray-300 rounded-lg border border-dark-border">
-                      <img [src]="getTechIcon(tech)" [alt]="tech" class="w-3.5 h-3.5">
-                      {{ tech }}
-                    </span>
-                  }
-                </div>
-
-                <!-- Links -->
-                <div class="flex gap-3" (click)="$event.stopPropagation()">
-                  @if (project.demo_url) {
-                    <a [href]="project.demo_url" target="_blank" rel="noopener"
-                       class="flex-1 py-2 text-center bg-primary hover:bg-primary-dark text-dark-bg font-medium rounded-lg transition-colors text-sm">
-                      Demo
-                    </a>
-                  }
-                  @if (project.github_url) {
-                    <a [href]="project.github_url" target="_blank" rel="noopener"
-                       class="flex-1 py-2 text-center border border-dark-border hover:border-primary text-gray-300 hover:text-primary rounded-lg transition-colors text-sm">
-                      Code
-                    </a>
-                  }
-                </div>
-              </div>
-            </article>
-          } @empty {
-            <div class="col-span-full text-center py-20 text-gray-400">
-              No projects to display.
-            </div>
+      <div class="flex-[2_1_320px] flex flex-col justify-end gap-5">
+        <p class="flex items-center gap-2.5 font-mono text-[13px] uppercase tracking-wider text-ink-muted">
+          <span aria-hidden="true" class="w-2 h-2 rounded-full bg-primary"></span>
+          Featured
+          @if (project.start_date) {
+            · {{ project.start_date | date: 'MMM y' }} — {{ project.is_in_progress ? 'Present' : (project.end_date | date: 'MMM y') }}
+          }
+        </p>
+        <h2 class="text-[44px] leading-[1.05] font-semibold tracking-tight">{{ project.title }}</h2>
+        <p class="text-[17px] leading-relaxed text-ink-soft">{{ project.long_description || project.description }}</p>
+        <p class="font-mono text-[13px] text-ink-muted">{{ project.technologies.join(' / ') }}</p>
+        <div class="mt-2 flex flex-wrap gap-3">
+          @if (project.demo_url) {
+            <a [href]="project.demo_url" target="_blank" rel="noopener" class="inline-flex items-center gap-2.5 min-h-[48px] px-5 rounded-full bg-ink text-paper text-[15px] font-medium hover:bg-ink-soft transition-colors">
+              Live demo
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M8 7h9v9"/></svg>
+            </a>
+          }
+          @if (project.github_url) {
+            <a [href]="project.github_url" target="_blank" rel="noopener" class="inline-flex items-center min-h-[48px] px-5 rounded-full border border-ink text-[15px] font-medium hover:bg-ink hover:text-paper transition-colors">
+              Source code
+            </a>
           }
         </div>
       </div>
-    </section>
+    </article>
+  }
+
+  <div class="grid gap-x-8 gap-y-16 grid-cols-[repeat(auto-fit,minmax(min(100%,360px),1fr))]">
+    @for (project of rest(); track project.id) {
+      <article class="flex flex-col gap-3.5">
+        <div class="aspect-[4/3] rounded-[4px] overflow-hidden bg-stone">
+          @if (project.image_url) {
+            <img [src]="project.image_url" alt="" class="w-full h-full object-cover">
+          }
+        </div>
+        <div class="mt-1.5 flex justify-between gap-3 font-mono text-[13px] text-ink-muted">
+          <span>
+            @if (project.start_date) {
+              {{ project.start_date | date: 'MMM y' }} — {{ project.is_in_progress ? 'Present' : (project.end_date | date: 'MMM y') }}
+            }
+          </span>
+          @if (project.is_in_progress) {
+            <span class="inline-flex items-center gap-1.5 text-ink">
+              <span aria-hidden="true" class="w-1.5 h-1.5 rounded-full bg-primary"></span>In progress
+            </span>
+          }
+        </div>
+        <h3 class="text-2xl font-medium tracking-tight">{{ project.title }}</h3>
+        <p class="leading-relaxed text-ink-soft line-clamp-3">{{ project.description }}</p>
+        <p class="font-mono text-[13px] text-ink-muted">{{ project.technologies.join(' / ') }}</p>
+        <div class="mt-1 flex gap-5">
+          @if (project.demo_url) {
+            <a [href]="project.demo_url" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 min-h-[44px] text-[15px] font-medium hover:text-ink-muted">
+              Demo
+              <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M8 7h9v9"/></svg>
+            </a>
+          }
+          @if (project.github_url) {
+            <a [href]="project.github_url" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 min-h-[44px] text-[15px] font-medium hover:text-ink-muted">
+              Code
+              <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M8 7h9v9"/></svg>
+            </a>
+          }
+        </div>
+      </article>
+    } @empty {
+      @if (!featured()) {
+        <p class="col-span-full py-20 text-ink-muted">No projects to display.</p>
+      }
+    }
+  </div>
+</section>

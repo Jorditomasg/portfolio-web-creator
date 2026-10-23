@@ -88,5 +88,5 @@
 /* Selection */
 ::selection {
   background-color: rgba(var(--color-primary-rgb), 0.3);
-  color: white;
+  color: inherit;
 }

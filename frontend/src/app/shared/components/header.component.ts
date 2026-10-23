@@ -1,6 +1,6 @@
-import { Component, inject, signal, effect } from '@angular/core';
+import { Component, inject, effect } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { DomSanitizer, SafeHtml, Title } from '@angular/platform-browser';
+import { Title } from '@angular/platform-browser';
 import { ContentService } from '../../core/services/content.service';
 import { DOCUMENT } from '@angular/common';
 
@@ -23,8 +23,13 @@ export class HeaderComponent {
   contentService = inject(ContentService);
   private titleService = inject(Title);
   private document = inject(DOCUMENT);
-  private sanitizer = inject(DomSanitizer);
-  mobileMenuOpen = signal(false);
+
+  links = [
+    { path: '/', label: 'Home' },
+    { path: '/projects', label: 'Projects' },
+    { path: '/about', label: 'About' },
+    { path: '/contact', label: 'Contact' },
+  ];
 
   constructor() {
     // Update browser title and favicon when settings change
@@ -44,13 +49,6 @@ export class HeaderComponent {
         }
       }
     });
-  }
-
-  getLogoIcon(): SafeHtml {
-    const faviconType = this.contentService.settings()?.favicon_type || 'terminal';
-    const svg = FAVICON_ICONS[faviconType] || FAVICON_ICONS['terminal'];
-    // We shouldn't need to replace currentColor here because we use text-primary class in HTML
-    return this.sanitizer.bypassSecurityTrustHtml(svg);
   }
 
   updateFavicon(type: string, color: string) {
@@ -85,13 +83,5 @@ export class HeaderComponent {
     const darkG = Math.max(0, Math.floor(g * 0.8));
     const darkB = Math.max(0, Math.floor(b * 0.8));
     root.style.setProperty('--color-primary-dark', `rgb(${darkR}, ${darkG}, ${darkB})`);
-  }
-
-  toggleMobileMenu() {
-    this.mobileMenuOpen.update(v => !v);
-  }
-
-  closeMobileMenu() {
-    this.mobileMenuOpen.set(false);
   }
 }

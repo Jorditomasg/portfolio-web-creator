@@ -16,6 +16,17 @@ module.exports = {
           surface: '#1A1A1A',
           border: '#2D2D2D',
         },
+        paper: '#F4F4F1',
+        ink: {
+          DEFAULT: '#0E0E0E',
+          soft: '#3A3A37',
+          muted: '#4A4A46',
+        },
+        line: {
+          DEFAULT: '#D9D9D3',
+          dark: '#2A2A28',
+        },
+        stone: '#E4E4DF',
         accent: {
           yellow: '#F5A623',
           green: '#4CAF50',
@@ -23,8 +34,8 @@ module.exports = {
         }
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
+        sans: ['Geist', 'system-ui', 'sans-serif'],
+        mono: ['Geist Mono', 'monospace'],
       },
       borderRadius: {
         DEFAULT: '8px',
