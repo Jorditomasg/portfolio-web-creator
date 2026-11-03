@@ -47,7 +47,7 @@ services:
       - ./uploads:/app/uploads
     command: /bin/sh -c "npm run seed:prod && npm run start:prod"
 
-  # Angular Frontend (Served by internal Nginx)
+  # Angular Frontend (SSR Node server, proxies /api and /uploads to backend)
   frontend:
     build:
       context: ./frontend
@@ -55,6 +55,8 @@ services:
     container_name: portfolio-frontend
     env_file:
       - .env
+    environment:
+      BACKEND_URL: http://backend:3000
     ports:
       - "4200:4200" # Expose directly for Traefik/Homelab
     depends_on:

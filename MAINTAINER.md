@@ -55,7 +55,7 @@ docker compose up
 
 The unified image contains:
 - **Backend** (port 3000) - NestJS API running with Node.js
-- **Frontend** (port 4200) - Angular app served with `serve` package
+- **Frontend** (port 4200) - Angular SSR Node server, proxies `/api` and `/uploads` to the backend
 - Both processes run concurrently via shell command
 
 Environment variables are converted to `.env` file automatically via `docker-entrypoint.sh`.
