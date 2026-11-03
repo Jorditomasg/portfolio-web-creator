@@ -1,19 +1,28 @@
-import { mergeApplicationConfig, ApplicationConfig } from '@angular/core';
-import { HttpInterceptorFn, ɵHTTP_ROOT_INTERCEPTOR_FNS } from '@angular/common/http';
+import { mergeApplicationConfig, ApplicationConfig, Injectable, inject } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
+import { FetchBackend, HttpBackend, HttpRequest } from '@angular/common/http';
 import { provideServerRendering, withRoutes } from '@angular/ssr';
 import { appConfig } from './app.config';
 import { serverRoutes } from './app.routes.server';
+import { toBackendUrl } from './backend-url';
 
 const backendUrl = process.env['BACKEND_URL'] || 'http://localhost:3000';
 
-const backendUrlInterceptor: HttpInterceptorFn = (req, next) =>
-  next(/^\/(api|uploads)(\/|$)/.test(req.url) ? req.clone({ url: backendUrl + req.url }) : req);
+@Injectable()
+class BackendUrlBackend implements HttpBackend {
+  private fetch = inject(FetchBackend);
+  private origin = inject(DOCUMENT).location.origin;
+
+  handle(req: HttpRequest<unknown>) {
+    return this.fetch.handle(req.clone({ url: toBackendUrl(req.url, this.origin, backendUrl) }));
+  }
+}
 
 const serverConfig: ApplicationConfig = {
   providers: [
-    // Root interceptors run after the HTTP transfer cache (key stays relative) and must precede provideServerRendering's relative-URL resolver.
-    { provide: ɵHTTP_ROOT_INTERCEPTOR_FNS, useValue: backendUrlInterceptor, multi: true },
     provideServerRendering(withRoutes(serverRoutes)),
+    FetchBackend,
+    { provide: HttpBackend, useClass: BackendUrlBackend },
   ],
 };
 
