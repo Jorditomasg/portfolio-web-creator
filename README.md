@@ -1,41 +1,67 @@
 # Portfolio Web Creator
 
-A modern, customizable portfolio website builder with **Angular** (frontend) and **NestJS** (backend). Features a complete admin panel, internationalization, and dynamic theming.
+A modern, customizable portfolio website builder with **Angular** (frontend, server-side rendered) and **NestJS** (backend). Features a complete admin panel, SEO out of the box, and dynamic theming.
 
 ![Angular](https://img.shields.io/badge/Angular-21-DD0031?logo=angular)
-![NestJS](https://img.shields.io/badge/NestJS-10-E0234E?logo=nestjs)
+![NestJS](https://img.shields.io/badge/NestJS-11-E0234E?logo=nestjs)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql)
+![Node.js](https://img.shields.io/badge/Node.js-24-5FA04E?logo=nodedotjs)
 ![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript)
 
 ## ✨ Features
 
 ### Frontend
-- **Angular 21** with zoneless change detection for optimal performance
+- **Angular 21** with zoneless change detection
+- **Server-side rendering** (`@angular/ssr`): crawlers and link previews get fully rendered HTML
 - **Tailwind CSS** for modern, responsive styling
-- **Visitor analytics**: Optional self-hosted [Umami](https://umami.is) (countries, cities, referrers, devices)
-- **Dark Theme**: Premium dark mode design with smooth animations
-- **Dynamic Theming**: Customizable accent colors and favicons
+- **Automatic dark mode** following the visitor's `prefers-color-scheme`
+- **Dynamic theming**: customizable accent color and favicon
+- **Visitor analytics**: optional self-hosted [Umami](https://umami.is) (countries, cities, referrers, devices)
 
 ### Backend
-- **NestJS** with TypeORM for robust API development
-- **PostgreSQL** for reliable data storage
-- **JWT Authentication** for secure admin access
-- **RESTful API** with proper validation
+- **NestJS** with TypeORM
+- **PostgreSQL** for data storage
+- **JWT authentication** for admin access
+- **RESTful API** with validation
+- **Dynamic favicon** served as SVG from the saved settings
 
 ### Admin Panel
 - **Dashboard** with content overview
-- **Projects Management**: Full CRUD with multilingual support
-- **Skills Management**: Categorized by Frontend/Backend/Tools (1-5 level slider)
-- **Technologies Management**: Centralized management of technology icons (auto-fetched from DevIcon or custom URL)
-- **Specialties Management**: Customizable specialty cards with SVG icons
-- **About & Hero Editor**: Edit bio, highlights, and hero section
-- **Settings**: 
+- **Projects**: full CRUD, plus **Sync with GitHub** to import your public repos
+- **Experience**: work history timeline
+- **Technologies**: centralized icons (auto-fetched from DevIcon or custom URL), categories and a 0-5 level (0 hides it)
+- **About & Hero editor**: bio, highlights and hero section
+- **Settings**:
   - Site title and meta description
+  - Hero background and SEO image (used for link previews)
   - Social links (LinkedIn, GitHub, Email)
-  - Favicon selection (6 preset icons)
-  - Accent color customization
+  - Favicon (6 preset icons) and accent color
   - Toggle admin link in navigation
+  - Umami analytics
+
+## 🔍 SEO
+
+Public pages (`/`, `/projects`, `/about`, `/contact`) are rendered on the server, so search engines and social
+networks receive the real content without running JavaScript. Every page ships:
+
+- `<title>` and `<meta name="description">` from **Settings**
+- Open Graph (`og:title`, `og:description`, `og:image`, `og:url`, `og:type`) and `twitter:card`
+- `<link rel="canonical">` with the public URL of the page
+- `<link rel="icon">` pointing to `/api/favicon.svg`, generated from the selected favicon and accent color
+
+The admin panel (`/admin/**`) is rendered in the browser only. Data fetched during server rendering is handed over to
+the browser, so the API is not called twice on page load.
+
+## 🏗️ Architecture
+
+```
+Browser / crawler ──► Angular SSR server (:4200) ──► /api, /uploads ──► NestJS (:3000) ──► PostgreSQL
+```
+
+- The SSR server renders pages and proxies `/api` and `/uploads` to the backend, so exposing **port 4200** is enough.
+  A reverse proxy (Traefik, nginx) may also route `/api` and `/uploads` straight to the backend.
+- During server rendering, API calls go directly to `BACKEND_URL` instead of looping through the public domain.
 
 ## 🚀 Installation
 
@@ -65,9 +91,9 @@ docker compose up -d
 
 ---
 
-### Method 2: Docker Hub (Automated Deployment)
+### Method 2: Docker Hub (single container)
 
-Perfect for quick deployment. The container will **automatically download and update** the source code into your local folders using the latest image.
+Perfect for quick deployment: one image runs the backend and the SSR server.
 
 1. **Create a directory**
 ```bash
@@ -89,7 +115,6 @@ services:
       POSTGRES_DB: portfolio_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./uploads:/app/uploads
     restart: unless-stopped
 
   app:
@@ -110,11 +135,10 @@ services:
     depends_on:
       - db
     ports:
-      - "3000:3000"
       - "4200:4200"
     restart: unless-stopped
     volumes:
-      - ./uploads:/app/uploads
+      - ./uploads:/app/backend/uploads
 
 volumes:
   postgres_data:
@@ -124,7 +148,6 @@ volumes:
 ```bash
 docker compose up -d
 ```
-*The `backend` and `frontend` folders will be automatically created and populated with the latest code from the image.*
 
 4. **Access your portfolio**
 - Frontend: http://localhost:4200
@@ -132,6 +155,8 @@ docker compose up -d
 - Login: `admin` / `admin123`
 
 > ⚠️ **Security**: Change `JWT_SECRET` and `ADMIN_PASSWORD` for production!
+
+A ready-to-use variant with `.env` support and required secrets lives in [`deploy/`](deploy/README.md).
 
 ---
 
@@ -147,17 +172,23 @@ docker compose up -d
 | `ADMIN_USERNAME` | Initial admin username | `admin` |
 | `ADMIN_EMAIL` | Initial admin email | `admin@example.com` |
 | `ADMIN_PASSWORD` | Initial admin password | `admin123` |
+| `GITHUB_TOKEN` | Optional token for **Sync with GitHub** (without it GitHub allows 60 requests/hour) | — |
+| `BACKEND_URL` | Backend address used by the SSR server (proxy and server-side API calls) | `http://localhost:3000` |
+| `PORT` | Port of the SSR server | `4200` |
+
+`BACKEND_URL` and `PORT` are already set in the Docker images; change them only for custom setups.
 
 ### Settings (Admin Panel)
 
 | Setting | Description |
 |---------|-------------|
-| **Site Title** | Displayed in browser tab and footer |
-| **Main Photo URL** | Your profile photo |
-| **Meta Description** | SEO description (max 160 chars) |
+| **Site Title** | Browser tab, footer, `<title>` and `og:title` |
+| **Meta Description** | `<meta name="description">` and `og:description` (max 160 chars) |
+| **Hero Background** | Background image of the home hero |
+| **SEO Image** | `og:image` shown in link previews |
 | **LinkedIn/GitHub/Email** | Optional social links |
 | **Favicon Type** | terminal, code, rocket, star, briefcase, user |
-| **Accent Color** | Primary color for buttons and highlights |
+| **Accent Color** | Primary color for buttons, highlights and the favicon |
 | **Show Admin Link** | Toggle "Admin" in navigation menu |
 | **Umami URL / Website ID** | Enables the analytics tracker. Leave empty to disable |
 
@@ -178,11 +209,11 @@ Before deploying to production:
 4. **Use HTTPS** in production
 5. **Disable admin link** in settings unless needed
 
-
-
 ## 🎨 Customization
 
 ### Favicon Options
+
+Served at `/api/favicon.svg` in the selected accent color.
 
 | Type | Description |
 |------|-------------|
@@ -200,22 +231,16 @@ Default palette: Yellow (#F5A623), Green, Blue, Purple, Pink, Red
 Or use the custom color picker in Settings.
 
 ### Technology Icons
- 
-Icons are managed centrally via the **Technologies** page in the Admin Panel. 
+
+Icons are managed centrally via the **Technologies** page in the Admin Panel.
 - **Auto-detection**: When adding a technology, the system attempts to auto-fetch the icon from [DevIcon](https://devicon.dev/).
 - **Smart Tags**: In the Projects editor, typing a technology name (e.g., "Angular") will auto-suggest existing technologies and display their correctly associated icons.
 - **Custom Icons**: You can manually provide any image URL for a technology if the auto-detection fails.
 
-### Specialty Icons
+## 🛠️ Tech Requirements
 
-| Type | Use Case |
-|------|----------|
-| `frontend` | UI/UX Development |
-| `backend` | Server-side Development |
-| `devops` | CI/CD & Cloud |
-| `database` | Database Management |
-| `mobile` | Mobile Development |
-| `cloud` | Cloud Architecture |
+- **Docker** for the methods above
+- **Node.js 24** to run or test the apps outside Docker (`npm test` in `backend/` and `frontend/`)
 
 ## 📝 License
 
