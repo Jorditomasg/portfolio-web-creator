@@ -11,8 +11,8 @@ mkdir portfolio && cd portfolio
 
 ### 2. Download deployment files
 ```bash
-curl -O https://raw.githubusercontent.com/YOUR_USERNAME/portfolio-creator/main/deploy/docker-compose.yml
-curl -O https://raw.githubusercontent.com/YOUR_USERNAME/portfolio-creator/main/deploy/.env.example
+curl -O https://raw.githubusercontent.com/Jorditomasg/portfolio-web-creator/main/deploy/docker-compose.yml
+curl -O https://raw.githubusercontent.com/Jorditomasg/portfolio-web-creator/main/deploy/.env.example
 mv .env.example .env
 ```
 

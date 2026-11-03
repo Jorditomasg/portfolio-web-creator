@@ -21,13 +21,13 @@ services:
     networks:
       - portfolio
 
-  # All-in-one App (Frontend + Backend + Nginx)
+  # All-in-one App (Angular SSR + NestJS backend)
   app:
-    image: ${DOCKER_IMAGE:-jorditomasg/portfolio-app:latest}
+    image: ${DOCKER_IMAGE:-jorditomasg/portfolio-web-creator:latest}
     container_name: portfolio-app
     restart: unless-stopped
     ports:
-      - "${PORT:-80}:80"
+      - "${PORT:-80}:4200"
     environment:
       # Database
       DATABASE_HOST: db
@@ -43,6 +43,8 @@ services:
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin123}
       # App
       NODE_ENV: production
+    volumes:
+      - uploads_data:/app/backend/uploads
     depends_on:
       db:
         condition: service_healthy
@@ -51,6 +53,7 @@ services:
 
 volumes:
   postgres_data:
+  uploads_data:
 
 networks:
   portfolio:
