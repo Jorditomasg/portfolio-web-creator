@@ -9,6 +9,38 @@ A modern, customizable portfolio website builder with **Angular** (frontend, ser
 ![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript)
 
+## 📸 Screenshots
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/home-dark.png">
+    <img src="docs/screenshots/home-light.png" alt="Home page" width="900">
+  </picture>
+</p>
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/projects-dark.png" alt="Projects page"><br><sub><b>Projects</b>: featured work with images, tech stack and links</sub></td>
+    <td width="50%"><img src="docs/screenshots/about-dark.png" alt="About page"><br><sub><b>About</b>: bio, highlights and technical skills</sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/home-light.png" alt="Home page in light mode"><br><sub><b>Light mode</b>: follows the visitor's system preference</sub></td>
+    <td width="50%" align="center"><img src="docs/screenshots/mobile-dark.png" alt="Home page on mobile" width="260"><br><sub><b>Mobile</b>: floating bottom navigation</sub></td>
+  </tr>
+</table>
+
+### Admin panel
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/admin-dashboard.png" alt="Admin dashboard"><br><sub><b>Dashboard</b>: content overview and quick actions</sub></td>
+    <td width="50%"><img src="docs/screenshots/admin-projects.png" alt="Admin projects"><br><sub><b>Projects</b>: drag to reorder, feature, or sync with GitHub</sub></td>
+  </tr>
+  <tr>
+    <td colspan="2"><img src="docs/screenshots/admin-settings.png" alt="Admin settings"><br><sub><b>Settings</b>: site title, meta description, SEO image, social links, favicon and accent color</sub></td>
+  </tr>
+</table>
+
 ## ✨ Features
 
 ### Frontend
@@ -34,7 +66,7 @@ A modern, customizable portfolio website builder with **Angular** (frontend, ser
 - **About & Hero editor**: bio, highlights and hero section
 - **Settings**:
   - Site title and meta description
-  - Hero background and SEO image (used for link previews)
+  - Home background and SEO image (used for link previews)
   - Social links (LinkedIn, GitHub, Email)
   - Favicon (6 preset icons) and accent color
   - Toggle admin link in navigation
@@ -184,7 +216,7 @@ A ready-to-use variant with `.env` support and required secrets lives in [`deplo
 |---------|-------------|
 | **Site Title** | Browser tab, footer, `<title>` and `og:title` |
 | **Meta Description** | `<meta name="description">` and `og:description` (max 160 chars) |
-| **Hero Background** | Background image of the home hero |
+| **Home Background** | Background image of the home hero |
 | **SEO Image** | `og:image` shown in link previews |
 | **LinkedIn/GitHub/Email** | Optional social links |
 | **Favicon Type** | terminal, code, rocket, star, briefcase, user |
