@@ -1,5 +1,5 @@
-import { Component, inject, effect } from '@angular/core';
-import { DOCUMENT } from '@angular/common';
+import { Component, inject, effect, computed, PLATFORM_ID } from '@angular/core';
+import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 import { Title, Meta } from '@angular/platform-browser';
 import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
 import { HeaderComponent } from './shared/components/header.component';
@@ -7,7 +7,7 @@ import { FooterComponent } from './shared/components/footer.component';
 import { ContentService } from './core/services/content.service';
 import { filter } from 'rxjs/operators';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { map, startWith } from 'rxjs';
+import { map } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -33,6 +33,17 @@ export class App {
   private metaService = inject(Meta);
   private contentService = inject(ContentService);
   private document = inject(DOCUMENT);
+  private isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+
+  private url = toSignal(
+    this.router.events.pipe(
+      filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+      map(e => e.urlAfterRedirects)
+    ),
+    { initialValue: this.router.url }
+  );
+
+  showLayout = computed(() => !this.url().startsWith('/admin'));
 
   constructor() {
     effect(() => {
@@ -45,15 +56,27 @@ export class App {
         this.metaService.updateTag({ property: 'og:title', content: settings.site_title || 'Portfolio' });
         this.metaService.updateTag({ property: 'og:description', content: settings.meta_description || '' });
         
+        const origin = this.document.location.origin;
+        const pageUrl = origin + this.url().split(/[?#]/)[0];
+        this.metaService.updateTag({ property: 'og:type', content: 'website' });
+        this.metaService.updateTag({ property: 'og:url', content: pageUrl });
+        this.metaService.updateTag({ name: 'twitter:card', content: 'summary_large_image' });
+        let canonical = this.document.head.querySelector<HTMLLinkElement>("link[rel='canonical']");
+        if (!canonical) {
+          canonical = this.document.createElement('link');
+          canonical.setAttribute('rel', 'canonical');
+          this.document.head.appendChild(canonical);
+        }
+        canonical.setAttribute('href', pageUrl);
+
         const image = settings.seo_image_url || settings.main_photo_url;
         if (image) {
-          // If relative path, prepend origin (though in SSR it might need base url, for SPA window.location is fine)
-          const fullUrl = image.startsWith('http') ? image : window.location.origin + image;
+          const fullUrl = image.startsWith('http') ? image : origin + image;
           this.metaService.updateTag({ property: 'og:image', content: fullUrl });
         }
 
         // Umami analytics (injected once)
-        if (settings.umami_url && settings.umami_website_id && !this.document.getElementById('umami-script')) {
+        if (this.isBrowser && settings.umami_url && settings.umami_website_id && !this.document.getElementById('umami-script')) {
           const script = this.document.createElement('script');
           script.id = 'umami-script';
           script.defer = true;
@@ -64,13 +87,4 @@ export class App {
       }
     });
   }
-
-  showLayout = toSignal(
-    this.router.events.pipe(
-      filter((e): e is NavigationEnd => e instanceof NavigationEnd),
-      map(e => !e.urlAfterRedirects.startsWith('/admin')),
-      startWith(!this.router.url.startsWith('/admin'))
-    ),
-    { initialValue: true }
-  );
 }
