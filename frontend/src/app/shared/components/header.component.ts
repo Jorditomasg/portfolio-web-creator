@@ -30,7 +30,7 @@ export class HeaderComponent {
       const settings = this.contentService.settings();
       if (settings) {
         // Update favicon
-        const icon = this.document.querySelector<HTMLLinkElement>("link[rel='icon']");
+        const icon = this.document.querySelector<HTMLLinkElement>("link[rel='icon'][type='image/svg+xml']");
         if (icon) icon.href = `/api/favicon.svg?v=${encodeURIComponent(settings.favicon_type + settings.accent_color)}`;
         // Update CSS variables for accent color
         if (settings.accent_color) {
