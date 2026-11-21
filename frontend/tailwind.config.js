@@ -40,8 +40,8 @@ module.exports = {
         }
       },
       fontFamily: {
-        sans: ['Geist', 'system-ui', 'sans-serif'],
-        mono: ['Geist Mono', 'monospace'],
+        sans: ['Geist', 'Geist Fallback', 'Geist Fallback Android', 'system-ui', 'sans-serif'],
+        mono: ['Geist Mono', 'Geist Mono Fallback', 'monospace'],
       },
       borderRadius: {
         DEFAULT: '8px',
